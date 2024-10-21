@@ -21,7 +21,7 @@
         <Button Content="Search" Command="{Binding SearchCommand}" 
                 Width="100" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="660,10,0,0"/>
 
-        <ListView ItemsSource="{Binding FilteredAssets}" DisplayMemberPath="Name"
+        <ListView ItemsSource="{Binding FilteredAssets}" DisplayMemberPath="FileName"
                   Width="750" Height="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,50,0,0"/>
 
     </Grid>
