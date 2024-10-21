@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
+using System.Text.RegularExpressions;
 
 
 namespace AssetManager.ViewModels
@@ -37,6 +38,7 @@ namespace AssetManager.ViewModels
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
+                ExecuteSearch();
             }
         }
 
@@ -62,15 +64,21 @@ namespace AssetManager.ViewModels
             if (string.IsNullOrEmpty(SearchText))
             {
                 FilteredAssets = new List<Asset>(Assets);
-                OnPropertyChanged(nameof(FilteredAssets)); 
             }
             else
             {
-                var filtered = Assets.Where(a => 
-                a.FileName.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase)).ToList();
-                FilteredAssets = new List<Asset>(filtered);
-                OnPropertyChanged(nameof(FilteredAssets)); 
+                try
+                {
+                    var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
+                    FilteredAssets = new List<Asset>(filtered);
+                }
+                catch (RegexParseException)
+                {
+                    // Handle invalid regex input if necessary
+                }
             }
+            OnPropertyChanged(nameof(FilteredAssets));
         }
 
 
