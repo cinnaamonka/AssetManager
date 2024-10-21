@@ -8,7 +8,7 @@ namespace AssetManager.Services
     internal class AssetRepository
     {
         private string _assetsFolderPath = "Assets";
-
+       
         //we dont load assets into a variable because it is usable only for small scope projects
         public List<Asset> LoadAssets()
         {

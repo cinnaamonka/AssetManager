@@ -2,11 +2,13 @@
 using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
 using System.Text.RegularExpressions;
-
+using AssetManager.Services;
+using System.Windows.Controls;
+using AssetManager.Views;
 
 namespace AssetManager.ViewModels
 {
-    public class AssetViewModel : ObservableObject
+    public class OverviewPageVM : ObservableObject
     {
         private List<Asset> _assets;
         public List<Asset> Assets
@@ -42,10 +44,17 @@ namespace AssetManager.ViewModels
             }
         }
 
-        public RelayCommand SearchCommand { get; set; }
+        private MetadataService _metadataService;
 
-        public AssetViewModel()
+        public RelayCommand SearchCommand { get; set; }
+        public RelayCommand EditMetadataCommand { get; }
+
+        public MainPageVM MainPageVM { get; }
+
+        public OverviewPageVM(MainPageVM mainPageVM)
         {
+            MainPageVM = mainPageVM;
+
             Assets = new List<Asset>
             {
                 new Asset( "Tree Model", "/Assets/Models/Tree/tree.fbx", "3D Model"),
@@ -57,6 +66,43 @@ namespace AssetManager.ViewModels
             FilteredAssets = new List<Asset>(Assets);
 
             SearchCommand = new RelayCommand(ExecuteSearch);
+            EditMetadataCommand = new RelayCommand(OpenMetadataPage);
+        }
+
+        public OverviewPageVM() { }
+      
+
+        private void OpenMetadataPage()
+        {
+            // Logic to navigate to MetadataPage with SelectedAsset
+            int test = 3;
+        }
+
+        public async Task LoadAssetsAsync()
+        {
+            foreach(var asset in Assets)
+            {
+                var metadata = await _metadataService.LoadMetadataAsync(asset.FileName);
+
+                if(metadata != null)
+                {
+                    asset.Metadata = metadata;
+                }
+
+                else
+                {
+                    asset.Metadata = new AssetMetadata
+                    {
+                        Name = asset.FileName,
+                        FilePath = asset.FilePath,
+                        FileType = asset.FileType,
+                        FileSize = 0,
+                        Format = "Not defined"
+                    };
+
+                    await _metadataService.SaveMetadataAsync(asset.Metadata);
+                }
+            }
         }
 
         private void ExecuteSearch()

@@ -18,9 +18,9 @@ namespace AssetManager.Views
     /// <summary>
     /// Interaction logic for MainPage.xaml
     /// </summary>
-    public partial class MainPage : Page
+    public partial class OverviewPage : Page
     {
-        public MainPage()
+        public OverviewPage()
         {
             InitializeComponent();
         }

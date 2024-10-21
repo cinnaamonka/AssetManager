@@ -4,9 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetManager"
-        xmlns:view="clr-namespace:AssetManager.Views"
+        xmlns:vm="clr-namespace:AssetManager.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
-        <view:MainPage></view:MainPage>
+    <Window.DataContext>
+        <vm:MainPageVM/>
+    </Window.DataContext>
+
+    <Window.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Frame Grid.Row="1" NavigationUIVisibility="Hidden" Content="{Binding CurrentPage}" />
+        </Grid>
+    </Window.Content>
 </Window>
