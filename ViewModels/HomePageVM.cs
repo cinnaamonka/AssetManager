@@ -9,23 +9,32 @@ namespace AssetManager.ViewModels
     internal class HomePageVM : ObservableObject
     {
         public MainPageVM MainPageVM { get; }
+        public OverviewPageVM OverViewPageVM { get; }
 
         public RelayCommand OpenOverviewPageCommand { get; set; }
+        public RelayCommand BrowseProjectFiles { get; set; }
+
 
         public HomePageVM()
         {
             
         }
 
-        public HomePageVM(MainPageVM mainPageVM)
+        public HomePageVM(MainPageVM mainPageVM,OverviewPageVM OverviewPageViewModel)
         {
             MainPageVM = mainPageVM;
-            OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage); 
+            OverViewPageVM = OverviewPageViewModel; 
+            OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage);
+            BrowseProjectFiles = new RelayCommand(BrowseFiles);
         }
 
         private void OpenOverviewPage()
         {
             MainPageVM.OpenOverViewPage();
+        }
+        private void BrowseFiles()
+        {
+            OverViewPageVM.OpenFolderDialog();
         }
     }
 }

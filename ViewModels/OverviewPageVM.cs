@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
 using System.Text.RegularExpressions;
 using AssetManager.Services;
+using System.IO;
+using System.Windows.Forms;
 namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
@@ -21,7 +23,7 @@ namespace AssetManager.ViewModels
             }
         }
 
-        public Asset SelectedAsset 
+        public Asset SelectedAsset
         {
             get { return _selectedAsset; }
             set
@@ -29,7 +31,7 @@ namespace AssetManager.ViewModels
                 _selectedAsset = value;
                 OnPropertyChanged(nameof(SelectedAsset));
             }
-        } 
+        }
 
         public List<Asset> FilteredAssets
         {
@@ -60,8 +62,13 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenHomePageCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
-       
 
+        private string _unityProjectPath;
+        public string UnityProjectPath
+        {
+            get => _unityProjectPath;
+            set => SetProperty(ref _unityProjectPath, value);
+        }
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -75,7 +82,7 @@ namespace AssetManager.ViewModels
 
             foreach (var asset in Assets)
             {
-                asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s); 
+                asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s);
             }
 
 
@@ -87,15 +94,15 @@ namespace AssetManager.ViewModels
         }
 
         public OverviewPageVM() { }
-      
+
 
         public async Task LoadAssetsAsync()
         {
-            foreach(var asset in Assets)
+            foreach (var asset in Assets)
             {
                 var metadata = await _metadataService.LoadMetadataAsync(asset.FileName);
 
-                if(metadata != null)
+                if (metadata != null)
                 {
                     asset.Metadata = metadata;
                 }
@@ -140,12 +147,48 @@ namespace AssetManager.ViewModels
 
         private void OpenMetadataFile(Asset asset)
         {
-            MainPageVM?.HandleOpenPopUpWindow(asset);   
+            MainPageVM?.HandleOpenPopUpWindow(asset);
         }
 
         private void OpenHomePage()
         {
             MainPageVM?.OpenHomePage();
+        }
+
+        public void OpenFolderDialog()
+        {
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    UnityProjectPath = folderDialog.SelectedPath;
+                    LoadAssetsFromUnityProject(UnityProjectPath);
+                }
+            }
+        }
+        private void LoadAssetsFromUnityProject(string projectPath)
+        {
+            FilteredAssets.Clear();
+
+            string assetsFolderPath = Path.Combine(projectPath, "Assets");
+
+            if (Directory.Exists(assetsFolderPath))
+            {
+                string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
+
+                foreach (string file in files)
+                {
+                    if (!file.EndsWith(".meta"))
+                    {
+                        var asset = new Asset(
+                            name: Path.GetFileName(file),
+                            filePath: file,
+                            fileType: Path.GetExtension(file));
+
+                        FilteredAssets.Add(asset);
+                    }
+                }
+            }
         }
     }
 }

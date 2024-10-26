@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using AssetManager.Views;
 using AssetManager.Models;
+using System.IO;
 
 namespace AssetManager.ViewModels
 {
@@ -12,11 +13,13 @@ namespace AssetManager.ViewModels
         public HomePage HomePage { get; }
         public Page CurrentPage { get; set; }
 
+       
+
         public MainPageVM()
         {
             OverviewPageVM overViewPageVM = new(this);
             //MetadataWindowVM metadataPageVM = new(this, overViewPageVM);
-            HomePageVM homePageVM = new(this);
+            HomePageVM homePageVM = new(this,overViewPageVM);
 
             MainPage = new OverviewPage { DataContext = overViewPageVM };
             HomePage = new HomePage { DataContext = homePageVM };
@@ -69,5 +72,7 @@ namespace AssetManager.ViewModels
             CurrentPage = HomePage;
             OnPropertyChanged(nameof(CurrentPage));
         }
+
+      
     }
 }
