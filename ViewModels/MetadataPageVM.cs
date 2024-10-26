@@ -1,5 +1,4 @@
 ﻿using AssetManager.Models;
-using AssetManager.Views;
 
 namespace AssetManager.ViewModels
 {
@@ -10,10 +9,17 @@ namespace AssetManager.ViewModels
         public MainPageVM MainPageVM { get; }
         public OverviewPageVM OverViewPageVM { get; }
 
+
+
         public MetadataPageVM(MainPageVM mainPageVM, OverviewPageVM overviewVM)
         {
             MainPageVM = mainPageVM;
             OverViewPageVM = overviewVM;
+        }
+
+        public MetadataPageVM()
+        {
+
         }
 
     }

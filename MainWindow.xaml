@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AssetManager"
         xmlns:vm="clr-namespace:AssetManager.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="700" Width="1400">
 
     <Window.DataContext>
         <vm:MainPageVM/>

@@ -4,13 +4,16 @@ using AssetManager.Models;
 using System.Text.RegularExpressions;
 using AssetManager.Services;
 using System.Windows.Controls;
-using AssetManager.Views;
+using System.Windows.Input;
 
 namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
     {
         private List<Asset> _assets;
+        private List<Asset> _filteredAssets;
+        private Asset _selectedAsset;
+
         public List<Asset> Assets
         {
             get { return _assets; }
@@ -21,7 +24,17 @@ namespace AssetManager.ViewModels
             }
         }
 
-        private List<Asset> _filteredAssets;
+        public Asset SelectedAsset
+        {
+            get { return _selectedAsset; }
+            set
+            {
+                _selectedAsset = value;
+                OnPropertyChanged(nameof(SelectedAsset));
+               // MainPageVM.HandleOpenDetailsPage();
+            }
+        } 
+
         public List<Asset> FilteredAssets
         {
             get { return _filteredAssets; }
@@ -47,7 +60,6 @@ namespace AssetManager.ViewModels
         private MetadataService _metadataService;
 
         public RelayCommand SearchCommand { get; set; }
-        public RelayCommand EditMetadataCommand { get; }
 
         public MainPageVM MainPageVM { get; }
 
@@ -66,17 +78,10 @@ namespace AssetManager.ViewModels
             FilteredAssets = new List<Asset>(Assets);
 
             SearchCommand = new RelayCommand(ExecuteSearch);
-            EditMetadataCommand = new RelayCommand(OpenMetadataPage);
         }
 
         public OverviewPageVM() { }
       
-
-        private void OpenMetadataPage()
-        {
-            // Logic to navigate to MetadataPage with SelectedAsset
-            int test = 3;
-        }
 
         public async Task LoadAssetsAsync()
         {
@@ -127,6 +132,6 @@ namespace AssetManager.ViewModels
             OnPropertyChanged(nameof(FilteredAssets));
         }
 
-
+      
     }
 }

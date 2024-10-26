@@ -23,6 +23,7 @@ namespace AssetManager.ViewModels
 
         public void HandleOpenDetailsPage()
         {
+            int test = 5;
             //if (CurrentPage.DataContext is OverviewPageVM overviewVM)
             //{
             //    var selectedSuperhero = overviewVM.SelectedSuperhero;

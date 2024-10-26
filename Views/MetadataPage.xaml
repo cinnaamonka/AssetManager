@@ -4,21 +4,26 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:AssetManager.Views"
+      xmlns:vm="clr-namespace:AssetManager.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Metadata">
+
+    <Page.DataContext>
+        <vm:MetadataPageVM />
+    </Page.DataContext>
 
     <StackPanel>
         <TextBlock Text="Asset Metadata" FontSize="20" Margin="10"/>
 
         <TextBlock Text="Name:" />
-        <TextBox Text="{Binding SelectedAsset.Metadata.Name}" />
+        <TextBox Text="{Binding SelectedMetadata.Name}" />
 
         <TextBlock Text="File Type:" />
-        <TextBox Text="{Binding SelectedAsset.Metadata.FileType}" />
+        <TextBox Text="{Binding SelectedMetadata.FileType}" />
 
         <TextBlock Text="Custom Fields:" />
-        <!-- Optional: A dynamic list to add/edit custom fields -->
+      
     </StackPanel>
 
 </Page>
