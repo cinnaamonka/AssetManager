@@ -3,9 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
 using System.Text.RegularExpressions;
 using AssetManager.Services;
-using System.Windows.Controls;
-using System.Windows.Input;
-
 namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
@@ -24,7 +21,7 @@ namespace AssetManager.ViewModels
             }
         }
 
-        public Asset SelectedAsset
+        public Asset SelectedAsset 
         {
             get { return _selectedAsset; }
             set
@@ -59,9 +56,11 @@ namespace AssetManager.ViewModels
         private MetadataService _metadataService;
 
         public RelayCommand SearchCommand { get; set; }
-        public RelayCommand OpenMetadata { get; set; }
+        public RelayCommand OpenMetadataCommand { get; set; }
+        public RelayCommand OpenHomePageCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
+       
 
         public OverviewPageVM(MainPageVM mainPageVM)
         {
@@ -83,6 +82,7 @@ namespace AssetManager.ViewModels
             FilteredAssets = new List<Asset>(Assets);
 
             SearchCommand = new RelayCommand(ExecuteSearch);
+            OpenHomePageCommand = new RelayCommand(OpenHomePage);
 
         }
 
@@ -140,7 +140,12 @@ namespace AssetManager.ViewModels
 
         private void OpenMetadataFile(Asset asset)
         {
-            MainPageVM?.HandleOpenMetadataPage(asset);  
+            MainPageVM?.HandleOpenPopUpWindow(asset);   
+        }
+
+        private void OpenHomePage()
+        {
+            MainPageVM?.OpenHomePage();
         }
     }
 }

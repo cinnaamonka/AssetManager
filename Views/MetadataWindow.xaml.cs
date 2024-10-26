@@ -16,13 +16,13 @@ using System.Windows.Shapes;
 namespace AssetManager.Views
 {
     /// <summary>
-    /// Interaction logic for Metadata.xaml
+    /// Interaction logic for MetadataWindow.xaml
     /// </summary>
-    public partial class MetadataPage : Page
+    public partial class MetadataWindow : Window
     {
-        public MetadataPage()
+        public MetadataWindow()
         {
-            InitializeComponent(); 
+            InitializeComponent();
         }
     }
 }

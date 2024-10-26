@@ -23,7 +23,7 @@
         <TextBox Text="{Binding SelectedMetadata.FileType}" />
 
         <TextBlock Text="Custom Fields:" />
-      
+
     </StackPanel>
 
 </Page>

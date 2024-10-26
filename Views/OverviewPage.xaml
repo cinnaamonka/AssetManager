@@ -32,6 +32,32 @@
                     Width="100" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0,0,0"/>
         </StackPanel>
 
+        <StackPanel Grid.Row = "0" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Center" 
+                    Background="DarkBlue">
+            <!--Home page button-->
+            <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand" Command="{Binding OpenHomePageCommand}">
+                <Border BorderBrush="Transparent" BorderThickness="2" Margin="5" Background="Transparent">
+                    <TextBlock Text="Home" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                </Border>
+            </Button>
+
+            <Border Margin="0" BorderThickness="2">
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="White" Offset="0.0" />
+                        <GradientStop Color="White" Offset="0.9" />
+                        <GradientStop Color="Transparent" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                <TextBlock Text="Library" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+            </Border>
+
+            <Border BorderBrush="Transparent" BorderThickness="2" Margin="5">
+                <TextBlock Text="?" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+            </Border>
+        </StackPanel>
+        
         <StackPanel Grid.Row="1" Grid.Column="0" Background="DarkSlateGray" >
             <TextBlock Text="Tag Search" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
             <StackPanel Margin="0,0,0,10">
