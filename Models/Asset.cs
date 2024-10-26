@@ -1,4 +1,7 @@
-﻿namespace AssetManager.Models
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Windows.Input;
+
+namespace AssetManager.Models
 {
     public class Asset
     {
@@ -9,7 +12,9 @@
         //public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }
 
-        public AssetMetadata Metadata { get; set; } 
+        public AssetMetadata Metadata { get; set; }
+
+        public ICommand OpenMetadataCommand { get; }
 
         public Asset(/*string id,*/ string name, string filePath, string fileType)
         {
@@ -19,7 +24,16 @@
             FileType = fileType;
             //DateCreated = DateTime.Now;
             //DateModified = DateTime.Now;
-            Metadata = new AssetMetadata(); 
+            Metadata = new AssetMetadata();
+            OpenMetadataCommand = new RelayCommand(OpenMetadata);
         }
+
+        private void OpenMetadata()
+        {
+            // Raise an event or invoke a callback
+            MetadataRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        public event EventHandler MetadataRequested;
     }
 }

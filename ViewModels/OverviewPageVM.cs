@@ -31,7 +31,6 @@ namespace AssetManager.ViewModels
             {
                 _selectedAsset = value;
                 OnPropertyChanged(nameof(SelectedAsset));
-               // MainPageVM.HandleOpenDetailsPage();
             }
         } 
 
@@ -60,6 +59,7 @@ namespace AssetManager.ViewModels
         private MetadataService _metadataService;
 
         public RelayCommand SearchCommand { get; set; }
+        public RelayCommand OpenMetadata { get; set; }
 
         public MainPageVM MainPageVM { get; }
 
@@ -74,10 +74,16 @@ namespace AssetManager.ViewModels
                 new Asset( "Mountain Model", "/Assets/Models/Mountain/mountain.fbx", "3D Model")
             };
 
+            foreach (var asset in Assets)
+            {
+                asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s); 
+            }
+
 
             FilteredAssets = new List<Asset>(Assets);
 
             SearchCommand = new RelayCommand(ExecuteSearch);
+
         }
 
         public OverviewPageVM() { }
@@ -132,6 +138,9 @@ namespace AssetManager.ViewModels
             OnPropertyChanged(nameof(FilteredAssets));
         }
 
-      
+        private void OpenMetadataFile(Asset asset)
+        {
+            MainPageVM?.HandleOpenMetadataPage(asset);  
+        }
     }
 }
