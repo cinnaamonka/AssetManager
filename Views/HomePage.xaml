@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:AssetManager.Views"
       xmlns:vm="clr-namespace:AssetManager.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -13,30 +12,67 @@
         <vm:HomePageVM />
     </Page.DataContext>
 
-    <Grid Margin="20">
-        <!-- Header with Welcome Text -->
-        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,0,0,20">
-            <TextBlock Text="Welcome to Project Manager" FontSize="32" FontWeight="Bold" Foreground="#333333" Margin="0,0,0,10" HorizontalAlignment="Left"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Projects" FontSize="24" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <!-- Menu column -->
+            <ColumnDefinition Width="5*" />
+            <!-- Main content column -->
+            <ColumnDefinition Width="3*" />
+            <!-- Additional space or sidebar column -->
+        </Grid.ColumnDefinitions>
 
-                <!-- Search Box -->
-                <TextBox Width="200" Height="30" Margin="20,0,0,0" VerticalAlignment="Center"
-                         HorizontalAlignment="Left"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-                <!-- Add Project Button -->
-                <Button Content="Add Project" Width="100" Height="30" Margin="20,0,0,0" VerticalAlignment="Center"
-                        Background="#4A90E2" Foreground="White" FontWeight="Bold"/>
-            </StackPanel>
+        <!-- Top Menu -->
+        <StackPanel Grid.Row = "0" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Center" 
+            Background="DarkBlue" Height="50" VerticalAlignment="Top">
+            <!--Home page button-->
+            <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand">
+                <Border BorderThickness="2" Margin="5" Background="Transparent">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="White" Offset="0.0" />
+                            <GradientStop Color="White" Offset="0.9" />
+                            <GradientStop Color="Transparent" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <TextBlock Text="Home" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" 
+           HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                </Border>
+            </Button>
+
+            <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand" Command="{Binding OpenOverviewPageCommand}">
+                <Border Margin="0" BorderThickness="2">
+                    <TextBlock Text="Library" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                </Border>
+            </Button>
+            <Border BorderBrush="Transparent" BorderThickness="2" Margin="5">
+                <TextBlock Text="?" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+            </Border>
         </StackPanel>
 
-        <!-- Table -->
-        <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Margin="0,120,0,0"
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  HeadersVisibility="Column" GridLinesVisibility="Horizontal"
-                  Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
-                  RowBackground="White" AlternatingRowBackground="#F8F8F8">
 
+        <!-- Header with Welcome Text -->
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Margin="0,10,0,10">
+            <TextBlock Text="Welcome to Project Manager" FontSize="24" FontWeight="Bold" Foreground="#333333" HorizontalAlignment="Center" Margin="0,10,0,10"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <!-- Search Box -->
+                <TextBox Width="200" Height="30" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <!-- Add Project Button -->
+                <Button Content="Add Project" Width="100" Height="30" VerticalAlignment="Center" Background="#4A90E2" Foreground="White" FontWeight="Bold"/>
+            </StackPanel>
+            <TextBlock Text="Previous Projects:" FontSize="24" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center" 
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Table for Content -->
+        <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
+                  RowBackground="White" AlternatingRowBackground="#F8F8F8">
             <!-- Columns -->
             <DataGrid.Columns>
                 <DataGridTextColumn Header="S.No" Binding="{Binding SerialNumber}" Width="50"/>
