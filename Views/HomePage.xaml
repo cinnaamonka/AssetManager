@@ -71,19 +71,16 @@
         </StackPanel>
 
         <!-- Table for Content -->
-        <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+        <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" 
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Projects}"
                   HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
                   RowBackground="White" AlternatingRowBackground="#F8F8F8">
             <!-- Columns -->
             <DataGrid.Columns>
-                <DataGridTextColumn Header="S.No" Binding="{Binding SerialNumber}" Width="50"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100"/>
-                <DataGridTextColumn Header="From" Binding="{Binding From}" Width="150"/>
-                <DataGridTextColumn Header="To" Binding="{Binding To}" Width="150"/>
-                <DataGridTextColumn Header="Days" Binding="{Binding Days}" Width="50"/>
-                <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="200"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
+                <DataGridTextColumn Header="Date Added" Binding="{Binding DateAdded}" Width="200"/>
+                <DataGridTextColumn Header="Files Amount" Binding="{Binding FileCount}" Width="200"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

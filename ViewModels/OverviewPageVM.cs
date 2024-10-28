@@ -163,6 +163,7 @@ namespace AssetManager.ViewModels
                 {
                     UnityProjectPath = folderDialog.SelectedPath;
                     LoadAssetsFromUnityProject(UnityProjectPath);
+
                 }
             }
         }
@@ -178,17 +179,31 @@ namespace AssetManager.ViewModels
 
                 foreach (string file in files)
                 {
-                    if (!file.EndsWith(".meta"))
+                    if (!file.EndsWith(".meta") 
+                        && !file.EndsWith(".asset") &&
+                        !file.EndsWith(".uss") &&
+                        !file.EndsWith(".cs"))
                     {
-                        var asset = new Asset(
-                            name: Path.GetFileName(file),
-                            filePath: file,
-                            fileType: Path.GetExtension(file));
+                        // Calculate the relative path manually
+                        string relativePath = file.Substring(assetsFolderPath.Length + 1);
 
-                        FilteredAssets.Add(asset);
+                        // Example filtering by asset type (e.g., only load specific file types)
+                        string extension = Path.GetExtension(file).ToLower();
+                        if (extension == ".png" || extension == ".jpg" || extension == ".fbx" || extension == ".prefab")
+                        {
+                            var asset = new Asset(
+                                name: Path.GetFileName(file),
+                                filePath: file,
+                                fileType: extension,
+                                relativePath: relativePath);  // Store the manually calculated relative path
+
+                            FilteredAssets.Add(asset);
+                        }
                     }
                 }
             }
         }
+
+
     }
 }
