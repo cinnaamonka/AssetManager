@@ -27,9 +27,25 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="HelixToolkit.Wpf" Version="2.25.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Reactive.Windows.Forms" Version="6.0.1" />
     <PackageReference Include="UnityEditor" Version="2019.3.2.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\projects.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(TargetDir)\Resources\projects.json&quot; &quot;$(ProjectDir)Resources\projects.json&quot;&#xD;&#xA;" />
+  </Target>
 
 </Project>

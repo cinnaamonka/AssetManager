@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Windows.Controls;
-using AssetManager.Views;
+using System.IO;
+using System.Text.Json;
 using AssetManager.Models;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -22,7 +22,7 @@ namespace AssetManager.ViewModels
             set => SetProperty(ref _projects, value);
         }
 
-    
+
         public HomePageVM()
         {
 
@@ -35,6 +35,7 @@ namespace AssetManager.ViewModels
             OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage);
             BrowseProjectFiles = new RelayCommand(BrowseFiles);
             Projects = new ObservableCollection<Project>();
+            LoadProjects();
         }
 
         private void OpenOverviewPage()
@@ -51,10 +52,31 @@ namespace AssetManager.ViewModels
                 FileCount = OverViewPageVM.FilteredAssets.Count,
                 Id = Projects.Count + 1
             };
+            using (var context = new AppDbContext())
+            {
+                context.Projects.Add(project);
+                context.SaveChanges(); 
+            }
 
-            Projects.Add(project);
+            Projects.Add(project);  
+
             OnPropertyChanged(nameof(Projects));
         }
+
+
+        private void LoadProjects()
+        {
+            using (var context = new AppDbContext())
+            {
+                context.Database.EnsureCreated();
+                var projectsFromDb = context.Projects.ToList();
+                foreach (var project in projectsFromDb)
+                {
+                    Projects.Add(project);
+                }
+            }
+        }
+
     }
-    }
+}
 
