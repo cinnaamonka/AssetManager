@@ -107,7 +107,8 @@ namespace AssetManager.ViewModels
                         FilePath = asset.FilePath,
                         FileType = asset.FileType,
                         FileSize = 0,
-                        Format = "Not defined"
+                        Format = "Not defined",
+                        
                     };
 
                     await _metadataService.SaveMetadataAsync(asset.Metadata);
@@ -179,7 +180,7 @@ namespace AssetManager.ViewModels
                                 name: Path.GetFileName(file),
                                 filePath: file,
                                 fileType: extension,
-                                relativePath: relativePath);  // Store the manually calculated relative path
+                                relativePath: relativePath );  // Store the manually calculated relative path
 
                             Assets.Add(asset);
                         }

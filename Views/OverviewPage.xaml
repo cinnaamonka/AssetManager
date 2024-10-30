@@ -73,29 +73,32 @@
             </ListBox>
         </StackPanel>
 
-        <ListView Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
-          SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
-          HorizontalAlignment="Left" VerticalAlignment="Top"
-          Margin="10,0,0,0" Width="675" Height="600"
-          Background="MidnightBlue">
+        <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
+         SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
+         Background="MidnightBlue" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-            <ListView.ItemsPanel>
+            <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="4" />
-                    <!-- Adjust columns as needed -->
+                    <WrapPanel ItemWidth="150" ItemHeight="150" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+            </ListBox.ItemsPanel>
 
-            <ListView.ItemTemplate>
+            <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="120" Height="120" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                    <Border Width="120" Height="120" Margin="10" BorderBrush="Gray" BorderThickness="1">
                         <Grid>
-                            <TextBlock Text="{Binding FileName}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                            <!-- Display the thumbnail image if available -->
+                            <Image Source="{Binding PreviewImage}" Stretch="Uniform" Width="100" Height="100" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <!-- Display the file name at the bottom of the border -->
+                            <TextBlock Text="{Binding FileName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" 
+                               Foreground="White" Background="#80000000" TextAlignment="Center" Padding="2"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
 
 
         <StackPanel Grid.Row="1" Grid.Column="2" Background="DarkSlateGray" >

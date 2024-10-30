@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace AssetManager.Models
 {
@@ -10,6 +12,9 @@ namespace AssetManager.Models
         public string FilePath { get; set; }  
         public string FileType { get; set; }
         public string RelativePath { get; set; }
+
+        public ImageSource PreviewImage { get; private set; }
+
         //public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }
 
@@ -28,12 +33,38 @@ namespace AssetManager.Models
             Metadata = new AssetMetadata();
             OpenMetadataCommand = new RelayCommand(OpenMetadata);
             RelativePath = relativePath;
+
+            LoadThumbnail();
         }
 
         private void OpenMetadata()
         {
             // Raise an event or invoke a callback
             MetadataRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void LoadThumbnail()
+        {
+            if (System.IO.File.Exists(FilePath))
+            {
+               
+                string extension = System.IO.Path.GetExtension(FilePath)?.ToLower();
+                if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(FilePath);
+                    bitmap.DecodePixelWidth = 120; 
+                    bitmap.EndInit();
+
+                    PreviewImage = bitmap;
+                }
+                else
+                {
+                    
+                    PreviewImage = null;
+                }
+            }
         }
 
         public event EventHandler MetadataRequested;
