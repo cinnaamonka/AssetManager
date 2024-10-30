@@ -68,20 +68,17 @@ namespace AssetManager.ViewModels
         {
             MainPageVM = mainPageVM;
 
-            Assets = new List<Asset>
+            if(Assets != null)
             {
-                new Asset( "Tree Model", "/Assets/Models/Tree/tree.fbx", "3D Model"),
-                new Asset( "Rock Texture", "/Assets/Textures/rock.png", "Texture"),
-                new Asset( "Mountain Model", "/Assets/Models/Mountain/mountain.fbx", "3D Model")
-            };
-
-            foreach (var asset in Assets)
-            {
-                asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s);
+                foreach (var asset in Assets)
+                {
+                    asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s);
+                }
             }
 
 
-            FilteredAssets = new List<Asset>(Assets);
+            Assets = new List<Asset>();
+            FilteredAssets = new List<Asset>();
 
             SearchCommand = new RelayCommand(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
@@ -122,7 +119,10 @@ namespace AssetManager.ViewModels
         {
             if (string.IsNullOrEmpty(SearchText))
             {
-                FilteredAssets = new List<Asset>(Assets);
+               var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+                var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
+                FilteredAssets = new List<Asset>(filtered);
+
             }
             else
             {
@@ -153,7 +153,7 @@ namespace AssetManager.ViewModels
       
         public void LoadAssetsFromUnityProject(string projectPath)
         {
-            FilteredAssets.Clear();
+            Assets.Clear();
 
             string assetsFolderPath = Path.Combine(projectPath, "Assets");
 
@@ -181,11 +181,13 @@ namespace AssetManager.ViewModels
                                 fileType: extension,
                                 relativePath: relativePath);  // Store the manually calculated relative path
 
-                            FilteredAssets.Add(asset);
+                            Assets.Add(asset);
                         }
                     }
                 }
             }
+
+            FilteredAssets = Assets;
         }
 
        

@@ -74,31 +74,21 @@
         </StackPanel>
 
         <ListView Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
-                  SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
-                  HorizontalAlignment="Left" VerticalAlignment="Top"
-                  Margin="10,0,0,0" Width="675" Height="600"
-                  Background="MidnightBlue">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="Open Metadata" Command="{Binding OpenMetadataCommand}" />
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListView.ItemContainerStyle>
+          SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
+          HorizontalAlignment="Left" VerticalAlignment="Top"
+          Margin="10,0,0,0" Width="675" Height="600"
+          Background="MidnightBlue">
 
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel HorizontalAlignment="Left" />
+                    <UniformGrid Columns="4" />
+                    <!-- Adjust columns as needed -->
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
 
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="100" Height="100" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                    <Border Width="120" Height="120" Margin="5" BorderBrush="Gray" BorderThickness="1">
                         <Grid>
                             <TextBlock Text="{Binding FileName}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
                         </Grid>
