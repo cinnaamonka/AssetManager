@@ -24,7 +24,7 @@ namespace AssetManager.ViewModels
             MainPage = new OverviewPage { DataContext = overViewPageVM };
             HomePage = new HomePage { DataContext = homePageVM };
 
-            CurrentPage = MainPage;
+            CurrentPage = HomePage;
         }
 
         public void HandleOpenMetadataPage(Asset asset)

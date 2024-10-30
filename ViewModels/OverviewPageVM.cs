@@ -63,12 +63,7 @@ namespace AssetManager.ViewModels
 
         public MainPageVM MainPageVM { get; }
 
-        private string _unityProjectPath;
-        public string UnityProjectPath
-        {
-            get => _unityProjectPath;
-            set => SetProperty(ref _unityProjectPath, value);
-        }
+       
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -155,19 +150,8 @@ namespace AssetManager.ViewModels
             MainPageVM?.OpenHomePage();
         }
 
-        public void OpenFolderDialog()
-        {
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    UnityProjectPath = folderDialog.SelectedPath;
-                    LoadAssetsFromUnityProject(UnityProjectPath);
-
-                }
-            }
-        }
-        private void LoadAssetsFromUnityProject(string projectPath)
+      
+        public void LoadAssetsFromUnityProject(string projectPath)
         {
             FilteredAssets.Clear();
 
@@ -204,6 +188,6 @@ namespace AssetManager.ViewModels
             }
         }
 
-
+       
     }
 }

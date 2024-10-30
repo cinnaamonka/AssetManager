@@ -19,7 +19,8 @@ namespace AssetManager.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     DateAdded = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    FileCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    FileCount = table.Column<int>(type: "INTEGER", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

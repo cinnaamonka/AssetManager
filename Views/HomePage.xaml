@@ -72,9 +72,13 @@
 
         <!-- Table for Content -->
         <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" 
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Projects}"
-                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
-                  RowBackground="White" AlternatingRowBackground="#F8F8F8">
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+          ItemsSource="{Binding Projects}"
+          SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
+          HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
+          Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
+          RowBackground="White" AlternatingRowBackground="#F8F8F8">
+
             <!-- Columns -->
             <DataGrid.Columns>
                 <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
@@ -83,5 +87,6 @@
                 <DataGridTextColumn Header="Files Amount" Binding="{Binding FileCount}" Width="200"/>
             </DataGrid.Columns>
         </DataGrid>
+
     </Grid>
 </Page>
