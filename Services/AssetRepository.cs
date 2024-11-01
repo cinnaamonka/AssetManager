@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -29,14 +27,13 @@ namespace AssetManager.Repositories
 
                 foreach (string file in files)
                 {
-                    // Exclude certain file types
                     if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
                     {
                         string result = file.Replace(" ", "");
                         string relativePath = result.Substring(assetsFolderPath.Length + 1);
                         string extension = Path.GetExtension(result).ToLower();
 
-                        // Only include supported file types
+                    
                         if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
                         {
                             
@@ -60,18 +57,20 @@ namespace AssetManager.Repositories
         {
             if (extension == ".png" || extension == ".jpg")
             {
-                return LoadImageThumbnail(filePath);
+                if(File.Exists(filePath))
+                {
+                    return LoadImageThumbnail(filePath);
+                }
+                return null;
+               
             }
             else if (extension == ".fbx" )
             {
                 string objFilePath = ConvertFbxToObj(filePath);
 
-                // Step 2: Generate thumbnail for OBJ
                 if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
                 {
-                    GenerateObjThumbnail(objFilePath);
-
-                    string filename = Path.ChangeExtension(objFilePath,".png");
+                    string filename = GeneratePngThumbnail(objFilePath);
 
                     return LoadImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename));
                     
@@ -79,7 +78,7 @@ namespace AssetManager.Repositories
             }
             else if(extension == ".prefab")
             {
-                return GetPlaceholderThumbnail(); // Placeholder for 3D assets
+                return GetPlaceholderThumbnail();
             }
             return null;
         }
@@ -92,7 +91,7 @@ namespace AssetManager.Repositories
             {
 
                 FileName = exePath,
-                Arguments = $"\"{fbxFilePath}\" \"{objFilePath}\"", // Pass FBX and OBJ paths as arguments
+                Arguments = $"\"{fbxFilePath}\" \"{objFilePath}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -110,11 +109,13 @@ namespace AssetManager.Repositories
             }
             return null;
         }
-        private string GenerateObjThumbnail(string objFilePath)
+        private string GeneratePngThumbnail(string objFilePath)
         {
-            string thumbnailPath = Path.ChangeExtension(objFilePath, ".png");
+            // Define the target path for the PNG thumbnail in the same directory as the OBJ file
+            string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ThumbnailsGenerator", "DirectX.exe");
 
+            // Define the temporary output folder for the thumbnail
             string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempThumbnails");
 
             if (!Directory.Exists(outputFolderPath))
@@ -137,11 +138,25 @@ namespace AssetManager.Repositories
                 process.WaitForExit();
                 if (process.ExitCode == 0)
                 {
-                    return thumbnailPath;
+                    // Construct the new path in the TempThumbnails folder
+                    string tempThumbnailPath = Path.Combine(outputFolderPath, Path.GetFileName(originalThumbnailPath));
+
+                    // If the file already exists, delete it to avoid IOException
+                    if (File.Exists(tempThumbnailPath))
+                    {
+                        File.Delete(tempThumbnailPath);
+                    }
+
+                    // Move the generated file from the original location to the TempThumbnails folder
+                    File.Move(originalThumbnailPath, tempThumbnailPath);
+
+                    // Return the final path of the thumbnail in the TempThumbnails directory
+                    return tempThumbnailPath;
                 }
             }
             return null;
-         }
+        }
+
 
         private ImageSource LoadImageThumbnail(string filePath)
         {
