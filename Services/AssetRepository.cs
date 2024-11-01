@@ -1,52 +1,171 @@
-﻿using AssetManager.Models;
-using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using AssetManager.Models;
 
-
-namespace AssetManager.Services
+namespace AssetManager.Repositories
 {
-    internal class AssetRepository
+    public class AssetRepository
     {
-        private string _assetsFolderPath = "Assets";
-       
-        //we dont load assets into a variable because it is usable only for small scope projects
-        public List<Asset> LoadAssets()
+        private readonly int thumbnailSize = 120;
+        public List<Asset> Assets { get; private set; } = new List<Asset>();
+
+        public AssetRepository()
         {
-            var assets = new List<Asset>();
-            var files = Directory.GetFiles(_assetsFolderPath);
+        }
 
-            foreach (var file in files)
+        public List<Asset> LoadAssetsFromUnityProject(string projectPath)
+        {
+            Assets.Clear();
+
+            string assetsFolderPath = Path.Combine(projectPath, "Assets");
+
+            if (Directory.Exists(assetsFolderPath))
             {
-                var asset = new Asset(Path.GetFileName(file), file, DetermineAssetType(file));
+                string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
 
-                assets.Add(asset);
+                foreach (string file in files)
+                {
+                    // Exclude certain file types
+                    if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
+                    {
+                        string result = file.Replace(" ", "");
+                        string relativePath = result.Substring(assetsFolderPath.Length + 1);
+                        string extension = Path.GetExtension(result).ToLower();
+
+                        // Only include supported file types
+                        if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
+                        {
+                            
+                            var asset = new Asset(
+                                name: Path.GetFileName(result),
+                                filePath: result,
+                                fileType: extension,
+                                relativePath: relativePath);
+
+                            asset.PreviewImage = GenerateThumbnail(result, extension);
+                            Assets.Add(asset);
+                        }
+                    }
+                }
             }
 
-            return assets;
+            return Assets;
         }
 
-        private string DetermineAssetType(string filePath)
+        private ImageSource GenerateThumbnail(string filePath, string extension)
         {
-            var extension = Path.GetExtension(filePath).ToLower();
-
-            switch (extension)
+            if (extension == ".png" || extension == ".jpg")
             {
-                case ".png":
-                case ".jpg":
-                    return "Texture";
-                case ".fbx":
-                    return "3D Model";
-                default:
-                    return "Unknown";
+                return LoadImageThumbnail(filePath);
             }
-        }
+            else if (extension == ".fbx" )
+            {
+                string objFilePath = ConvertFbxToObj(filePath);
 
-        public void SaveAssetMetadata(Asset asset)
+                // Step 2: Generate thumbnail for OBJ
+                if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
+                {
+                    GenerateObjThumbnail(objFilePath);
+
+                    string filename = Path.ChangeExtension(objFilePath,".png");
+
+                    return LoadImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename));
+                    
+                }
+            }
+            else if(extension == ".prefab")
+            {
+                return GetPlaceholderThumbnail(); // Placeholder for 3D assets
+            }
+            return null;
+        }
+        private string ConvertFbxToObj(string fbxFilePath)
         {
-            var metadataFile = Path.Combine(asset.FilePath, "metadata.json");
-            var json = JsonConvert.SerializeObject(asset.Metadata);
-            File.WriteAllText(metadataFile, json);
+            string objFilePath = Path.ChangeExtension(fbxFilePath, ".obj");
+            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\FBXToObjConverter", "FBXToObjConverter.exe");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+
+                FileName = exePath,
+                Arguments = $"\"{fbxFilePath}\" \"{objFilePath}\"", // Pass FBX and OBJ paths as arguments
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                process.WaitForExit();
+                bool test = File.Exists(objFilePath);
+                if (process.ExitCode == 0 && test)
+                {
+                    return objFilePath;
+                }
+            }
+            return null;
+        }
+        private string GenerateObjThumbnail(string objFilePath)
+        {
+            string thumbnailPath = Path.ChangeExtension(objFilePath, ".png");
+            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ThumbnailsGenerator", "DirectX.exe");
+
+            string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempThumbnails");
+
+            if (!Directory.Exists(outputFolderPath))
+            {
+                Directory.CreateDirectory(outputFolderPath);
+            }
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = $"\"{objFilePath}\" \"{outputFolderPath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                process.WaitForExit();
+                if (process.ExitCode == 0)
+                {
+                    return thumbnailPath;
+                }
+            }
+            return null;
+         }
+
+        private ImageSource LoadImageThumbnail(string filePath)
+        {
+            if(filePath != null)
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(filePath);
+                bitmap.DecodePixelWidth = thumbnailSize;
+                bitmap.EndInit();
+
+                return bitmap;
+            }
+            return null;
         }
 
+        private ImageSource GetPlaceholderThumbnail()
+        {
+            string placeholderPath = "path/to/placeholder.png";
+            if (File.Exists(placeholderPath))
+            {
+                return new BitmapImage(new Uri(placeholderPath));
+            }
+            return null;
+        }
     }
 }

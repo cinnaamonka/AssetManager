@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using AssetManager.Services;
 using System.IO;
 using System.Windows.Forms;
+using AssetManager.Repositories;
 namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
@@ -62,13 +63,14 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenHomePageCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
+        private AssetRepository _assetRepository;
 
-       
+
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
 
-            if(Assets != null)
+            if (Assets != null)
             {
                 foreach (var asset in Assets)
                 {
@@ -82,6 +84,7 @@ namespace AssetManager.ViewModels
 
             SearchCommand = new RelayCommand(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
+            _assetRepository = new AssetRepository();
 
         }
 
@@ -108,7 +111,7 @@ namespace AssetManager.ViewModels
                         FileType = asset.FileType,
                         FileSize = 0,
                         Format = "Not defined",
-                        
+
                     };
 
                     await _metadataService.SaveMetadataAsync(asset.Metadata);
@@ -120,7 +123,7 @@ namespace AssetManager.ViewModels
         {
             if (string.IsNullOrEmpty(SearchText))
             {
-               var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+                var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
                 var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
                 FilteredAssets = new List<Asset>(filtered);
 
@@ -151,46 +154,15 @@ namespace AssetManager.ViewModels
             MainPageVM?.OpenHomePage();
         }
 
-      
+
         public void LoadAssetsFromUnityProject(string projectPath)
         {
-            Assets.Clear();
-
-            string assetsFolderPath = Path.Combine(projectPath, "Assets");
-
-            if (Directory.Exists(assetsFolderPath))
-            {
-                string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
-
-                foreach (string file in files)
-                {
-                    if (!file.EndsWith(".meta") 
-                        && !file.EndsWith(".asset") &&
-                        !file.EndsWith(".uss") &&
-                        !file.EndsWith(".cs"))
-                    {
-                        // Calculate the relative path manually
-                        string relativePath = file.Substring(assetsFolderPath.Length + 1);
-
-                        // Example filtering by asset type (e.g., only load specific file types)
-                        string extension = Path.GetExtension(file).ToLower();
-                        if (extension == ".png" || extension == ".jpg" || extension == ".fbx" || extension == ".prefab")
-                        {
-                            var asset = new Asset(
-                                name: Path.GetFileName(file),
-                                filePath: file,
-                                fileType: extension,
-                                relativePath: relativePath );  // Store the manually calculated relative path
-
-                            Assets.Add(asset);
-                        }
-                    }
-                }
-            }
-
+        
+            Assets = _assetRepository.LoadAssetsFromUnityProject(projectPath);
             FilteredAssets = Assets;
+
         }
 
-       
+
     }
 }

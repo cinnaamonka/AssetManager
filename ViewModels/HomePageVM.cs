@@ -91,7 +91,7 @@ namespace AssetManager.ViewModels
             {
                 context.Projects.Add(project);
                 context.SaveChanges(); 
-            }
+            } 
 
             Projects.Add(project);  
 
