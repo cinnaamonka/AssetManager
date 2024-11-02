@@ -155,10 +155,10 @@ namespace AssetManager.ViewModels
         }
 
 
-        public void LoadAssetsFromUnityProject(string projectPath)
+        public async Task LoadAssetsFromUnityProject(string projectPath)
         {
         
-            Assets = _assetRepository.LoadAssetsFromUnityProject(projectPath);
+            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
             FilteredAssets = Assets;
 
         }

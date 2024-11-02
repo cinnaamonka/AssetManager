@@ -15,7 +15,7 @@ namespace AssetManager.Repositories
         {
         }
 
-        public List<Asset> LoadAssetsFromUnityProject(string projectPath)
+        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath)
         {
             Assets.Clear();
 
@@ -25,33 +25,40 @@ namespace AssetManager.Repositories
             {
                 string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
 
-                foreach (string file in files)
+                // Run the asset processing on a background thread
+                await Task.Run(() =>
                 {
-                    if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
+                    foreach (string file in files)
                     {
-                        string result = file.Replace(" ", "");
-                        string relativePath = result.Substring(assetsFolderPath.Length + 1);
-                        string extension = Path.GetExtension(result).ToLower();
-
-                    
-                        if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
+                        if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
                         {
-                            
-                            var asset = new Asset(
-                                name: Path.GetFileName(result),
-                                filePath: result,
-                                fileType: extension,
-                                relativePath: relativePath);
+                            string result = file.Replace(" ", "");
+                            string relativePath = result.Substring(assetsFolderPath.Length + 1);
+                            string extension = Path.GetExtension(result).ToLower();
 
-                            asset.PreviewImage = GenerateThumbnail(result, extension);
-                            Assets.Add(asset);
+                            if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
+                            {
+                                var asset = new Asset(
+                                    name: Path.GetFileName(result),
+                                    filePath: result,
+                                    fileType: extension,
+                                    relativePath: relativePath);
+
+                                // Use Dispatcher to update the UI safely
+                                App.Current.Dispatcher.Invoke(() =>
+                                {
+                                    asset.PreviewImage = GenerateThumbnail(result, extension);
+                                    Assets.Add(asset);
+                                });
+                            }
                         }
                     }
-                }
+                });
             }
 
             return Assets;
         }
+
 
         private ImageSource GenerateThumbnail(string filePath, string extension)
         {
@@ -131,6 +138,7 @@ namespace AssetManager.Repositories
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
             };
 
             using (Process process = Process.Start(startInfo))
