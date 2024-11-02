@@ -11,6 +11,7 @@ namespace AssetManager.ViewModels
         public MainPageVM MainPageVM { get; }
         public OverviewPageVM OverViewPageVM { get; }
 
+        public LoaderVM Loader { get; set; } = new LoaderVM();
         public RelayCommand OpenOverviewPageCommand { get; set; }
         public RelayCommand BrowseProjectFiles { get; set; }
         public RelayCommand OpenProjectDetailsCommand { get; }
@@ -72,6 +73,10 @@ namespace AssetManager.ViewModels
             LoadProjects();
         }
 
+        public async Task OpenProjectAsync()
+        {
+           
+        }
         private void OpenOverviewPage()
         {
             MainPageVM.OpenOverViewPage();
@@ -112,10 +117,30 @@ namespace AssetManager.ViewModels
             }
         }
 
+        private async Task OpenProjectLibraryAsync()
+        {
+            Loader.IsLoading = true;
+            Loader.LoadingMessage = "Loading project...";
+
+            await Task.Delay(10);  // Adjust the delay if needed
+
+            try
+            {
+                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path);
+
+            }
+            finally
+            {
+                Loader.IsLoading = false;
+                MainPageVM.OpenOverViewPage();
+            }
+
+           
+        }
+
         private void OpenProjectLibrary()
         {
-            MainPageVM.OpenOverViewPage();
-            OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path);   
+            OpenProjectLibraryAsync();
         }
 
     }

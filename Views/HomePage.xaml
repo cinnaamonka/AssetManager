@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:AssetManager.ViewModels"
+      xmlns:conv="clr-namespace:AssetManager.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="HomePage">
@@ -12,14 +13,15 @@
         <vm:HomePageVM />
     </Page.DataContext>
 
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Page.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
-            <!-- Menu column -->
             <ColumnDefinition Width="5*" />
-            <!-- Main content column -->
             <ColumnDefinition Width="3*" />
-            <!-- Additional space or sidebar column -->
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -28,9 +30,8 @@
         </Grid.RowDefinitions>
 
         <!-- Top Menu -->
-        <StackPanel Grid.Row = "0" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Center" 
-            Background="DarkBlue" Height="50" VerticalAlignment="Top">
-            <!--Home page button-->
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" 
+                    Background="DarkBlue" Height="50" VerticalAlignment="Top">
             <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand">
                 <Border BorderThickness="2" Margin="5" Background="Transparent">
                     <Border.BorderBrush>
@@ -41,7 +42,7 @@
                         </LinearGradientBrush>
                     </Border.BorderBrush>
                     <TextBlock Text="Home" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" 
-           HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
                 </Border>
             </Button>
 
@@ -55,14 +56,11 @@
             </Border>
         </StackPanel>
 
-
         <!-- Header with Welcome Text -->
         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Margin="0,10,0,10">
             <TextBlock Text="Welcome to Project Manager" FontSize="24" FontWeight="Bold" Foreground="#333333" HorizontalAlignment="Center" Margin="0,10,0,10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <!-- Search Box -->
                 <TextBox Width="200" Height="30" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <!-- Add Project Button -->
                 <Button Content="Add Project" Width="100" Height="30" VerticalAlignment="Center" Background="#4A90E2" 
                         Foreground="White" FontWeight="Bold" Command="{Binding BrowseProjectFiles}"/>
             </StackPanel>
@@ -72,14 +70,12 @@
 
         <!-- Table for Content -->
         <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" 
-          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-          ItemsSource="{Binding Projects}"
-          SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
-          HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
-          Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
-          RowBackground="White" AlternatingRowBackground="#F8F8F8">
-
-            <!-- Columns -->
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                  ItemsSource="{Binding Projects}"
+                  SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
+                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
+                  Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
+                  RowBackground="White" AlternatingRowBackground="#F8F8F8">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
@@ -87,6 +83,18 @@
                 <DataGridTextColumn Header="Files Amount" Binding="{Binding FileCount}" Width="200"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <Grid Background="#80000000" 
+         Visibility="{Binding Loader.IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="2" Grid.ColumnSpan="3">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                <Ellipse Width="50" Height="50" Fill="Gray">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform x:Name="SpinnerRotateTransform" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <TextBlock Text="{Binding Loader.LoadingMessage}" Foreground="White" FontSize="16" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
 
     </Grid>
 </Page>
