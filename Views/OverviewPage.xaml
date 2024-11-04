@@ -57,7 +57,7 @@
                 <TextBlock Text="?" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
             </Border>
         </StackPanel>
-        
+
         <StackPanel Grid.Row="1" Grid.Column="0" Background="DarkSlateGray" >
             <TextBlock Text="Tag Search" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
             <StackPanel Margin="0,0,0,10">
@@ -89,7 +89,15 @@
                         <Grid>
                             <!-- Display the thumbnail image if available -->
                             <Image Source="{Binding PreviewImage}" Stretch="Uniform" Width="100" Height="100" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                                
+                                <Image.InputBindings>
+                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                  CommandParameter="{Binding PreviewImage}"/>
+                                </Image.InputBindings>
+                                
+                            </Image>
+
                             <!-- Display the file name at the bottom of the border -->
                             <TextBlock Text="{Binding FileName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" 
                                Foreground="White" Background="#80000000" TextAlignment="Center" Padding="2"/>

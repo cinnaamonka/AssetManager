@@ -122,7 +122,7 @@ namespace AssetManager.ViewModels
             Loader.IsLoading = true;
             Loader.LoadingMessage = "Loading project...";
 
-            await Task.Delay(10);  // Adjust the delay if needed
+            await Task.Delay(10);  
 
             try
             {

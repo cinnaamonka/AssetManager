@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
 using System.Text.RegularExpressions;
 using AssetManager.Services;
-using System.IO;
-using System.Windows.Forms;
 using AssetManager.Repositories;
+using AssetManager.Views;
+
 namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
@@ -26,7 +26,10 @@ namespace AssetManager.ViewModels
 
         public Asset SelectedAsset
         {
-            get { return _selectedAsset; }
+            get
+            {
+                return _selectedAsset; 
+            }
             set
             {
                 _selectedAsset = value;
@@ -62,6 +65,8 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenMetadataCommand { get; set; }
         public RelayCommand OpenHomePageCommand { get; set; }
 
+        public RelayCommand OpenFullImageCommand { get; set; }
+
         public MainPageVM MainPageVM { get; }
         private AssetRepository _assetRepository;
 
@@ -84,6 +89,8 @@ namespace AssetManager.ViewModels
 
             SearchCommand = new RelayCommand(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
+            OpenFullImageCommand = new RelayCommand(OpenFullImage);
+
             _assetRepository = new AssetRepository();
 
         }
@@ -154,10 +161,18 @@ namespace AssetManager.ViewModels
             MainPageVM?.OpenHomePage();
         }
 
+        private void OpenFullImage()
+        {
+            var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+            {
+                Owner = App.Current.MainWindow 
+            };
+            imageViewer.ShowDialog(); 
+        }
 
         public async Task LoadAssetsFromUnityProject(string projectPath)
         {
-        
+
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
             FilteredAssets = Assets;
 
