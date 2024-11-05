@@ -66,6 +66,8 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenHomePageCommand { get; set; }
 
         public RelayCommand OpenFullImageCommand { get; set; }
+        public RelayCommand ClearSelectionCommand { get; }
+
 
         public MainPageVM MainPageVM { get; }
         private AssetRepository _assetRepository;
@@ -90,6 +92,7 @@ namespace AssetManager.ViewModels
             SearchCommand = new RelayCommand(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
             OpenFullImageCommand = new RelayCommand(OpenFullImage);
+            ClearSelectionCommand = new RelayCommand(ClearSelection);
 
             _assetRepository = new AssetRepository();
 
@@ -151,6 +154,10 @@ namespace AssetManager.ViewModels
             OnPropertyChanged(nameof(FilteredAssets));
         }
 
+        private void ClearSelection()
+        {
+            SelectedAsset = null;
+        }
         private void OpenMetadataFile(Asset asset)
         {
             MainPageVM?.HandleOpenPopUpWindow(asset);

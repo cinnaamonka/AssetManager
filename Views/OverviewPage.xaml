@@ -20,6 +20,12 @@
 
 
     <Grid>
+        
+        <Grid.InputBindings>
+            <MouseBinding Gesture="LeftClick" Command="{Binding ClearSelectionCommand}" />
+        </Grid.InputBindings>
+
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="5*" />
@@ -83,6 +89,7 @@
          SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
          Background="Beige" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
+          
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel ItemWidth="150" ItemHeight="150" HorizontalAlignment="Center" VerticalAlignment="Top"/>
