@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AssetManager.Models;
+using static AssetManager.AssetHelpers.AssetHelpers;
 
 namespace AssetManager.Repositories
 {
@@ -38,10 +39,12 @@ namespace AssetManager.Repositories
 
                             if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
                             {
+                                var assetType = GetAssetType(extension);
+
                                 var asset = new Asset(
                                     name: Path.GetFileName(result),
                                     filePath: result,
-                                    fileType: extension,
+                                    fileType: assetType,
                                     relativePath: relativePath);
 
                                 // Use Dispatcher to update the UI safely

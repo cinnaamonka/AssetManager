@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using static AssetManager.AssetHelpers.AssetHelpers;
 
 namespace AssetManager.Models
 {
@@ -9,7 +9,8 @@ namespace AssetManager.Models
     {
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public string FileType { get; set; }
+        public AssetType FileType { get; }
+
         public string RelativePath { get; set; }
 
         public ImageSource PreviewImage { get; set; }
@@ -18,7 +19,7 @@ namespace AssetManager.Models
 
         public ICommand OpenMetadataCommand { get; }
 
-        public Asset(string name, string filePath, string fileType, string relativePath = "", ImageSource preview = null)
+        public Asset(string name, string filePath, AssetType fileType, string relativePath = "", ImageSource preview = null)
         {
             FileName = name;
             FilePath = filePath;
@@ -37,4 +38,6 @@ namespace AssetManager.Models
 
         public event EventHandler MetadataRequested;
     }
+
+  
 }

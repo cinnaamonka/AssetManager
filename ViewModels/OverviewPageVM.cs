@@ -114,17 +114,17 @@ namespace AssetManager.ViewModels
 
                 else
                 {
-                    asset.Metadata = new AssetMetadata
-                    {
-                        Name = asset.FileName,
-                        FilePath = asset.FilePath,
-                        FileType = asset.FileType,
-                        FileSize = 0,
-                        Format = "Not defined",
+                    //asset.Metadata = new AssetMetadata
+                    //{
+                    //    Name = asset.FileName,
+                    //    FilePath = asset.FilePath,
+                    //    FileType = asset.FileType,
+                    //    FileSize = 0,
+                    //    Format = "Not defined",
 
-                    };
+                    //};
 
-                    await _metadataService.SaveMetadataAsync(asset.Metadata);
+                    //await _metadataService.SaveMetadataAsync(asset.Metadata);
                 }
             }
         }
