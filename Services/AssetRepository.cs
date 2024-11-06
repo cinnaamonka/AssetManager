@@ -67,14 +67,14 @@ namespace AssetManager.Repositories
         {
             if (extension == ".png" || extension == ".jpg")
             {
-                if(File.Exists(filePath))
+                if (File.Exists(filePath))
                 {
                     return LoadImageThumbnail(filePath);
                 }
                 return null;
-               
+
             }
-            else if (extension == ".fbx" )
+            else if (extension == ".fbx")
             {
                 string objFilePath = ConvertFbxToObj(filePath);
 
@@ -83,10 +83,10 @@ namespace AssetManager.Repositories
                     string filename = GeneratePngThumbnail(objFilePath);
 
                     return LoadImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename));
-                    
+
                 }
             }
-            else if(extension == ".prefab")
+            else if (extension == ".prefab")
             {
                 return GetPlaceholderThumbnail();
             }
@@ -94,14 +94,20 @@ namespace AssetManager.Repositories
         }
         private string ConvertFbxToObj(string fbxFilePath)
         {
-            string objFilePath = Path.ChangeExtension(fbxFilePath, ".obj");
+            string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles");
+
+            if (!Directory.Exists(outputFolderPath))
+            {
+                Directory.CreateDirectory(outputFolderPath);
+            }
+
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\FBXToObjConverter", "FBXToObjConverter.exe");
 
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
 
                 FileName = exePath,
-                Arguments = $"\"{fbxFilePath}\" \"{objFilePath}\"",
+                Arguments = $"\"{fbxFilePath}\" \"{outputFolderPath}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -110,11 +116,16 @@ namespace AssetManager.Repositories
 
             using (Process process = Process.Start(startInfo))
             {
-                process.WaitForExit();
-                bool test = File.Exists(objFilePath);
-                if (process.ExitCode == 0 && test)
+                if (process != null)
                 {
-                    return objFilePath;
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0 && Path.Exists(Path.Combine(outputFolderPath, Path.ChangeExtension(
+                        Path.GetFileName(fbxFilePath), ".obj"))))
+                    {
+                        return Path.Combine(outputFolderPath, Path.ChangeExtension(
+                        Path.GetFileName(fbxFilePath), ".obj"));
+                    }
                 }
             }
             return null;
@@ -146,23 +157,26 @@ namespace AssetManager.Repositories
 
             using (Process process = Process.Start(startInfo))
             {
-                process.WaitForExit();
-                if (process.ExitCode == 0)
+                if (process != null)
                 {
-                    // Construct the new path in the TempThumbnails folder
-                    string tempThumbnailPath = Path.Combine(outputFolderPath, Path.GetFileName(originalThumbnailPath));
-
-                    // If the file already exists, delete it to avoid IOException
-                    if (File.Exists(tempThumbnailPath))
+                    process.WaitForExit();
+                    if (process.ExitCode == 0)
                     {
-                        File.Delete(tempThumbnailPath);
+                        // Construct the new path in the TempThumbnails folder
+                        string tempThumbnailPath = Path.Combine(outputFolderPath, Path.GetFileName(originalThumbnailPath));
+
+                        // If the file already exists, delete it to avoid IOException
+                        if (File.Exists(tempThumbnailPath))
+                        {
+                            File.Delete(tempThumbnailPath);
+                        }
+
+                        // Move the generated file from the original location to the TempThumbnails folder
+                        File.Move(originalThumbnailPath, tempThumbnailPath);
+
+                        // Return the final path of the thumbnail in the TempThumbnails directory
+                        return tempThumbnailPath;
                     }
-
-                    // Move the generated file from the original location to the TempThumbnails folder
-                    File.Move(originalThumbnailPath, tempThumbnailPath);
-
-                    // Return the final path of the thumbnail in the TempThumbnails directory
-                    return tempThumbnailPath;
                 }
             }
             return null;
@@ -171,7 +185,7 @@ namespace AssetManager.Repositories
 
         private ImageSource LoadImageThumbnail(string filePath)
         {
-            if(filePath != null)
+            if (filePath != null)
             {
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
