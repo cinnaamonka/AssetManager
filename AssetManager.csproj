@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\MetafileImage.png" />
     <None Remove="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx" />
   </ItemGroup>
 
@@ -30,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\MetafileImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <EmbeddedResource Include="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
