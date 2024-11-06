@@ -28,7 +28,7 @@ namespace AssetManager.ViewModels
         {
             get
             {
-                return _selectedAsset; 
+                return _selectedAsset;
             }
             set
             {
@@ -90,7 +90,7 @@ namespace AssetManager.ViewModels
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
-
+            _metadataService = new MetadataService();
         }
 
         public OverviewPageVM() { }
@@ -100,27 +100,19 @@ namespace AssetManager.ViewModels
         {
             foreach (var asset in Assets)
             {
-                var metadata = await _metadataService.LoadMetadataAsync(asset.FileName);
 
-                if (metadata != null)
+                asset.Metadata = new AssetMetadata
                 {
-                    asset.Metadata = metadata;
-                }
+                    Name = asset.FileName,
+                    FilePath = asset.FilePath,
+                    FileType = asset.FileType,
+                    FileSize = 0,
+                    Format = "Not defined",
 
-                else
-                {
-                    //asset.Metadata = new AssetMetadata
-                    //{
-                    //    Name = asset.FileName,
-                    //    FilePath = asset.FilePath,
-                    //    FileType = asset.FileType,
-                    //    FileSize = 0,
-                    //    Format = "Not defined",
+                };
 
-                    //};
+                await _metadataService.SaveMetadataAsync(asset.Metadata);
 
-                    //await _metadataService.SaveMetadataAsync(asset.Metadata);
-                }
             }
         }
 
@@ -155,7 +147,7 @@ namespace AssetManager.ViewModels
         }
         private void OpenMetadataFile()
         {
-            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset); 
+            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
         }
 
         private void OpenHomePage()
@@ -167,9 +159,9 @@ namespace AssetManager.ViewModels
         {
             var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
             {
-                Owner = App.Current.MainWindow 
+                Owner = App.Current.MainWindow
             };
-            imageViewer.ShowDialog(); 
+            imageViewer.ShowDialog();
         }
 
         public async Task LoadAssetsFromUnityProject(string projectPath)
@@ -177,6 +169,7 @@ namespace AssetManager.ViewModels
 
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
             FilteredAssets = Assets;
+            await LoadAssetsAsync();
 
         }
 
