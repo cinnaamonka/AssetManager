@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AssetManager.Models;
+using AssetManager.ViewModels;
+
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AssetManager.Views
 {
@@ -23,6 +14,18 @@ namespace AssetManager.Views
         public OverviewPage()
         {
             InitializeComponent();
+        }
+
+        private void MetadataButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button && button.DataContext is Asset asset)
+            {
+                // Get the ViewModel from the DataContext
+                var viewModel = (OverviewPageVM)DataContext;
+
+                // Set the SelectedAsset in the ViewModel to the clicked asset
+                viewModel.SelectedAsset = asset;
+            }
         }
     }
 }

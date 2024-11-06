@@ -68,6 +68,8 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenFullImageCommand { get; set; }
         public RelayCommand ClearSelectionCommand { get; }
 
+        public RelayCommand OpenMetadataFileCommand { get; }
+
 
         public MainPageVM MainPageVM { get; }
         private AssetRepository _assetRepository;
@@ -77,14 +79,6 @@ namespace AssetManager.ViewModels
         {
             MainPageVM = mainPageVM;
 
-            if (Assets != null)
-            {
-                foreach (var asset in Assets)
-                {
-                    asset.MetadataRequested += (s, e) => OpenMetadataFile((Asset)s);
-                }
-            }
-
 
             Assets = new List<Asset>();
             FilteredAssets = new List<Asset>();
@@ -93,6 +87,7 @@ namespace AssetManager.ViewModels
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
             OpenFullImageCommand = new RelayCommand(OpenFullImage);
             ClearSelectionCommand = new RelayCommand(ClearSelection);
+            OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
 
@@ -158,9 +153,9 @@ namespace AssetManager.ViewModels
         {
             SelectedAsset = null;
         }
-        private void OpenMetadataFile(Asset asset)
+        private void OpenMetadataFile()
         {
-            MainPageVM?.HandleOpenPopUpWindow(asset);
+            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset); 
         }
 
         private void OpenHomePage()
