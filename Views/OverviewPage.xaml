@@ -91,7 +91,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel ItemWidth="150" ItemHeight="170" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    <WrapPanel ItemWidth="150" ItemHeight="170" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 
