@@ -96,6 +96,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy &quot;$(TargetDir)\Resources\projects.json&quot; &quot;$(ProjectDir)Resources\projects.json&quot;&#xD;&#xA;" />
   </Target>

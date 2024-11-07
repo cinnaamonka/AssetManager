@@ -6,6 +6,7 @@ using AssetManager.Services;
 using AssetManager.Repositories;
 using AssetManager.Views;
 using System.IO;
+using Assimp;
 
 namespace AssetManager.ViewModels
 {
@@ -99,92 +100,98 @@ namespace AssetManager.ViewModels
 
         public Task GetMetadata()
         {
-            foreach (var asset in Assets)
+            using (var context = new AppDbContext())
             {
-                asset.Metadata = new AssetMetadata
+                foreach (var asset in Assets)
                 {
-                    Name = asset.FileName,
-                    FilePath = asset.FilePath,
-                    FileType = asset.FileType,
-                    Format = "Not defined",
+                    asset.Metadata = new AssetMetadata
+                    {
+                        Name = asset.FileName,
+                        FilePath = asset.FilePath,
+                        FileType = asset.FileType,
+                        Format = "Not defined",
 
-                };
+                    };
 
-                if (asset.Metadata.FilePath != "")
-                {
-                    FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
-                    asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0) ,0);
-                    asset.Metadata.Format = fileInfo.Extension;
-                    asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
-                    asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+                    if (asset.Metadata.FilePath != "")
+                    {
+                        FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
+                        asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0), 0);
+                        asset.Metadata.Format = fileInfo.Extension;
+                        asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
+                        asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+                    }
+                    else
+                    {
+                        asset.Metadata.FileSize = 0;
+                    }
+
+                    context.MetadataFiles.Add(asset.Metadata);
+                    context.SaveChanges();
                 }
-                else
-                {
-                    asset.Metadata.FileSize = 0;
-                }
-
 
             }
             return Task.CompletedTask;
         }
 
-    private void ExecuteSearch()
-    {
-        if (string.IsNullOrEmpty(SearchText))
-        {
-            var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
-            var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
-            FilteredAssets = new List<Asset>(filtered);
 
-        }
-        else
+        private void ExecuteSearch()
         {
-            try
+            if (string.IsNullOrEmpty(SearchText))
             {
                 var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
                 var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
                 FilteredAssets = new List<Asset>(filtered);
+
             }
-            catch (RegexParseException)
+            else
             {
-                // Handle invalid regex input if necessary
+                try
+                {
+                    var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
+                    FilteredAssets = new List<Asset>(filtered);
+                }
+                catch (RegexParseException)
+                {
+                    // Handle invalid regex input if necessary
+                }
             }
+            OnPropertyChanged(nameof(FilteredAssets));
         }
-        OnPropertyChanged(nameof(FilteredAssets));
-    }
 
-    private void ClearSelection()
-    {
-        SelectedAsset = null;
-    }
-    private void OpenMetadataFile()
-    {
-        MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
-    }
-
-    private void OpenHomePage()
-    {
-        MainPageVM?.OpenHomePage();
-    }
-
-    private void OpenFullImage()
-    {
-        var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+        private void ClearSelection()
         {
-            Owner = App.Current.MainWindow
-        };
-        imageViewer.ShowDialog();
+            SelectedAsset = null;
+        }
+        private void OpenMetadataFile()
+        {
+            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
+        }
+
+        private void OpenHomePage()
+        {
+            MainPageVM?.OpenHomePage();
+        }
+
+        private void OpenFullImage()
+        {
+            var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+            {
+                Owner = App.Current.MainWindow
+            };
+            imageViewer.ShowDialog();
+        }
+
+        public async Task LoadAssetsFromUnityProject(string projectPath)
+        {
+
+            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
+            FilteredAssets = Assets;
+            await GetMetadata();
+
+        }
+
+
     }
-
-    public async Task LoadAssetsFromUnityProject(string projectPath)
-    {
-
-        Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
-        FilteredAssets = Assets;
-        await GetMetadata();
-
-    }
-
-
-}
 }

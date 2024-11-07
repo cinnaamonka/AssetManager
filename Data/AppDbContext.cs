@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 public class AppDbContext : DbContext
 {
     public DbSet<Project> Projects { get; set; }
+    public DbSet<AssetMetadata> MetadataFiles{ get; set; }  
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -15,5 +16,6 @@ public class AppDbContext : DbContext
     public AppDbContext()
     {
         Projects = Set<Project>();
+        MetadataFiles = Set<AssetMetadata>();
     }
 }
