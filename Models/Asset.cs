@@ -7,6 +7,7 @@ namespace AssetManager.Models
 {
     public class Asset
     {
+        public int Id { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public AssetType FileType { get; }
@@ -17,8 +18,9 @@ namespace AssetManager.Models
 
         public AssetMetadata Metadata { get; set; }
 
-        public Asset(string name, string filePath, AssetType fileType, string relativePath = "", ImageSource preview = null)
+        public Asset( string name, string filePath, AssetType fileType, string relativePath = "", ImageSource preview = null)
         {
+            
             FileName = name;
             FilePath = filePath;
             FileType = fileType;

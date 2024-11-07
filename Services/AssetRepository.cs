@@ -42,6 +42,7 @@ namespace AssetManager.Repositories
                                 var assetType = GetAssetType(extension);
 
                                 var asset = new Asset(
+                                 
                                     name: Path.GetFileName(result),
                                     filePath: result,
                                     fileType: assetType,

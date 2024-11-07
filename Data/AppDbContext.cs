@@ -12,7 +12,12 @@ public class AppDbContext : DbContext
         optionsBuilder.UseSqlite("Data Source=appdata.db");
 
     }
-
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AssetMetadata>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+    }
     public AppDbContext()
     {
         Projects = Set<Project>();

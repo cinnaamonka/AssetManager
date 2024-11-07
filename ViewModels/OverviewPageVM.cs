@@ -61,7 +61,7 @@ namespace AssetManager.ViewModels
             }
         }
 
-        private MetadataService _metadataService;
+        private MetadataRepository _metadataRepository;
 
         public RelayCommand SearchCommand { get; set; }
         public RelayCommand OpenMetadataCommand { get; set; }
@@ -92,7 +92,7 @@ namespace AssetManager.ViewModels
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
-            _metadataService = new MetadataService();
+            _metadataRepository = new MetadataRepository();
         }
 
         public OverviewPageVM() { }
@@ -102,32 +102,14 @@ namespace AssetManager.ViewModels
         {
             using (var context = new AppDbContext())
             {
+
                 foreach (var asset in Assets)
                 {
-                    asset.Metadata = new AssetMetadata
-                    {
-                        Name = asset.FileName,
-                        FilePath = asset.FilePath,
-                        FileType = asset.FileType,
-                        Format = "Not defined",
+                    var metadataFile = _metadataRepository.LoadMetadata(asset); 
 
-                    };
-
-                    if (asset.Metadata.FilePath != "")
-                    {
-                        FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
-                        asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0), 0);
-                        asset.Metadata.Format = fileInfo.Extension;
-                        asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
-                        asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
-                    }
-                    else
-                    {
-                        asset.Metadata.FileSize = 0;
-                    }
-
-                    context.MetadataFiles.Add(asset.Metadata);
+                    context.MetadataFiles.Add(metadataFile);
                     context.SaveChanges();
+
                 }
 
             }
