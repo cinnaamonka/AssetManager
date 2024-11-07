@@ -14,7 +14,7 @@ namespace AssetManager.ViewModels
         public LoaderVM Loader { get; set; } = new LoaderVM();
         public RelayCommand OpenOverviewPageCommand { get; set; }
         public RelayCommand BrowseProjectFiles { get; set; }
-        public RelayCommand OpenProjectDetailsCommand { get; }
+        public AsyncRelayCommand OpenProjectDetailsCommand { get; }
 
         private ObservableCollection<Project> _projects;
         public ObservableCollection<Project> Projects
@@ -68,15 +68,12 @@ namespace AssetManager.ViewModels
             OverViewPageVM = OverviewPageViewModel;
             OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage);
             BrowseProjectFiles = new RelayCommand(BrowseFiles);
-            OpenProjectDetailsCommand = new RelayCommand(OpenProjectLibrary);
+            OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             Projects = new ObservableCollection<Project>();
             LoadProjects();
         }
 
-        public async Task OpenProjectAsync()
-        {
-           
-        }
+  
         private void OpenOverviewPage()
         {
             MainPageVM.OpenOverViewPage();
@@ -137,12 +134,6 @@ namespace AssetManager.ViewModels
 
            
         }
-
-        private void OpenProjectLibrary()
-        {
-            OpenProjectLibraryAsync();
-        }
-
     }
 }
 

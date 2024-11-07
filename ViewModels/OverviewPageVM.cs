@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using AssetManager.Services;
 using AssetManager.Repositories;
 using AssetManager.Views;
+using System.IO;
 
 namespace AssetManager.ViewModels
 {
@@ -96,83 +97,94 @@ namespace AssetManager.ViewModels
         public OverviewPageVM() { }
 
 
-        public async Task LoadAssetsAsync()
+        public Task GetMetadata()
         {
             foreach (var asset in Assets)
             {
-
                 asset.Metadata = new AssetMetadata
                 {
                     Name = asset.FileName,
                     FilePath = asset.FilePath,
                     FileType = asset.FileType,
-                    FileSize = 0,
                     Format = "Not defined",
 
                 };
 
-                await _metadataService.SaveMetadataAsync(asset.Metadata);
+                if (asset.Metadata.FilePath != "")
+                {
+                    FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
+                    asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0) ,0);
+                    asset.Metadata.Format = fileInfo.Extension;
+                    asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
+                    asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+                }
+                else
+                {
+                    asset.Metadata.FileSize = 0;
+                }
+
 
             }
+            return Task.CompletedTask;
         }
 
-        private void ExecuteSearch()
+    private void ExecuteSearch()
+    {
+        if (string.IsNullOrEmpty(SearchText))
         {
-            if (string.IsNullOrEmpty(SearchText))
+            var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+            var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
+            FilteredAssets = new List<Asset>(filtered);
+
+        }
+        else
+        {
+            try
             {
                 var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
                 var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
                 FilteredAssets = new List<Asset>(filtered);
-
             }
-            else
+            catch (RegexParseException)
             {
-                try
-                {
-                    var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
-                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
-                    FilteredAssets = new List<Asset>(filtered);
-                }
-                catch (RegexParseException)
-                {
-                    // Handle invalid regex input if necessary
-                }
+                // Handle invalid regex input if necessary
             }
-            OnPropertyChanged(nameof(FilteredAssets));
         }
+        OnPropertyChanged(nameof(FilteredAssets));
+    }
 
-        private void ClearSelection()
+    private void ClearSelection()
+    {
+        SelectedAsset = null;
+    }
+    private void OpenMetadataFile()
+    {
+        MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
+    }
+
+    private void OpenHomePage()
+    {
+        MainPageVM?.OpenHomePage();
+    }
+
+    private void OpenFullImage()
+    {
+        var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
         {
-            SelectedAsset = null;
-        }
-        private void OpenMetadataFile()
-        {
-            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
-        }
+            Owner = App.Current.MainWindow
+        };
+        imageViewer.ShowDialog();
+    }
 
-        private void OpenHomePage()
-        {
-            MainPageVM?.OpenHomePage();
-        }
+    public async Task LoadAssetsFromUnityProject(string projectPath)
+    {
 
-        private void OpenFullImage()
-        {
-            var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
-            {
-                Owner = App.Current.MainWindow
-            };
-            imageViewer.ShowDialog();
-        }
-
-        public async Task LoadAssetsFromUnityProject(string projectPath)
-        {
-
-            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
-            FilteredAssets = Assets;
-            await LoadAssetsAsync();
-
-        }
-
+        Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
+        FilteredAssets = Assets;
+        await GetMetadata();
 
     }
+
+
+}
 }

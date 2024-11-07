@@ -23,6 +23,7 @@ namespace AssetManager.Views
         public MetadataWindow()
         {
             InitializeComponent();
+
         }
     }
 }

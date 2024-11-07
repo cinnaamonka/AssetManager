@@ -1,5 +1,7 @@
 ﻿using AssetManager.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Windows;
 
 namespace AssetManager.ViewModels
 {
@@ -9,6 +11,8 @@ namespace AssetManager.ViewModels
 
         public MainPageVM MainPageVM { get; }
         public OverviewPageVM OverViewPageVM { get; }
+
+        public RelayCommand CloseWindowCommand { get; } 
 
         public AssetMetadata SelectedMetadata
         {
@@ -25,6 +29,7 @@ namespace AssetManager.ViewModels
         {
             MainPageVM = mainPageVM;
             OverViewPageVM = overviewVM;
+            CloseWindowCommand = new RelayCommand(CloseWindow);
         }
 
         public MetadataWindowVM() { }
@@ -33,5 +38,9 @@ namespace AssetManager.ViewModels
             SelectedMetadata = metadata;
         }
 
+        private void CloseWindow()
+        {
+            App.Current.Windows.OfType<Window>().SingleOrDefault(w => w.IsActive)?.Close();
+        }
     }
 }

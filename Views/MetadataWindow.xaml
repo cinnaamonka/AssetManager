@@ -53,25 +53,47 @@
         <!-- Header Section -->
         <TextBlock Text="Asset Metadata" FontSize="22" FontWeight="Bold" Foreground="#333" Margin="0,0,0,20" HorizontalAlignment="Left" />
 
-        <!-- Metadata Content Section -->
         <Border Grid.Row="1" Background="White" Padding="20" CornerRadius="10" BorderBrush="#d0d0d5" BorderThickness="1">
             <StackPanel>
-                <TextBlock Text="Name:" FontWeight="SemiBold" Foreground="#555" />
-                <TextBlock Text="{Binding SelectedMetadata.Name}" FontSize="14" Foreground="#333" Margin="0,0,0,15"/>
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="Name:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.Name}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
 
-                <TextBlock Text="File Type:" FontWeight="SemiBold" Foreground="#555" />
-                <TextBlock Text="{Binding SelectedMetadata.FileType}" FontSize="14" Foreground="#333" Margin="0,0,0,15"/>
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="File Type:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.FileType}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
 
-                <TextBlock Text="Custom Fields:" FontWeight="SemiBold" Foreground="#555" />
-                <Border Background="#f7f7fa" Padding="10" CornerRadius="5" BorderBrush="#ddd" BorderThickness="1" Margin="0,5,0,0">
-                    <TextBlock Text="Add custom field here..." Foreground="#888" FontStyle="Italic" />
-                </Border>
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="File Size:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.FileSize}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                    <TextBlock Text="kB" FontWeight="SemiBold" Foreground="#555" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="File Format:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.Format}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="Date Created:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.DateCreated}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="Last Changes:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.DateLastChanged}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
             </StackPanel>
         </Border>
 
+
         <!-- Buttons Section -->
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Content="Cancel" Style="{StaticResource RoundedButtonStyle}" Background="#ddd" Foreground="#333" Margin="0,0,10,0"/>
+            <Button Content="Cancel" Style="{StaticResource RoundedButtonStyle}" 
+                     Margin="0,0,10,0" Command="{Binding CloseWindowCommand}" 
+                    />
             <Button Content="Save" Style="{StaticResource RoundedButtonStyle}" Background="#4CAF50" Foreground="White"/>
         </StackPanel>
     </Grid>

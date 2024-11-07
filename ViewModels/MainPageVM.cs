@@ -9,56 +9,39 @@ namespace AssetManager.ViewModels
     public class MainPageVM : ObservableObject
     {
         public OverviewPage MainPage { get; set; }
-       // public MetadataPage MetadataPage { get; set; }
+        public MetadataWindow MetadataWindow { get; set; }
         public HomePage HomePage { get; }
         public Page CurrentPage { get; set; }
 
-       
+        private MetadataWindowVM metadataWindowVM { get; }
 
         public MainPageVM()
         {
             OverviewPageVM overViewPageVM = new(this);
-            //MetadataWindowVM metadataPageVM = new(this, overViewPageVM);
+       
             HomePageVM homePageVM = new(this,overViewPageVM);
-
+            metadataWindowVM = new(this, overViewPageVM);
             MainPage = new OverviewPage { DataContext = overViewPageVM };
             HomePage = new HomePage { DataContext = homePageVM };
 
             CurrentPage = HomePage;
         }
 
-        public void HandleOpenMetadataPage(Asset asset)
-        {
-            //if (CurrentPage.DataContext is OverviewPageVM overviewVM)
-            //{
-            //    var selectedAsset = overviewVM.SelectedAsset;
-            //    if (selectedAsset != null)
-            //    {
-            //        CurrentPage = MetadataPopUpWindow; 
-            //        if (MetadataWindowVM.DataContext is MetadataWindowVM metadataVM)
-            //        {
-            //            metadataVM.SetMetadata(selectedAsset.Metadata); 
-            //            OnPropertyChanged(nameof(CurrentPage));
-            //        }
-            //    }
-            //}
-        }
 
         public void HandleOpenPopUpWindow(Asset selectedAsset) 
         {
             if (selectedAsset != null)
             {
-                var metadataPageVM = new MetadataWindowVM
+              
+                metadataWindowVM.SelectedMetadata = selectedAsset.Metadata;
+
+
+                MetadataWindow = new MetadataWindow
                 {
-                    SelectedMetadata = selectedAsset.Metadata 
+                    DataContext = metadataWindowVM,
                 };
 
-                var metadataWindow = new MetadataWindow
-                {
-                    DataContext = metadataPageVM,
-                };
-
-                metadataWindow.ShowDialog();
+                MetadataWindow.ShowDialog(); 
             }
         }
         public void OpenOverViewPage()
