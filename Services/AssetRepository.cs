@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AssetManager.Models;
+using Microsoft.EntityFrameworkCore;
 using static AssetManager.AssetHelpers.AssetHelpers;
 
 namespace AssetManager.Repositories
@@ -15,19 +16,50 @@ namespace AssetManager.Repositories
         public AssetRepository()
         {
         }
+        public async Task<List<Asset>> GetAssetsByProjectPathAsync(string projectPath,AppDbContext context)
+        {
 
-        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath)
+            var connection = context.Database.GetDbConnection();
+            connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='Assets';";
+                var result = command.ExecuteScalar();
+
+                if (result == null)
+                {
+                    throw new InvalidOperationException("The Assets table does not exist in the database.");
+                }
+            }
+
+            return await context.Assets
+                .Where(a => a.FilePath.StartsWith(projectPath))
+                .Include(a => a.Metadata)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context,int currentProjectId)
         {
             Assets.Clear();
 
             string assetsFolderPath = Path.Combine(projectPath, "Assets");
 
+            // Check if assets for this project path already exist in the database
+            var existingAssets = await GetAssetsByProjectPathAsync(projectPath,context);
+            Assets.AddRange(existingAssets); // Add existing assets to the list
+
+            if(existingAssets != null && existingAssets.Count > 0)
+            {
+                return existingAssets;
+            }
             if (Directory.Exists(assetsFolderPath))
             {
                 string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
 
                 // Run the asset processing on a background thread
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
                     foreach (string file in files)
                     {
@@ -37,23 +69,50 @@ namespace AssetManager.Repositories
                             string relativePath = result.Substring(assetsFolderPath.Length + 1);
                             string extension = Path.GetExtension(result).ToLower();
 
-                            if (extension == ".png" || extension == ".jpg" || extension == ".fbx")
+                            if ((extension == ".png" || extension == ".jpg" || extension == ".fbx") &&
+                                !existingAssets.Any(a => a.FilePath == result)) // Skip if asset already exists
                             {
                                 var assetType = GetAssetType(extension);
 
                                 var asset = new Asset(
-                                 
+                                  
                                     name: Path.GetFileName(result),
                                     filePath: result,
+                                    projectId: currentProjectId,
                                     fileType: assetType,
-                                    relativePath: relativePath);
+                                    relativePath: relativePath
+                                    
+                                    );
+                                asset.Metadata = new AssetMetadata
+                                {
+                                    Name = asset.FileName,
+                                    FilePath = asset.FilePath,
+                                    FileType = asset.FileType,
+                                    Format = "Not defined",
+                                };
 
-                                // Use Dispatcher to update the UI safely
+                                if (!string.IsNullOrEmpty(asset.Metadata.FilePath))
+                                {
+                                    FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
+                                    asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0), 0);
+                                    asset.Metadata.Format = fileInfo.Extension;
+                                    asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
+                                    asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+                                    //asset.Metadata.Id = asset.Id;
+                                }
+                                else
+                                {
+                                    asset.Metadata.FileSize = 0;
+                                }
+
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
                                     asset.PreviewImage = GenerateThumbnail(result, extension);
                                     Assets.Add(asset);
                                 });
+
+                                // Save the new asset to the database
+                                await SaveAssetAsync(asset, context);
                             }
                         }
                     }
@@ -63,6 +122,13 @@ namespace AssetManager.Repositories
             return Assets;
         }
 
+
+        public async Task SaveAssetAsync(Asset asset, AppDbContext context)
+        {
+            context.Assets.Add(asset);
+          
+            await context.SaveChangesAsync();
+        }
 
         private ImageSource GenerateThumbnail(string filePath, string extension)
         {

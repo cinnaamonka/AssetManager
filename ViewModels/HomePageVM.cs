@@ -36,7 +36,7 @@ namespace AssetManager.ViewModels
             get => _selectedProject;
             set
             {
-                SetProperty(ref _selectedProject, value); 
+                SetProperty(ref _selectedProject, value);
                 if (_selectedProject != null)
                 {
                     // Trigger navigation whenever a project is selected
@@ -52,7 +52,7 @@ namespace AssetManager.ViewModels
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     UnityProjectPath = folderDialog.SelectedPath;
-                    OverViewPageVM.LoadAssetsFromUnityProject(UnityProjectPath);
+                    OverViewPageVM.LoadAssetsFromUnityProject(UnityProjectPath,SelectedProject.Id);
 
                 }
             }
@@ -73,7 +73,7 @@ namespace AssetManager.ViewModels
             LoadProjects();
         }
 
-  
+
         private void OpenOverviewPage()
         {
             MainPageVM.OpenOverViewPage();
@@ -86,16 +86,15 @@ namespace AssetManager.ViewModels
                 Name = UnityProjectPath.Substring(UnityProjectPath.LastIndexOf(@"\") + 1),
                 DateAdded = DateTime.Now,
                 FileCount = OverViewPageVM.FilteredAssets.Count,
-                Id = Projects.Count + 1,
+                Id = Projects.Count,
                 Path = UnityProjectPath
             };
-            using (var context = new AppDbContext())
-            {
-                context.Projects.Add(project);
-                context.SaveChanges(); 
-            } 
 
-            Projects.Add(project);  
+            MainPageVM.AppDbContext.Projects.Add(project);
+            MainPageVM.AppDbContext.SaveChanges();
+
+
+            Projects.Add(project);
 
             OnPropertyChanged(nameof(Projects));
         }
@@ -103,15 +102,14 @@ namespace AssetManager.ViewModels
 
         private void LoadProjects()
         {
-            using (var context = new AppDbContext())
+
+            MainPageVM.AppDbContext.Database.EnsureCreated();
+            var projectsFromDb = MainPageVM.AppDbContext.Projects.ToList();
+            foreach (var project in projectsFromDb)
             {
-                context.Database.EnsureCreated();
-                var projectsFromDb = context.Projects.ToList();
-                foreach (var project in projectsFromDb)
-                {
-                    Projects.Add(project);
-                }
+                Projects.Add(project);
             }
+
         }
 
         private async Task OpenProjectLibraryAsync()
@@ -119,11 +117,11 @@ namespace AssetManager.ViewModels
             Loader.IsLoading = true;
             Loader.LoadingMessage = "Loading project...";
 
-            await Task.Delay(10);  
+            await Task.Delay(10);
 
             try
             {
-                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path);
+                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path,SelectedProject.Id);
 
             }
             finally
@@ -132,7 +130,7 @@ namespace AssetManager.ViewModels
                 MainPageVM.OpenOverViewPage();
             }
 
-           
+
         }
     }
 }

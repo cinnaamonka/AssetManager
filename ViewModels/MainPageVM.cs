@@ -13,10 +13,15 @@ namespace AssetManager.ViewModels
         public HomePage HomePage { get; }
         public Page CurrentPage { get; set; }
 
+        private AppDbContext _appDbContext;
+        public AppDbContext AppDbContext { get; set; }
+
         private MetadataWindowVM metadataWindowVM { get; }
 
         public MainPageVM()
         {
+            AppDbContext = new AppDbContext();
+
             OverviewPageVM overViewPageVM = new(this);
        
             HomePageVM homePageVM = new(this,overViewPageVM);
@@ -25,6 +30,8 @@ namespace AssetManager.ViewModels
             HomePage = new HomePage { DataContext = homePageVM };
 
             CurrentPage = HomePage;
+
+           
         }
 
 

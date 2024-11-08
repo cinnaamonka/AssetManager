@@ -7,6 +7,7 @@ using AssetManager.Repositories;
 using AssetManager.Views;
 using System.IO;
 using Assimp;
+using Microsoft.EntityFrameworkCore;
 
 namespace AssetManager.ViewModels
 {
@@ -15,6 +16,7 @@ namespace AssetManager.ViewModels
         private List<Asset> _assets;
         private List<Asset> _filteredAssets;
         private Asset _selectedAsset;
+
 
         public List<Asset> Assets
         {
@@ -74,6 +76,7 @@ namespace AssetManager.ViewModels
 
 
         public MainPageVM MainPageVM { get; }
+
         private AssetRepository _assetRepository;
 
 
@@ -93,28 +96,25 @@ namespace AssetManager.ViewModels
 
             _assetRepository = new AssetRepository();
             _metadataRepository = new MetadataRepository();
+
+
         }
 
         public OverviewPageVM() { }
 
 
-        public Task GetMetadata()
+        public async Task GetMetadata(Asset asset)
         {
-            using (var context = new AppDbContext())
+            using (MainPageVM.AppDbContext)
             {
+                var metadataFile = _metadataRepository.LoadMetadata(asset);
 
-                foreach (var asset in Assets)
-                {
-                    var metadataFile = _metadataRepository.LoadMetadata(asset); 
-
-                    context.MetadataFiles.Add(metadataFile);
-                    context.SaveChanges();
-
-                }
+                MainPageVM.AppDbContext.MetadataFiles.Add(metadataFile);
+                await MainPageVM.AppDbContext.SaveChangesAsync();
 
             }
-            return Task.CompletedTask;
         }
+
 
 
         private void ExecuteSearch()
@@ -165,12 +165,12 @@ namespace AssetManager.ViewModels
             imageViewer.ShowDialog();
         }
 
-        public async Task LoadAssetsFromUnityProject(string projectPath)
+        public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
         {
 
-            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath);
+            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
+                MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
-            await GetMetadata();
 
         }
 
