@@ -20,20 +20,20 @@ namespace AssetManager.Models
 
         public string RelativePath { get; set; }
 
-        [NotMapped] public ImageSource PreviewImage { get; set; }
+        public string PreviewImagePath{ get; set; }
 
         public AssetMetadata Metadata { get; set; }
 
         public Asset() { }
 
-        public Asset(string name, string filePath,int projectId, AssetType fileType, string relativePath = "", ImageSource preview = null)
+        public Asset(string name, string filePath,int projectId, AssetType fileType, string relativePath = "", string previewImagePath = null)
         {
             
             FileName = name;
             FilePath = filePath;
             FileType = fileType;
             RelativePath = relativePath;
-            PreviewImage = preview;
+            PreviewImagePath = previewImagePath;
             ProjectId = projectId;
 
             Metadata = new AssetMetadata();

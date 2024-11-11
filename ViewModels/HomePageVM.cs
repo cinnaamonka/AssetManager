@@ -39,7 +39,6 @@ namespace AssetManager.ViewModels
                 SetProperty(ref _selectedProject, value);
                 if (_selectedProject != null)
                 {
-                    // Trigger navigation whenever a project is selected
                     OpenProjectDetailsCommand.Execute(_selectedProject);
                 }
             }
@@ -52,7 +51,7 @@ namespace AssetManager.ViewModels
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     UnityProjectPath = folderDialog.SelectedPath;
-                    OverViewPageVM.LoadAssetsFromUnityProject(UnityProjectPath,SelectedProject.Id);
+                
 
                 }
             }

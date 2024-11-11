@@ -16,7 +16,7 @@ namespace AssetManager.Repositories
         public AssetRepository()
         {
         }
-        public async Task<List<Asset>> GetAssetsByProjectPathAsync(string projectPath,AppDbContext context)
+        public async Task<List<Asset>> GetAssetsByProjectPathAsync(string projectPath, AppDbContext context)
         {
 
             var connection = context.Database.GetDbConnection();
@@ -40,17 +40,17 @@ namespace AssetManager.Repositories
         }
 
 
-        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context,int currentProjectId)
+        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId)
         {
             Assets.Clear();
 
             string assetsFolderPath = Path.Combine(projectPath, "Assets");
 
-            // Check if assets for this project path already exist in the database
-            var existingAssets = await GetAssetsByProjectPathAsync(projectPath,context);
-            Assets.AddRange(existingAssets); // Add existing assets to the list
+         
+            var existingAssets = await GetAssetsByProjectPathAsync(projectPath, context);
+            Assets.AddRange(existingAssets); 
 
-            if(existingAssets != null && existingAssets.Count > 0)
+            if (existingAssets != null && existingAssets.Count > 0)
             {
                 return existingAssets;
             }
@@ -58,7 +58,7 @@ namespace AssetManager.Repositories
             {
                 string[] files = Directory.GetFiles(assetsFolderPath, "*.*", SearchOption.AllDirectories);
 
-                // Run the asset processing on a background thread
+              
                 await Task.Run(async () =>
                 {
                     foreach (string file in files)
@@ -70,18 +70,18 @@ namespace AssetManager.Repositories
                             string extension = Path.GetExtension(result).ToLower();
 
                             if ((extension == ".png" || extension == ".jpg" || extension == ".fbx") &&
-                                !existingAssets.Any(a => a.FilePath == result)) // Skip if asset already exists
+                                !existingAssets.Any(a => a.FilePath == result)) 
                             {
                                 var assetType = GetAssetType(extension);
 
                                 var asset = new Asset(
-                                  
+
                                     name: Path.GetFileName(result),
                                     filePath: result,
                                     projectId: currentProjectId,
                                     fileType: assetType,
                                     relativePath: relativePath
-                                    
+
                                     );
                                 asset.Metadata = new AssetMetadata
                                 {
@@ -98,7 +98,7 @@ namespace AssetManager.Repositories
                                     asset.Metadata.Format = fileInfo.Extension;
                                     asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
                                     asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
-                                    //asset.Metadata.Id = asset.Id;
+                                  
                                 }
                                 else
                                 {
@@ -107,11 +107,11 @@ namespace AssetManager.Repositories
 
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
-                                    asset.PreviewImage = GenerateThumbnail(result, extension);
+                                    asset.PreviewImagePath = GenerateThumbnail(result, extension);
                                     Assets.Add(asset);
                                 });
 
-                                // Save the new asset to the database
+                             
                                 await SaveAssetAsync(asset, context);
                             }
                         }
@@ -126,17 +126,17 @@ namespace AssetManager.Repositories
         public async Task SaveAssetAsync(Asset asset, AppDbContext context)
         {
             context.Assets.Add(asset);
-          
+
             await context.SaveChangesAsync();
         }
 
-        private ImageSource GenerateThumbnail(string filePath, string extension)
+        private string GenerateThumbnail(string filePath, string extension)
         {
             if (extension == ".png" || extension == ".jpg")
             {
                 if (File.Exists(filePath))
                 {
-                    return LoadImageThumbnail(filePath);
+                    return LoadAndSaveImageThumbnail(filePath,thumbnailSize);
                 }
                 return null;
 
@@ -149,7 +149,7 @@ namespace AssetManager.Repositories
                 {
                     string filename = GeneratePngThumbnail(objFilePath);
 
-                    return LoadImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename));
+                    return LoadAndSaveImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename), thumbnailSize);
 
                 }
             }
@@ -199,11 +199,11 @@ namespace AssetManager.Repositories
         }
         private string GeneratePngThumbnail(string objFilePath)
         {
-            // Define the target path for the PNG thumbnail in the same directory as the OBJ file
+           
             string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ThumbnailsGenerator", "DirectX.exe");
 
-            // Define the temporary output folder for the thumbnail
+            
             string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempThumbnails");
 
             if (!Directory.Exists(outputFolderPath))
@@ -229,19 +229,19 @@ namespace AssetManager.Repositories
                     process.WaitForExit();
                     if (process.ExitCode == 0)
                     {
-                        // Construct the new path in the TempThumbnails folder
+                      
                         string tempThumbnailPath = Path.Combine(outputFolderPath, Path.GetFileName(originalThumbnailPath));
 
-                        // If the file already exists, delete it to avoid IOException
+                      
                         if (File.Exists(tempThumbnailPath))
                         {
                             File.Delete(tempThumbnailPath);
                         }
 
-                        // Move the generated file from the original location to the TempThumbnails folder
+                      
                         File.Move(originalThumbnailPath, tempThumbnailPath);
 
-                        // Return the final path of the thumbnail in the TempThumbnails directory
+                     
                         return tempThumbnailPath;
                     }
                 }
@@ -250,7 +250,7 @@ namespace AssetManager.Repositories
         }
 
 
-        private ImageSource LoadImageThumbnail(string filePath)
+        private string LoadAndSaveImageThumbnail(string filePath, int thumbnailSize)
         {
             if (filePath != null)
             {
@@ -260,19 +260,50 @@ namespace AssetManager.Repositories
                 bitmap.DecodePixelWidth = thumbnailSize;
                 bitmap.EndInit();
 
-                return bitmap;
+
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+
+                string thumbnailPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(filePath),
+                                                              $"{System.IO.Path.GetFileNameWithoutExtension(filePath)}_thumbnail.png");
+
+
+                using (var fileStream = new FileStream(thumbnailPath, FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+
+
+                return thumbnailPath;
             }
+
             return null;
         }
 
-        private ImageSource GetPlaceholderThumbnail()
+        private string GetPlaceholderThumbnail()
         {
             string placeholderPath = "path/to/placeholder.png";
-            if (File.Exists(placeholderPath))
+
+            if (!File.Exists(placeholderPath))
             {
-                return new BitmapImage(new Uri(placeholderPath));
+                BitmapImage placeholderImage = new BitmapImage();
+                placeholderImage.BeginInit();
+                placeholderImage.UriSource = new Uri("pack://application:,,,/Resources/default_placeholder.png"); // Replace with your actual default image path if embedded in resources
+                placeholderImage.CacheOption = BitmapCacheOption.OnLoad;
+                placeholderImage.EndInit();
+
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(placeholderImage));
+
+                using (FileStream fileStream = new FileStream(placeholderPath, FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
             }
-            return null;
+
+            return placeholderPath;
         }
+
     }
 }

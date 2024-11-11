@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241108200357_EnsureAssetsTable")]
-    partial class EnsureAssetsTable
+    [Migration("20241111204914_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,10 @@ namespace AssetManager.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PreviewImagePath")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

@@ -36,7 +36,8 @@ namespace AssetManager.Migrations
                     ProjectId = table.Column<int>(type: "INTEGER", nullable: false),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FilePath = table.Column<string>(type: "TEXT", nullable: false),
-                    RelativePath = table.Column<string>(type: "TEXT", nullable: false)
+                    RelativePath = table.Column<string>(type: "TEXT", nullable: false),
+                    PreviewImagePath = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

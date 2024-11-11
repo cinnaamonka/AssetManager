@@ -30,6 +30,10 @@ namespace AssetManager.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PreviewImagePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 
