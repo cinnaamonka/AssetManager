@@ -20,5 +20,9 @@ namespace AssetManager.Models
         public int AssetId { get; set; }
         public Asset Asset { get; set; }
 
+
+        public int VertexCount { get; set; }
+        public int FaceCount { get; set; }
+
     }
 }

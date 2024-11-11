@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241111204914_InitialCreate")]
+    [Migration("20241111221402_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -66,6 +66,9 @@ namespace AssetManager.Migrations
                     b.Property<DateTime>("DateLastChanged")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("FaceCount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -83,6 +86,9 @@ namespace AssetManager.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("VertexCount")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

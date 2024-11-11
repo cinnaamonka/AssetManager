@@ -85,7 +85,7 @@ namespace AssetManager.ViewModels
                 Name = UnityProjectPath.Substring(UnityProjectPath.LastIndexOf(@"\") + 1),
                 DateAdded = DateTime.Now,
                 FileCount = OverViewPageVM.FilteredAssets.Count,
-                Id = Projects.Count,
+                Id = Projects.Count + 1,
                 Path = UnityProjectPath
             };
 

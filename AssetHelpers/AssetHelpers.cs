@@ -1,4 +1,6 @@
-﻿
+﻿using System.IO;
+using AssetManager.Models;
+
 namespace AssetManager.AssetHelpers
 {
     public class AssetHelpers
@@ -21,5 +23,26 @@ namespace AssetManager.AssetHelpers
             };
         }
 
+        public static void AddVertexFileInfo(string fileName, Asset asset)
+        {
+            if(!File.Exists(fileName))
+            {
+                Console.WriteLine("File does not exist");
+                return;
+            }
+
+            foreach(var line in File.ReadAllLines(fileName))
+            {
+                if(line.StartsWith("v"))
+                {
+                    asset.Metadata.VertexCount++;
+                }
+                else if(line.StartsWith("f"))
+                {
+                    asset.Metadata.FaceCount++;
+                }
+            
+            }
+        }
     }
 }

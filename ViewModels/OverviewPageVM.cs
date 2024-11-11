@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using AssetManager.Models;
 using System.Text.RegularExpressions;
-using AssetManager.Services;
 using AssetManager.Repositories;
 using AssetManager.Views;
 using System.IO;
@@ -63,8 +62,6 @@ namespace AssetManager.ViewModels
             }
         }
 
-        private MetadataRepository _metadataRepository;
-
         public RelayCommand SearchCommand { get; set; }
         public RelayCommand OpenMetadataCommand { get; set; }
         public RelayCommand OpenHomePageCommand { get; set; }
@@ -95,7 +92,7 @@ namespace AssetManager.ViewModels
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
-            _metadataRepository = new MetadataRepository();
+     
 
 
         }
@@ -107,15 +104,13 @@ namespace AssetManager.ViewModels
         {
             using (MainPageVM.AppDbContext)
             {
-                var metadataFile = _metadataRepository.LoadMetadata(asset);
+                var metadataFile = asset.Metadata;
 
                 MainPageVM.AppDbContext.MetadataFiles.Add(metadataFile);
                 await MainPageVM.AppDbContext.SaveChangesAsync();
 
             }
         }
-
-
 
         private void ExecuteSearch()
         {

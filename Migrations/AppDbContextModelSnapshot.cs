@@ -63,6 +63,9 @@ namespace AssetManager.Migrations
                     b.Property<DateTime>("DateLastChanged")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("FaceCount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -80,6 +83,9 @@ namespace AssetManager.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("VertexCount")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
