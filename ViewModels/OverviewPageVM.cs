@@ -92,9 +92,7 @@ namespace AssetManager.ViewModels
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
-     
-
-
+  
         }
 
         public OverviewPageVM() { }

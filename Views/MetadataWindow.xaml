@@ -2,10 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:AssetManager.ViewModels"
+        xmlns:converters="clr-namespace:AssetManager.Converters"
         Title="Metadata" Height="450" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="#f0f0f5">
 
     <Window.Resources>
-        <!-- Corrected Rounded Button Style -->
+        <converters:ExtenstionToVisibilityConverter x:Key ="ExtenstionToVisibilityConverter" />
+
         <Style x:Key="RoundedButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#4CAF50" />
             <Setter Property="Foreground" Value="White" />
@@ -20,9 +22,9 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="15"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                          CornerRadius="15"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -39,9 +41,6 @@
         </Style>
     </Window.Resources>
 
-    <Window.DataContext>
-        <vm:MetadataWindowVM />
-    </Window.DataContext>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -85,16 +84,19 @@
                     <TextBlock Text="Last Changes:" FontWeight="SemiBold" Foreground="#555" />
                     <TextBlock Text="{Binding SelectedMetadata.DateLastChanged}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
                 </StackPanel>
-                
-                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2" 
+            Visibility="{Binding SelectedMetadata.FileType, Converter={StaticResource ExtenstionToVisibilityConverter}}">
                     <TextBlock Text="Vertex Count:" FontWeight="SemiBold" Foreground="#555" />
                     <TextBlock Text="{Binding SelectedMetadata.VertexCount}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2" 
+            Visibility="{Binding SelectedMetadata.FileType, Converter={StaticResource ExtenstionToVisibilityConverter}}">
                     <TextBlock Text="Face Count:" FontWeight="SemiBold" Foreground="#555" />
                     <TextBlock Text="{Binding SelectedMetadata.FaceCount}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
                 </StackPanel>
+
             </StackPanel>
         </Border>
 
