@@ -13,7 +13,7 @@ namespace AssetManager.ViewModels
 
         public LoaderVM Loader { get; set; } = new LoaderVM();
         public RelayCommand OpenOverviewPageCommand { get; set; }
-        public RelayCommand BrowseProjectFiles { get; set; }
+        public AsyncRelayCommand BrowseProjectFiles { get; set; }
         public AsyncRelayCommand OpenProjectDetailsCommand { get; }
 
         private ObservableCollection<Project> _projects;
@@ -51,7 +51,7 @@ namespace AssetManager.ViewModels
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     UnityProjectPath = folderDialog.SelectedPath;
-                
+
 
                 }
             }
@@ -66,7 +66,7 @@ namespace AssetManager.ViewModels
             MainPageVM = mainPageVM;
             OverViewPageVM = OverviewPageViewModel;
             OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage);
-            BrowseProjectFiles = new RelayCommand(BrowseFiles);
+            BrowseProjectFiles = new AsyncRelayCommand(BrowseFiles);
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             Projects = new ObservableCollection<Project>();
             LoadProjects();
@@ -77,9 +77,10 @@ namespace AssetManager.ViewModels
         {
             MainPageVM.OpenOverViewPage();
         }
-        private void BrowseFiles()
+        async private Task BrowseFiles()
         {
             OpenFolderDialog();
+
             var project = new Project()
             {
                 Name = UnityProjectPath.Substring(UnityProjectPath.LastIndexOf(@"\") + 1),
@@ -92,6 +93,17 @@ namespace AssetManager.ViewModels
             MainPageVM.AppDbContext.Projects.Add(project);
             MainPageVM.AppDbContext.SaveChanges();
 
+            Loader.IsLoading = true;
+            Loader.LoadingMessage = "Loading project...";
+
+            await Task.Delay(10);
+
+            await OverViewPageVM.LoadAssetsFromUnityProject(project.Path, project.Id);
+
+            Loader.IsLoading = false;
+
+            project.FileCount = OverViewPageVM.Assets.Count;
+            MainPageVM.AppDbContext.SaveChanges();
 
             Projects.Add(project);
 
@@ -120,7 +132,7 @@ namespace AssetManager.ViewModels
 
             try
             {
-                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path,SelectedProject.Id);
+                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
 
             }
             finally
