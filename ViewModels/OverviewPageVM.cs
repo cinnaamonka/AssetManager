@@ -15,6 +15,7 @@ namespace AssetManager.ViewModels
         private List<Asset> _assets;
         private List<Asset> _filteredAssets;
         private Asset _selectedAsset;
+        private List<Tag> _tags;
 
 
         public List<Asset> Assets
@@ -27,6 +28,15 @@ namespace AssetManager.ViewModels
             }
         }
 
+        public List<Tag> Tags
+        {
+            get { return _tags; }
+            set
+            {
+                _tags = value;
+                OnPropertyChanged(nameof(Tags));
+            }
+        }
         public Asset SelectedAsset
         {
             get
@@ -75,6 +85,7 @@ namespace AssetManager.ViewModels
         public MainPageVM MainPageVM { get; }
 
         private AssetRepository _assetRepository;
+        private TagRepository _tagRepository;
 
 
         public OverviewPageVM(MainPageVM mainPageVM)
@@ -92,23 +103,12 @@ namespace AssetManager.ViewModels
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
 
             _assetRepository = new AssetRepository();
-  
+            _tagRepository = new TagRepository(MainPageVM.AppDbContext);
+
+       
         }
 
         public OverviewPageVM() { }
-
-
-        public async Task GetMetadata(Asset asset)
-        {
-            using (MainPageVM.AppDbContext)
-            {
-                var metadataFile = asset.Metadata;
-
-                MainPageVM.AppDbContext.MetadataFiles.Add(metadataFile);
-                await MainPageVM.AppDbContext.SaveChangesAsync();
-
-            }
-        }
 
         private void ExecuteSearch()
         {
@@ -164,9 +164,37 @@ namespace AssetManager.ViewModels
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
                 MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
-
+          
+            LoadAllTags();
         }
 
+        public async void LoadAllTags()
+        {
+            Tags = await _tagRepository.GetAllTagsAsync();
+        }
 
+        public async void LoadAssetTags(int assetId)
+        {
+            var tags = await _tagRepository.GetAssetTagsAsync(assetId);
+
+            Tags.Clear();
+
+            foreach (var tag in tags)
+            {
+                Tags.Add(tag);
+            } 
+        }
+
+        public async void AddTag(int assetId, string tagName)
+        {
+            await _tagRepository.AddTagAsync(assetId, tagName);
+            LoadAssetTags(assetId); 
+        }
+
+        public async void RemoveTag(int assetId, string tagName)
+        {
+            await _tagRepository.RemoveTagFromAssetAsync(assetId, tagName);
+            LoadAssetTags(assetId); 
+        }
     }
 }

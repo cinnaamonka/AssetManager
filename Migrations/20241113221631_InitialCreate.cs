@@ -28,6 +28,19 @@ namespace AssetManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    TagId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.TagId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Assets",
                 columns: table => new
                 {
@@ -47,6 +60,43 @@ namespace AssetManager.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AssetTags",
+                columns: table => new
+                {
+                    AssetId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TagId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TagId1 = table.Column<int>(type: "INTEGER", nullable: false),
+                    AssetId1 = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssetTags", x => new { x.AssetId, x.TagId });
+                    table.ForeignKey(
+                        name: "FK_AssetTags_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssetTags_Assets_AssetId1",
+                        column: x => x.AssetId1,
+                        principalTable: "Assets",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AssetTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "TagId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssetTags_Tags_TagId1",
+                        column: x => x.TagId1,
+                        principalTable: "Tags",
+                        principalColumn: "TagId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -84,6 +134,21 @@ namespace AssetManager.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AssetTags_AssetId1",
+                table: "AssetTags",
+                column: "AssetId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetTags_TagId",
+                table: "AssetTags",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetTags_TagId1",
+                table: "AssetTags",
+                column: "TagId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MetadataFiles_AssetId",
                 table: "MetadataFiles",
                 column: "AssetId",
@@ -94,7 +159,13 @@ namespace AssetManager.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AssetTags");
+
+            migrationBuilder.DropTable(
                 name: "MetadataFiles");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Assets");

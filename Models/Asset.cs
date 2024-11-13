@@ -24,6 +24,8 @@ namespace AssetManager.Models
 
         public AssetMetadata Metadata { get; set; }
 
+        public List<AssetTag> Tags { get; set; }
+
         public Asset() { }
 
         public Asset(string name, string filePath,int projectId, AssetType fileType, string relativePath = "", string previewImagePath = null)
@@ -37,6 +39,7 @@ namespace AssetManager.Models
             ProjectId = projectId;
 
             Metadata = new AssetMetadata();
+            Tags = new List<AssetTag>();
         }
 
       

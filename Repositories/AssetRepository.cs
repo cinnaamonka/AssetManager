@@ -105,6 +105,10 @@ namespace AssetManager.Repositories
                                     asset.Metadata.FileSize = 0;
                                 }
 
+
+                          
+                             
+
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
                                     asset.PreviewImagePath = GenerateThumbnail(asset, extension);

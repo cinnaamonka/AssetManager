@@ -12,6 +12,12 @@ namespace AssetManager.AssetHelpers
             Other
         }
 
+        public enum Tags
+        {
+            Image,
+            Model
+        }
+
         public static AssetType GetAssetType(string extension)
         {
             return extension.ToLower() switch
