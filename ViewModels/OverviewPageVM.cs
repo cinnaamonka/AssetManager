@@ -175,19 +175,19 @@ namespace AssetManager.ViewModels
 
         public async void LoadAssetTags(int assetId)
         {
-            //var tags = await _tagRepository.GetAssetTagsAsync(assetId);
+            var tags = await _tagRepository.GetAssetTagsAsync(assetId);
 
-            //Tags.Clear();
+            Tags.Clear();
 
-            //foreach (var tag in tags)
-            //{
-            //    Tags.Add(tag);
-            //} 
+            foreach (var tag in tags)
+            {
+                Tags.Add(tag);
+            }
         }
 
         public async void AddTag(int assetId, string tagName)
         {
-            await _tagRepository.AddTagAsync(assetId, tagName);
+            await _tagRepository.AddAssetTagAsync(assetId, tagName);
             LoadAssetTags(assetId); 
         }
 

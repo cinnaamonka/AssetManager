@@ -1,9 +1,20 @@
 ﻿using AssetManager.Models;
 using Microsoft.EntityFrameworkCore;
 using static AssetManager.AssetHelpers.AssetHelpers;
+using System.Windows.Media;
+
 
 namespace AssetManager.Repositories
 {
+    enum Tags
+    {
+        Image,
+        Model,
+        Video,
+        Audio,
+        Document,
+
+    }
     internal class TagRepository
     {
         private readonly AppDbContext _dbContext;
@@ -11,68 +22,74 @@ namespace AssetManager.Repositories
         public TagRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-
-            AddTag(new Tag { Name = Tags.Image.ToString() });
-            AddTag(new Tag { Name = Tags.Model.ToString() });
-
-            _dbContext.SaveChanges();
+            InitializeTagsAsync().Wait();
         }
 
-        public async Task AddTagAsync(int assetId, string tagName)
+        private async Task InitializeTagsAsync()
         {
-            //var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
-            //           ?? new Tag { Name = tagName };
-
-            //if (!await _dbContext.Tags.AnyAsync(t => t.TagId == tag.TagId))
-            //{
-            //    _dbContext.Tags.Add(tag);
-            //}
-
-       
-            //await _dbContext.SaveChangesAsync();
-
-       
-            //var assetTag = new AssetTag { AssetId = assetId, TagId = tag.TagId };
-            //if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.TagId))
-            //{
-            //    _dbContext.AssetTags.Add(assetTag);
-            //    await _dbContext.SaveChangesAsync();
-            //}
+            foreach (var tag in Enum.GetValues(typeof(Tags)))
+            {
+                await AddTag(tag.ToString());
+            }
         }
 
-        private void AddTag(Tag newTag)
+        private async Task<Tag> AddTag(string tagName)
         {
-            //var tag = _dbContext.Tags.FirstOrDefault(t => t.Name == newTag.Name)
-            //          ?? new Tag { Name = newTag.Name };
+            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
+                      ?? new Tag { Name = tagName };
 
-            //if (!_dbContext.Tags.Any(t => t.TagId == tag.TagId))
-            //{
-            //    _dbContext.Tags.Add(tag);
-            //    _dbContext.SaveChanges();
-            //}
+            Random random = new Random();
+            byte r = (byte)random.Next(128, 256); 
+            byte g = (byte)random.Next(128, 256); 
+            byte b = (byte)random.Next(128, 256); 
+
+            System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
+
+            tag.Color = brightColor.ToString();
+
+            if (!await _dbContext.Tags.AnyAsync(t => t.Id == tag.Id))
+            {
+                _dbContext.Tags.Add(tag);
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return tag;
         }
 
-        //public async Task<List<Tag>> GetAssetTagsAsync(int assetId)
-        //{
-        //    //return await _dbContext.AssetTags
-        //    //    .Where(at => at.AssetId == assetId)
-        //    //    .Select(at => at.Tag)
-        //    //    .ToListAsync();
-        //}
+        public async Task AddAssetTagAsync(int assetId, string tagName)
+        {
+            var tag = await AddTag(tagName);
+
+            var assetTag = new AssetTag { AssetId = assetId, TagId = tag.Id };
+            if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.Id))
+            {
+                _dbContext.AssetTags.Add(assetTag);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Tag>> GetAssetTagsAsync(int assetId)
+        {
+            return await _dbContext.AssetTags
+                .Where(at => at.AssetId == assetId)
+                .Select(at => at.Tag)
+                .ToListAsync();
+        }
 
         public async Task RemoveTagFromAssetAsync(int assetId, string tagName)
         {
-            //var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
-            //if (tag == null) return;
+            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
+            if (tag == null) return;
 
-            //var assetTag = await _dbContext.AssetTags
-            //    .SingleOrDefaultAsync(at => at.TagId == tag.TagId && at.AssetId == assetId);
+            var assetTag = await _dbContext.AssetTags
+                .SingleOrDefaultAsync(at => at.TagId == tag.Id && at.AssetId == assetId);
 
-            //if (assetTag != null)
-            //{
-            //    _dbContext.AssetTags.Remove(assetTag);
-            //    await _dbContext.SaveChangesAsync();
-            //}
+            if (assetTag != null)
+            {
+                _dbContext.AssetTags.Remove(assetTag);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task RemoveAllTagsAsync()
@@ -85,7 +102,5 @@ namespace AssetManager.Repositories
         {
             return await _dbContext.Tags.ToListAsync();
         }
-
-
     }
 }

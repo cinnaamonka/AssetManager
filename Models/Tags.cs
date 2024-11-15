@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
-        
+        public string Color { get; set; } = "#000000";
         public HashSet<AssetTag> AssetTags { get; set; }
     }
     public class AssetTag

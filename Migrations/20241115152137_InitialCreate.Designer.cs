@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241115013452_InitialCreate")]
+    [Migration("20241115152137_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -143,6 +143,10 @@ namespace AssetManager.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
