@@ -20,59 +20,59 @@ namespace AssetManager.Repositories
 
         public async Task AddTagAsync(int assetId, string tagName)
         {
-            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
-                       ?? new Tag { Name = tagName };
+            //var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
+            //           ?? new Tag { Name = tagName };
 
-            if (!await _dbContext.Tags.AnyAsync(t => t.TagId == tag.TagId))
-            {
-                _dbContext.Tags.Add(tag);
-            }
-
-       
-            await _dbContext.SaveChangesAsync();
+            //if (!await _dbContext.Tags.AnyAsync(t => t.TagId == tag.TagId))
+            //{
+            //    _dbContext.Tags.Add(tag);
+            //}
 
        
-            var assetTag = new AssetTag { AssetId = assetId, TagId = tag.TagId };
-            if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.TagId))
-            {
-                _dbContext.AssetTags.Add(assetTag);
-                await _dbContext.SaveChangesAsync();
-            }
+            //await _dbContext.SaveChangesAsync();
+
+       
+            //var assetTag = new AssetTag { AssetId = assetId, TagId = tag.TagId };
+            //if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.TagId))
+            //{
+            //    _dbContext.AssetTags.Add(assetTag);
+            //    await _dbContext.SaveChangesAsync();
+            //}
         }
 
         private void AddTag(Tag newTag)
         {
-            var tag = _dbContext.Tags.FirstOrDefault(t => t.Name == newTag.Name)
-                      ?? new Tag { Name = newTag.Name };
+            //var tag = _dbContext.Tags.FirstOrDefault(t => t.Name == newTag.Name)
+            //          ?? new Tag { Name = newTag.Name };
 
-            if (!_dbContext.Tags.Any(t => t.TagId == tag.TagId))
-            {
-                _dbContext.Tags.Add(tag);
-                _dbContext.SaveChanges();
-            }
+            //if (!_dbContext.Tags.Any(t => t.TagId == tag.TagId))
+            //{
+            //    _dbContext.Tags.Add(tag);
+            //    _dbContext.SaveChanges();
+            //}
         }
 
-        public async Task<List<Tag>> GetAssetTagsAsync(int assetId)
-        {
-            return await _dbContext.AssetTags
-                .Where(at => at.AssetId == assetId)
-                .Select(at => at.Tag)
-                .ToListAsync();
-        }
+        //public async Task<List<Tag>> GetAssetTagsAsync(int assetId)
+        //{
+        //    //return await _dbContext.AssetTags
+        //    //    .Where(at => at.AssetId == assetId)
+        //    //    .Select(at => at.Tag)
+        //    //    .ToListAsync();
+        //}
 
         public async Task RemoveTagFromAssetAsync(int assetId, string tagName)
         {
-            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
-            if (tag == null) return;
+            //var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
+            //if (tag == null) return;
 
-            var assetTag = await _dbContext.AssetTags
-                .SingleOrDefaultAsync(at => at.TagId == tag.TagId && at.AssetId == assetId);
+            //var assetTag = await _dbContext.AssetTags
+            //    .SingleOrDefaultAsync(at => at.TagId == tag.TagId && at.AssetId == assetId);
 
-            if (assetTag != null)
-            {
-                _dbContext.AssetTags.Remove(assetTag);
-                await _dbContext.SaveChangesAsync();
-            }
+            //if (assetTag != null)
+            //{
+            //    _dbContext.AssetTags.Remove(assetTag);
+            //    await _dbContext.SaveChangesAsync();
+            //}
         }
 
         public async Task RemoveAllTagsAsync()

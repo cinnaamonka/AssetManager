@@ -9,7 +9,6 @@ public class AppDbContext : DbContext
     public DbSet<AssetMetadata> MetadataFiles { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Tag> Tags { get; set; }
-    public DbSet<AssetTag> AssetTags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -24,32 +23,17 @@ public class AppDbContext : DbContext
              .HasForeignKey(a => a.ProjectId)
              .OnDelete(DeleteBehavior.Cascade);
 
-
-        modelBuilder.Entity<Asset>()
-        .HasOne(a => a.Metadata)
-        .WithOne(m => m.Asset)
-        .HasForeignKey<AssetMetadata>(m => m.AssetId) 
-        .OnDelete(DeleteBehavior.Cascade); 
-
         modelBuilder.Entity<Asset>()
           .HasOne(a => a.Metadata)
           .WithOne(m => m.Asset)
           .HasForeignKey<AssetMetadata>(m => m.AssetId)
           .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<AssetTag>()
-            .HasKey(at => new { at.AssetId, at.TagId });
-
-   
-        modelBuilder.Entity<AssetTag>()
-            .HasOne<Asset>()               
-            .WithMany()                    
-            .HasForeignKey(at => at.AssetId);
-
-        modelBuilder.Entity<AssetTag>()
-            .HasOne<Tag>()                  
-            .WithMany()                     
-            .HasForeignKey(at => at.TagId);
+        modelBuilder.Entity<Asset>()
+             .HasMany(a => a.Tags)           
+             .WithOne(t => t.Asset)          
+             .HasForeignKey(t => t.AssetId)  
+             .OnDelete(DeleteBehavior.Cascade); 
     }
     public AppDbContext()
     {
@@ -57,8 +41,7 @@ public class AppDbContext : DbContext
         MetadataFiles = Set<AssetMetadata>();
         Assets = Set<Asset>();
         Tags = Set<Tag>();
-        AssetTags = Set<AssetTag>();
-
+     
         this.Database.EnsureCreated();
     }
 }

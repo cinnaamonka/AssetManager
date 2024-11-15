@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241113221631_InitialCreate")]
+    [Migration("20241115000003_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -98,31 +98,6 @@ namespace AssetManager.Migrations
                     b.ToTable("MetadataFiles");
                 });
 
-            modelBuilder.Entity("AssetManager.Models.AssetTag", b =>
-                {
-                    b.Property<int>("AssetId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("AssetId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TagId1")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("AssetId", "TagId");
-
-                    b.HasIndex("AssetId1");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("TagId1");
-
-                    b.ToTable("AssetTags");
-                });
-
             modelBuilder.Entity("AssetManager.Models.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -150,15 +125,20 @@ namespace AssetManager.Migrations
 
             modelBuilder.Entity("AssetManager.Models.Tag", b =>
                 {
-                    b.Property<int>("TagId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AssetId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("TagId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
 
                     b.ToTable("Tags");
                 });
@@ -183,31 +163,15 @@ namespace AssetManager.Migrations
                     b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("AssetManager.Models.AssetTag", b =>
+            modelBuilder.Entity("AssetManager.Models.Tag", b =>
                 {
-                    b.HasOne("AssetManager.Models.Asset", null)
-                        .WithMany()
+                    b.HasOne("AssetManager.Models.Asset", "Asset")
+                        .WithMany("Tags")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AssetManager.Models.Asset", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("AssetId1");
-
-                    b.HasOne("AssetManager.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AssetManager.Models.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tag");
+                    b.Navigation("Asset");
                 });
 
             modelBuilder.Entity("AssetManager.Models.Asset", b =>

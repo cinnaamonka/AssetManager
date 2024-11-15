@@ -24,7 +24,7 @@ namespace AssetManager.Models
 
         public AssetMetadata Metadata { get; set; }
 
-        public List<AssetTag> Tags { get; set; }
+        public List<Tag> Tags { get; set; }
 
         public Asset() { }
 
@@ -39,7 +39,7 @@ namespace AssetManager.Models
             ProjectId = projectId;
 
             Metadata = new AssetMetadata();
-            Tags = new List<AssetTag>();
+            Tags = new List<Tag>();
         }
 
       

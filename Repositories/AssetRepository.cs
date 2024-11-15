@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 using AssetManager.Models;
 using Microsoft.EntityFrameworkCore;
 using static AssetManager.AssetHelpers.AssetHelpers;
@@ -83,6 +84,7 @@ namespace AssetManager.Repositories
                                     relativePath: relativePath
 
                                     );
+
                                 asset.Metadata = new AssetMetadata
                                 {
                                     Name = asset.FileName,
@@ -106,8 +108,12 @@ namespace AssetManager.Repositories
                                 }
 
 
-                          
-                             
+                                var typeTag = new Tag
+                                {
+                                    Name = asset.FileType.ToString()
+
+                                };
+                                asset.Tags.Add(typeTag);
 
                                 App.Current.Dispatcher.Invoke(() =>
                                 {

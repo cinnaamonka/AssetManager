@@ -105,7 +105,7 @@ namespace AssetManager.ViewModels
             _assetRepository = new AssetRepository();
             _tagRepository = new TagRepository(MainPageVM.AppDbContext);
 
-       
+            LoadAllTags();
         }
 
         public OverviewPageVM() { }
@@ -165,7 +165,7 @@ namespace AssetManager.ViewModels
                 MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
           
-            LoadAllTags();
+           
         }
 
         public async void LoadAllTags()
@@ -175,14 +175,14 @@ namespace AssetManager.ViewModels
 
         public async void LoadAssetTags(int assetId)
         {
-            var tags = await _tagRepository.GetAssetTagsAsync(assetId);
+            //var tags = await _tagRepository.GetAssetTagsAsync(assetId);
 
-            Tags.Clear();
+            //Tags.Clear();
 
-            foreach (var tag in tags)
-            {
-                Tags.Add(tag);
-            } 
+            //foreach (var tag in tags)
+            //{
+            //    Tags.Add(tag);
+            //} 
         }
 
         public async void AddTag(int assetId, string tagName)

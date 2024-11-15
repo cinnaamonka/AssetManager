@@ -70,6 +70,7 @@ namespace AssetManager.ViewModels
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             Projects = new ObservableCollection<Project>();
             LoadProjects();
+            OverViewPageVM.LoadAllTags();
         }
 
 
