@@ -24,7 +24,7 @@ namespace AssetManager.Models
 
         public AssetMetadata Metadata { get; set; }
 
-        public List<Tag> Tags { get; set; }
+        public HashSet<AssetTag> AssetTags { get; set; }
 
         public Asset() { }
 
@@ -39,7 +39,7 @@ namespace AssetManager.Models
             ProjectId = projectId;
 
             Metadata = new AssetMetadata();
-            Tags = new List<Tag>();
+            AssetTags = new HashSet<AssetTag>();
         }
 
       

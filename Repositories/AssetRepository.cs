@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using AssetManager.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static AssetManager.AssetHelpers.AssetHelpers;
 
 namespace AssetManager.Repositories
@@ -107,22 +108,42 @@ namespace AssetManager.Repositories
                                     asset.Metadata.FileSize = 0;
                                 }
 
-
-                                var typeTag = new Tag
-                                {
-                                    Name = asset.FileType.ToString()
-
-                                };
-                                asset.Tags.Add(typeTag);
-
+                               
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
                                     asset.PreviewImagePath = GenerateThumbnail(asset, extension);
                                     Assets.Add(asset);
                                 });
 
+                                
+
 
                                 await SaveAssetAsync(asset, context);
+
+                                var existingTag = context.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
+
+
+                                if (existingTag == null)
+                                {
+                                    existingTag = new Tag { Name = asset.FileType.ToString() };
+                                    context.Tags.Add(existingTag);
+                                    await context.SaveChangesAsync();
+
+                                }
+
+                                bool assetTagExists = asset.AssetTags.Any(at => at.TagId == existingTag.Id);
+
+                                if (!assetTagExists)
+                                {
+                                    var assetTag = new AssetTag
+                                    {
+                                        Asset = asset,
+                                        Tag = existingTag
+                                    };
+
+                                    context.AssetTags.Add(assetTag);
+                                    await context.SaveChangesAsync();
+                                }
                             }
                         }
                     }

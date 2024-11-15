@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<AssetMetadata> MetadataFiles { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<AssetTag> AssetTags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -29,11 +30,18 @@ public class AppDbContext : DbContext
           .HasForeignKey<AssetMetadata>(m => m.AssetId)
           .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Asset>()
-             .HasMany(a => a.Tags)           
-             .WithOne(t => t.Asset)          
-             .HasForeignKey(t => t.AssetId)  
-             .OnDelete(DeleteBehavior.Cascade); 
+        modelBuilder.Entity<AssetTag>()
+            .HasKey(at => new { at.AssetId, at.TagId });
+
+        modelBuilder.Entity<AssetTag>()
+            .HasOne(at => at.Asset)
+            .WithMany(a => a.AssetTags)
+            .HasForeignKey(at => at.AssetId);
+
+        modelBuilder.Entity<AssetTag>()
+            .HasOne(at => at.Tag)
+            .WithMany(t => t.AssetTags)
+            .HasForeignKey(at => at.TagId);
     }
     public AppDbContext()
     {
@@ -41,7 +49,9 @@ public class AppDbContext : DbContext
         MetadataFiles = Set<AssetMetadata>();
         Assets = Set<Asset>();
         Tags = Set<Tag>();
-     
+        AssetTags = Set<AssetTag>();
+
+
         this.Database.EnsureCreated();
     }
 }
