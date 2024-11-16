@@ -6,15 +6,7 @@ using System.Windows.Media;
 
 namespace AssetManager.Repositories
 {
-    enum Tags
-    {
-        Image,
-        Model,
-        Video,
-        Audio,
-        Document,
-
-    }
+    
     internal class TagRepository
     {
         private readonly AppDbContext _dbContext;
@@ -27,13 +19,25 @@ namespace AssetManager.Repositories
 
         private async Task InitializeTagsAsync()
         {
+            if (_dbContext.Tags.Count() >= 0)
+            {
+                var initializedTags = _dbContext.Tags.Where(t => t.WasInitialized);
+
+                _dbContext.Tags.RemoveRange(initializedTags);
+                
+                _dbContext.SaveChanges();
+                return;
+            }
             foreach (var tag in Enum.GetValues(typeof(Tags)))
             {
-                await AddTag(tag.ToString());
+              
+                var newTag = await AddTag(tag.ToString());
+
+                newTag.WasInitialized = true;
             }
         }
 
-        private async Task<Tag> AddTag(string tagName)
+        public async Task<Tag> AddTag(string tagName)
         {
             var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
                       ?? new Tag { Name = tagName };
@@ -94,7 +98,9 @@ namespace AssetManager.Repositories
 
         public async Task RemoveAllTagsAsync()
         {
-            _dbContext.Tags.RemoveRange(_dbContext.Tags);
+            var initializedTags = _dbContext.Tags.Where(t => !t.WasInitialized);
+
+            _dbContext.Tags.RemoveRange(initializedTags);
             await _dbContext.SaveChangesAsync();
         }
 

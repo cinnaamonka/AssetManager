@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241115152137_InitialCreate")]
+    [Migration("20241116125217_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -151,6 +151,9 @@ namespace AssetManager.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("WasInitialized")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

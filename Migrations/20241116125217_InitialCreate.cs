@@ -34,7 +34,8 @@ namespace AssetManager.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Color = table.Column<string>(type: "TEXT", nullable: false)
+                    Color = table.Column<string>(type: "TEXT", nullable: false),
+                    WasInitialized = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
