@@ -15,7 +15,10 @@ namespace AssetManager.AssetHelpers
         public enum Tags
         {
             Image,
-            Model
+            Model,
+            Document,
+            Video,
+            Audio
         }
 
         public static AssetType GetAssetType(string extension)

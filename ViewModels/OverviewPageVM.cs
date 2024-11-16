@@ -88,6 +88,8 @@ namespace AssetManager.ViewModels
         private AssetRepository _assetRepository;
         private TagRepository _tagRepository;
 
+
+
         private string _newTagName;
 
         public string NewTagName
@@ -108,14 +110,12 @@ namespace AssetManager.ViewModels
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
             OpenFullImageCommand = new RelayCommand(OpenFullImage);
             ClearSelectionCommand = new RelayCommand(ClearSelection);
-            OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
+            OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile); 
             RemoveAllTagsCommand = new RelayCommand(RemoveAllTags);
             AddTagCommand = new RelayCommand(AddTag);
 
-            _assetRepository = new AssetRepository();
-            _tagRepository = new TagRepository(MainPageVM.AppDbContext);
 
-            LoadAllTags();
+            _assetRepository = new AssetRepository();
         }
 
         public OverviewPageVM() { }
@@ -170,14 +170,22 @@ namespace AssetManager.ViewModels
 
         public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
         {
-
+           
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
                 MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
 
+           
+       
 
         }
 
+        public void LoadTags()
+        {
+            _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
+
+            LoadAllTags();
+        }
         public async void LoadAllTags()
         {
             Tags = await _tagRepository.GetAllTagsAsync();

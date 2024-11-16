@@ -214,6 +214,9 @@
                             <TextBlock Text="{Binding FileType}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,5"
                                 Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
 
+                            <TextBlock Text="{Binding AssetTags}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,5"
+                                Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
+
                             <Button Width="15" Height="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3" Background="Transparent" BorderBrush="Transparent" 
                                      Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                       CommandParameter="{Binding}"  Click="MetadataButton_Click">

@@ -10,7 +10,6 @@ namespace AssetManager.Models
         public string Color { get; set; } = "#000000";
         public HashSet<AssetTag> AssetTags { get; set; }
 
-        public bool WasInitialized { get; set; }
     }
     public class AssetTag
     {

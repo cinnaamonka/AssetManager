@@ -15,5 +15,7 @@ namespace AssetManager.Models
         public int FileCount { get; set; }
 
         public string Path { get;set; }
+
+        public bool WasInitialized { get; set; }
     }
 }

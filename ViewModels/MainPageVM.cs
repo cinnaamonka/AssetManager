@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using AssetManager.Views;
 using AssetManager.Models;
 using System.IO;
+using AssetManager.Repositories;
+using System.Windows.Data;
 
 namespace AssetManager.ViewModels
 {
@@ -11,6 +13,7 @@ namespace AssetManager.ViewModels
         public OverviewPage MainPage { get; set; }
         public MetadataWindow MetadataWindow { get; set; }
         public HomePage HomePage { get; }
+
         public Page CurrentPage { get; set; }
 
         private AppDbContext _appDbContext;
@@ -18,6 +21,19 @@ namespace AssetManager.ViewModels
 
         private MetadataWindowVM metadataWindowVM { get; }
 
+        private Project _selectedProject;
+        public Project SelectedProject
+        {
+            get => _selectedProject;
+            set
+            {
+                _selectedProject = value;
+                OnPropertyChanged(nameof(SelectedProject));
+               
+            }
+        }
+
+    
         public MainPageVM()
         {
             AppDbContext = new AppDbContext();
@@ -31,9 +47,8 @@ namespace AssetManager.ViewModels
 
             CurrentPage = HomePage;
 
-           
+          
         }
-
 
         public void HandleOpenPopUpWindow(Asset selectedAsset) 
         {

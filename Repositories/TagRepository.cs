@@ -2,39 +2,42 @@
 using Microsoft.EntityFrameworkCore;
 using static AssetManager.AssetHelpers.AssetHelpers;
 using System.Windows.Media;
+using AssetManager.ViewModels;
 
 
 namespace AssetManager.Repositories
 {
-    
-    internal class TagRepository
+
+    public class TagRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public TagRepository(AppDbContext dbContext)
+        MainPageVM MainPageVM;  
+
+        public TagRepository(AppDbContext dbContext,MainPageVM mainPageVM)
         {
             _dbContext = dbContext;
+
+            MainPageVM = mainPageVM;
+
+
             InitializeTagsAsync().Wait();
         }
 
         private async Task InitializeTagsAsync()
         {
-            if (_dbContext.Tags.Count() >= 0)
+            if (MainPageVM.SelectedProject != null)
             {
-                var initializedTags = _dbContext.Tags.Where(t => t.WasInitialized);
-
-                _dbContext.Tags.RemoveRange(initializedTags);
-                
-                _dbContext.SaveChanges();
-                return;
+                if (!MainPageVM.SelectedProject.WasInitialized)
+                {
+                    foreach (var tag in Enum.GetValues(typeof(Tags)))
+                    {
+                        await AddTag(tag.ToString());
+                        MainPageVM.SelectedProject.WasInitialized = true;
+                    }
+                }
             }
-            foreach (var tag in Enum.GetValues(typeof(Tags)))
-            {
-              
-                var newTag = await AddTag(tag.ToString());
-
-                newTag.WasInitialized = true;
-            }
+          
         }
 
         public async Task<Tag> AddTag(string tagName)
@@ -43,9 +46,9 @@ namespace AssetManager.Repositories
                       ?? new Tag { Name = tagName };
 
             Random random = new Random();
-            byte r = (byte)random.Next(128, 256); 
-            byte g = (byte)random.Next(128, 256); 
-            byte b = (byte)random.Next(128, 256); 
+            byte r = (byte)random.Next(128, 256);
+            byte g = (byte)random.Next(128, 256);
+            byte b = (byte)random.Next(128, 256);
 
             System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
 
@@ -98,9 +101,7 @@ namespace AssetManager.Repositories
 
         public async Task RemoveAllTagsAsync()
         {
-            var initializedTags = _dbContext.Tags.Where(t => !t.WasInitialized);
-
-            _dbContext.Tags.RemoveRange(initializedTags);
+            _dbContext.Tags.RemoveRange(_dbContext.Tags);
             await _dbContext.SaveChangesAsync();
         }
 

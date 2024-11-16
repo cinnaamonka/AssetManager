@@ -40,6 +40,8 @@ namespace AssetManager.ViewModels
                 if (_selectedProject != null)
                 {
                     OpenProjectDetailsCommand.Execute(_selectedProject);
+                    MainPageVM.SelectedProject = _selectedProject;
+                  
                 }
             }
         }
@@ -70,7 +72,7 @@ namespace AssetManager.ViewModels
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             Projects = new ObservableCollection<Project>();
             LoadProjects();
-            OverViewPageVM.LoadAllTags();
+           
         }
 
 
@@ -104,6 +106,7 @@ namespace AssetManager.ViewModels
             Loader.IsLoading = false;
 
             project.FileCount = OverViewPageVM.Assets.Count;
+
             MainPageVM.AppDbContext.SaveChanges();
 
             Projects.Add(project);
@@ -112,7 +115,7 @@ namespace AssetManager.ViewModels
         }
 
 
-        private void LoadProjects()
+        private async void LoadProjects()
         {
 
             MainPageVM.AppDbContext.Database.EnsureCreated();
@@ -140,6 +143,7 @@ namespace AssetManager.ViewModels
             {
                 Loader.IsLoading = false;
                 MainPageVM.OpenOverViewPage();
+                OverViewPageVM.LoadTags();
             }
 
 
