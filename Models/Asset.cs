@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -24,7 +25,7 @@ namespace AssetManager.Models
 
         public AssetMetadata Metadata { get; set; }
 
-        public HashSet<AssetTag> AssetTags { get; set; }
+        public ObservableCollection<AssetTag> AssetTags { get; set; }
 
         public Asset() { }
 
@@ -39,7 +40,7 @@ namespace AssetManager.Models
             ProjectId = projectId;
 
             Metadata = new AssetMetadata();
-            AssetTags = new HashSet<AssetTag>();
+            AssetTags = new ObservableCollection<AssetTag>();
         }
 
       

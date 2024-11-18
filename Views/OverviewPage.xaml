@@ -73,7 +73,8 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Background="White" >
 
             <TextBlock Text="Tags: " Foreground="Black" FontWeight="Bold" Margin="5,10,0,10"/>
-            <ListBox ItemsSource="{Binding Tags}">
+
+            <ListBox ItemsSource="{Binding Tags}" ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="200">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Background="{Binding Color}" Margin="5" Padding="5" CornerRadius="5">
@@ -82,6 +83,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+          
 
             <StackPanel Orientation="Vertical" Margin="5,0,0,0">
                 <!-- First Row: TextBox and Add Tag Button -->
@@ -214,9 +216,6 @@
                             <TextBlock Text="{Binding FileType}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,5"
                                 Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
 
-                            <TextBlock Text="{Binding AssetTags}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,5"
-                                Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
-
                             <Button Width="15" Height="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3" Background="Transparent" BorderBrush="Transparent" 
                                      Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                       CommandParameter="{Binding}"  Click="MetadataButton_Click">
@@ -231,27 +230,119 @@
 
 
 
-        <StackPanel Grid.Row="1" Grid.Column="2" Background="WhiteSmoke"  
-                    Visibility="{Binding SelectedAsset, Converter={StaticResource NullToVisibilityConverter}}">
-
+        <StackPanel Grid.Row="1" Grid.Column="2" Background="White"  
+            Visibility="{Binding SelectedAsset, Converter={StaticResource NullToVisibilityConverter}}"
+            Margin="10">
+       
             <Border BorderBrush="Gray" BorderThickness="1" Height="200" Margin="0,0,0,10">
-
-                <Image Source="{Binding SelectedAsset.PreviewImagePath}">
-
-                </Image>
+                <Image Source="{Binding SelectedAsset.PreviewImagePath}" Stretch="Uniform" />
             </Border>
-            <TextBlock Text="{Binding SelectedAsset.FileName}" Foreground="Black" FontWeight="Bold" Margin="5,0,0,5" FontSize="32"/>
+
+       
+            <TextBlock Text="{Binding SelectedAsset.FileName}" 
+               Foreground="Black" 
+               FontWeight="Bold" 
+               Margin="0,0,0,5" 
+               FontSize="32" />
+
+         
             <TextBlock Foreground="Black" Margin="5,0,0,5">
-    <Run Text="File Type:" FontWeight="Bold"/>
-    <Run Text="{Binding SelectedAsset.FileType, Mode=OneWay}" FontWeight="Normal"/>
+                <Run Text="File Type:" FontWeight="Bold" />
+                 <Run Text="{Binding SelectedAsset.FileType, Mode=OneWay}" FontWeight="Normal" />
             </TextBlock>
 
+            <StackPanel Margin="0,10,0,0">
+          
+                <TextBlock Text="Tags" FontWeight="Bold" Foreground="Gray" Margin="5,0,0,5" />
 
-            <TextBlock Text="Tags" Foreground="Gray" FontWeight="Bold" Margin="5,10,0,5"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="100" Margin="5,0,5,0"/>
-                <Button Content="+" Width="25"/>
+
+                <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
+         Margin="-5,0,0,0" 
+         Padding="0" 
+         BorderThickness="0"
+         ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+         ScrollViewer.VerticalScrollBarVisibility="Auto" 
+         MaxHeight="200">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!-- WrapPanel for wrapping into rows and columns -->
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Focusable" Value="False" />
+                            <Setter Property="IsHitTestVisible" Value="False" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding Tag.Color}" 
+                    Margin="5" 
+                    Padding="5" 
+                    CornerRadius="5">
+                                <TextBlock Text="{Binding Tag.Name}" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center" 
+                           Foreground="White" />
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+
+
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="150" Height="30" Margin="5,0,10,0"
+                  Text="{Binding NewAssetTagName, UpdateSourceTrigger=PropertyChanged}" />
+                
+                <Button Content="Add Tag" Command="{Binding AddAssetTagCommand}" HorizontalAlignment="Left">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="DarkBlue" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Padding" Value="10,5" />
+                        <Setter Property="Width" Value="70" />
+                        <Setter Property="Height" Value="30" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="ButtonBorder"
+                                       Background="{TemplateBinding Background}"
+                                       CornerRadius="10"
+                                       BorderBrush="{TemplateBinding BorderBrush}"
+                                       BorderThickness="1">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <!-- Trigger for Pressed State -->
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="ButtonBorder" Property="Background" Value="White" />
+                                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="DarkBlue" />
+                                            <Setter Property="Foreground" Value="DarkBlue" />
+                                        </Trigger>
+
+                                        <!-- Trigger for MouseOver State -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ButtonBorder" Property="Background" Value="LightBlue" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+           
+            </StackPanel>
+
         </StackPanel>
+
     </Grid>
 </Page>

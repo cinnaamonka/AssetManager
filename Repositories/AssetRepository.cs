@@ -38,6 +38,7 @@ namespace AssetManager.Repositories
             return await context.Assets
                 .Where(a => a.FilePath.StartsWith(projectPath))
                 .Include(a => a.Metadata)
+                .Include(a => a.AssetTags)
                 .ToListAsync();
         }
 
@@ -115,10 +116,10 @@ namespace AssetManager.Repositories
                                     Assets.Add(asset);
                                 });
 
-                                
-
 
                                 await SaveAssetAsync(asset, context);
+
+
 
                                 var existingTag = context.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
 
@@ -141,8 +142,11 @@ namespace AssetManager.Repositories
                                         Tag = existingTag
                                     };
 
+                                    asset.AssetTags.Add(assetTag);
                                     context.AssetTags.Add(assetTag);
+                    
                                     await context.SaveChangesAsync();
+                                   
                                 }
                             }
                         }

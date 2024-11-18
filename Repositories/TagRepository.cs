@@ -76,11 +76,10 @@ namespace AssetManager.Repositories
             }
         }
 
-        public async Task<List<Tag>> GetAssetTagsAsync(int assetId)
+        public async Task<List<AssetTag>> GetAssetTagsAsync(int assetId)
         {
             return await _dbContext.AssetTags
                 .Where(at => at.AssetId == assetId)
-                .Select(at => at.Tag)
                 .ToListAsync();
         }
 
