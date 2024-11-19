@@ -108,5 +108,14 @@ namespace AssetManager.Repositories
         {
             return await _dbContext.Tags.ToListAsync();
         }
+
+        public async void RemoveTag(string tagName)
+        {
+            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
+            if (tag == null) return;
+
+            _dbContext.Tags.Remove(tag);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

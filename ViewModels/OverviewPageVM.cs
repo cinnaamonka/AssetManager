@@ -8,6 +8,7 @@ using System.IO;
 using Assimp;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace AssetManager.ViewModels
 {
@@ -84,8 +85,9 @@ namespace AssetManager.ViewModels
         public RelayCommand RemoveAllTagsCommand { get; set; }
         public RelayCommand AddTagCommand { get; set; }
         public RelayCommand AddAssetTagCommand { get; set; }
+        public ICommand RemoveTagCommand { get; set; } 
 
-        public MainPageVM MainPageVM { get; }
+        public MainPageVM MainPageVM { get; } 
 
         private AssetRepository _assetRepository;
         private TagRepository _tagRepository;
@@ -107,6 +109,12 @@ namespace AssetManager.ViewModels
             set { _newAssetTagName = value; }
         }
 
+        private Tag _selectedTag;
+        public Tag SetelectedTag
+        {
+            get { return _selectedTag; }
+            set { _selectedTag = value;}
+        }
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -123,6 +131,7 @@ namespace AssetManager.ViewModels
             RemoveAllTagsCommand = new RelayCommand(RemoveAllTags);
             AddTagCommand = new RelayCommand(AddTag);
             AddAssetTagCommand = new RelayCommand(AddAssetTag);
+            RemoveTagCommand = new RelayCommand<Tag>(RemoveTag);
 
             _assetRepository = new AssetRepository();
         }
@@ -223,11 +232,16 @@ namespace AssetManager.ViewModels
             }
         }
 
-        public async void RemoveTag(int assetId, string tagName)
+        public async void RemoveAssetTag(int assetId, string tagName)
         {
             await _tagRepository.RemoveTagFromAssetAsync(assetId, tagName);
         }
-
+        public async void RemoveTag(Tag tag)
+        {
+            _tagRepository.RemoveTag(tag.Name); 
+            LoadAllTags();
+            OnPropertyChanged(nameof(Tags));
+        }
         public async void AddTag()
         {
             if (NewTagName == null) return;
