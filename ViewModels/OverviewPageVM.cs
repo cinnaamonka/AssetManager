@@ -113,10 +113,15 @@ namespace AssetManager.ViewModels
         }
 
         private Tag _selectedTag;
-        public Tag SetelectedTag
+        public Tag SelectedTag
         {
             get { return _selectedTag; }
-            set { _selectedTag = value;}
+            set 
+            {
+                _selectedTag = value;
+                FilterAssetsByTag();
+
+            }
         }
         public OverviewPageVM(MainPageVM mainPageVM)
         {
@@ -146,27 +151,42 @@ namespace AssetManager.ViewModels
         {
             if (string.IsNullOrEmpty(SearchText))
             {
-                var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
-                var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
-                FilteredAssets = new List<Asset>(filtered);
-
+                // Show all assets when SearchText is empty or null
+                FilteredAssets = new List<Asset>(Assets);
             }
             else
             {
                 try
                 {
+                    // Use regex to filter assets based on SearchText
                     var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
-                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName)).ToList();
+                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
+                        a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
+
                     FilteredAssets = new List<Asset>(filtered);
                 }
                 catch (RegexParseException)
                 {
-                    // Handle invalid regex input if necessary
+                    // Handle invalid regex input if necessary (optional logging or message to user)
+                    FilteredAssets = new List<Asset>(); // No results in case of an error
                 }
             }
+
+            // Notify the UI that FilteredAssets has changed
             OnPropertyChanged(nameof(FilteredAssets));
+
         }
 
+        private void FilterAssetsByTag()
+        {
+            FilteredAssets = Assets
+                .Where(a => a.AssetTags != null && a.AssetTags.Any(tag => 
+                tag.Tag.Name.Equals(SelectedTag.Name, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            OnPropertyChanged(nameof(FilteredAssets));
+
+        }
         private void ClearSelection()
         {
             SelectedAsset = null;

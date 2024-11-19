@@ -73,9 +73,12 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Background="White" >
 
             <TextBlock Text="Tags: " Foreground="Black" FontWeight="Bold" Margin="5,10,0,10"/>
+            
             <ListBox ItemsSource="{Binding Tags}" 
-         ScrollViewer.VerticalScrollBarVisibility="Auto" 
-         MaxHeight="200">
+                     SelectedItem="{Binding SelectedTag, Mode=TwoWay}"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                     MaxHeight="200">
+                
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="5" HorizontalAlignment="Stretch">
