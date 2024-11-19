@@ -87,7 +87,8 @@ namespace AssetManager.ViewModels
         public RelayCommand RemoveAllTagsCommand { get; set; }
         public RelayCommand AddTagCommand { get; set; }
         public RelayCommand AddAssetTagCommand { get; set; }
-        public ICommand RemoveTagCommand { get; set; } 
+        public ICommand RemoveTagCommand { get; set; }
+        public ICommand RemoveAssetTagCommand { get; set; }
 
         public MainPageVM MainPageVM { get; } 
 
@@ -134,6 +135,7 @@ namespace AssetManager.ViewModels
             AddTagCommand = new RelayCommand(AddTag);
             AddAssetTagCommand = new RelayCommand(AddAssetTag);
             RemoveTagCommand = new RelayCommand<Tag>(RemoveTag);
+            RemoveAssetTagCommand = new RelayCommand<AssetTag>(RemoveAssetTag);
 
             _assetRepository = new AssetRepository();
         }
@@ -234,9 +236,9 @@ namespace AssetManager.ViewModels
             }
         }
 
-        public async void RemoveAssetTag(int assetId, string tagName)
+        public async void RemoveAssetTag(AssetTag assetTag)
         {
-            await _tagRepository.RemoveTagFromAssetAsync(assetId, tagName);
+            await _tagRepository.RemoveTagFromAssetAsync(assetTag.AssetId, assetTag.Tag.Name);
         }
         public async void RemoveTag(Tag tag)
         {
