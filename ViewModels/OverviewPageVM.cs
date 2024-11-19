@@ -14,6 +14,8 @@ namespace AssetManager.ViewModels
 {
     public class OverviewPageVM : ObservableObject
     {
+        public string RemoveIconPath => "C:\\Users\\parni\\Desktop\\2024-2025\\semester5\\GraduationWork\\AssetManager\\Resources\\minus.png";
+
         private List<Asset> _assets;
         private List<Asset> _filteredAssets;
         private Asset _selectedAsset;
