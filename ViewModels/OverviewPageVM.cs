@@ -4,11 +4,9 @@ using AssetManager.Models;
 using System.Text.RegularExpressions;
 using AssetManager.Repositories;
 using AssetManager.Views;
-using System.IO;
-using Assimp;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using System.Windows.Input;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace AssetManager.ViewModels
 {
@@ -90,7 +88,7 @@ namespace AssetManager.ViewModels
         public ICommand RemoveTagCommand { get; set; }
         public ICommand RemoveAssetTagCommand { get; set; }
 
-        public MainPageVM MainPageVM { get; } 
+        public MainPageVM MainPageVM { get; }
 
         private AssetRepository _assetRepository;
         private TagRepository _tagRepository;
@@ -116,7 +114,7 @@ namespace AssetManager.ViewModels
         public Tag SelectedTag
         {
             get { return _selectedTag; }
-            set 
+            set
             {
                 _selectedTag = value;
                 FilterAssetsByTag();
@@ -135,7 +133,7 @@ namespace AssetManager.ViewModels
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
             OpenFullImageCommand = new RelayCommand(OpenFullImage);
             ClearSelectionCommand = new RelayCommand(ClearSelection);
-            OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile); 
+            OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
             RemoveAllTagsCommand = new RelayCommand(RemoveAllTags);
             AddTagCommand = new RelayCommand(AddTag);
             AddAssetTagCommand = new RelayCommand(AddAssetTag);
@@ -151,14 +149,12 @@ namespace AssetManager.ViewModels
         {
             if (string.IsNullOrEmpty(SearchText))
             {
-                // Show all assets when SearchText is empty or null
                 FilteredAssets = new List<Asset>(Assets);
             }
             else
             {
                 try
                 {
-                    // Use regex to filter assets based on SearchText
                     var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
                     var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
                         a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
@@ -167,12 +163,11 @@ namespace AssetManager.ViewModels
                 }
                 catch (RegexParseException)
                 {
-                    // Handle invalid regex input if necessary (optional logging or message to user)
-                    FilteredAssets = new List<Asset>(); // No results in case of an error
+
+                    FilteredAssets = new List<Asset>();
                 }
             }
 
-            // Notify the UI that FilteredAssets has changed
             OnPropertyChanged(nameof(FilteredAssets));
 
         }
@@ -180,7 +175,7 @@ namespace AssetManager.ViewModels
         private void FilterAssetsByTag()
         {
             FilteredAssets = Assets
-                .Where(a => a.AssetTags != null && a.AssetTags.Any(tag => 
+                .Where(a => a.AssetTags != null && a.AssetTags.Any(tag =>
                 tag.Tag.Name.Equals(SelectedTag.Name, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
@@ -212,7 +207,7 @@ namespace AssetManager.ViewModels
 
         public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
         {
-           
+
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
                 MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
@@ -256,29 +251,40 @@ namespace AssetManager.ViewModels
             }
         }
 
+        public async void AddAssetTag(string assetTagName)
+        {
+            await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, assetTagName);
+
+            OnPropertyChanged(nameof(SelectedAsset.AssetTags)); 
+            LoadAllTags();
+
+        }
+
         public async void RemoveAssetTag(AssetTag assetTag)
         {
             await _tagRepository.RemoveTagFromAssetAsync(assetTag.AssetId, assetTag.Tag.Name);
         }
         public async void RemoveTag(Tag tag)
         {
-            _tagRepository.RemoveTag(tag.Name); 
+            _tagRepository.RemoveTag(tag.Name);
             LoadAllTags();
             OnPropertyChanged(nameof(Tags));
         }
         public async void AddTag()
         {
             if (NewTagName == null) return;
-              
+
             var newTag = await _tagRepository.AddTag(NewTagName);
             if (!string.IsNullOrWhiteSpace(NewTagName))
             {
-              
+
                 Tags = Tags.Append(newTag).ToList();
-                NewTagName = string.Empty; 
+                NewTagName = string.Empty;
                 OnPropertyChanged(nameof(Tags));
                 OnPropertyChanged(nameof(NewTagName));
             }
         }
+
+      
     }
 }

@@ -42,6 +42,8 @@ namespace AssetManager.Repositories
 
         public async Task<Tag> AddTag(string tagName)
         {
+            if (tagName == null) return null;
+
             var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
                       ?? new Tag { Name = tagName };
 

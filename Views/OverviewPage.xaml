@@ -77,7 +77,8 @@
             <ListBox ItemsSource="{Binding Tags}" 
                      SelectedItem="{Binding SelectedTag, Mode=TwoWay}"
                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                     MaxHeight="200">
+                     MaxHeight="200"
+                     Name="TagsListBox" MouseMove="TagsListBox_MouseMove"> 
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -300,7 +301,13 @@
                  <Run Text="{Binding SelectedAsset.FileType, Mode=OneWay}" FontWeight="Normal" />
             </TextBlock>
 
-            <StackPanel Margin="0,10,0,0">
+
+            <Border AllowDrop="True" 
+                    Drop="AssetArea_Drop"
+                    DragEnter="AssetArea_DragEnter" 
+                    DragLeave="AssetArea_DragLeave">
+                
+                <StackPanel Margin="0,10,0,0">
                 <TextBlock Text="Tags" FontWeight="Bold" Foreground="Gray" Margin="5,0,0,5" />
                 <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
              Margin="-5,0,0,0" 
@@ -356,7 +363,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </StackPanel>
-
+            </Border>
 
             <StackPanel Orientation="Horizontal">
                 <TextBox Width="150" Height="30" Margin="5,0,10,0"
