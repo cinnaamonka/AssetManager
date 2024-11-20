@@ -7,6 +7,7 @@ using AssetManager.Views;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
+using static AssetManager.AssetHelpers.AssetHelpers;
 
 namespace AssetManager.ViewModels
 {
@@ -70,11 +71,11 @@ namespace AssetManager.ViewModels
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
-                ExecuteSearch();
+                ExecuteSearch(SearchText);
             }
         }
 
-        public RelayCommand SearchCommand { get; set; }
+        public RelayCommand<string> SearchCommand { get; set; }
         public RelayCommand OpenMetadataCommand { get; set; }
         public RelayCommand OpenHomePageCommand { get; set; }
 
@@ -87,6 +88,7 @@ namespace AssetManager.ViewModels
         public RelayCommand AddAssetTagCommand { get; set; }
         public ICommand RemoveTagCommand { get; set; }
         public ICommand RemoveAssetTagCommand { get; set; }
+        public RelayCommand ConvertCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
 
@@ -121,6 +123,47 @@ namespace AssetManager.ViewModels
 
             }
         }
+
+        private List<string> _availableFormats;
+        public List<string> AvailableFormats
+        {
+            get { return _availableFormats; }
+            set { _availableFormats = value; }
+        }
+
+        private string _selectedFileToConvert;
+        public string SelectedAssetToConvert
+        {
+            get { return _selectedFileToConvert; }
+            set
+            {
+                _selectedFileToConvert = value;
+              
+                OnPropertyChanged(nameof(SelectedAssetToConvert));
+                ExecuteSearch(SelectedAssetToConvert);
+             
+            }
+        }
+
+        private string _selectedFromFormat;
+        public string SelectedFromFormat
+        {
+            get { return _selectedFromFormat; }
+            set 
+            {
+                _selectedFromFormat = value;
+            }
+        }
+
+        private string _selectedToFormat;
+        public string SelectedToFormat
+        {
+            get { return _selectedToFormat; }
+            set
+            { 
+                _selectedToFormat = value;
+            }
+        }
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -128,8 +171,9 @@ namespace AssetManager.ViewModels
 
             Assets = new List<Asset>();
             FilteredAssets = new List<Asset>();
+            AvailableFormats = new List<string>();
 
-            SearchCommand = new RelayCommand(ExecuteSearch);
+            SearchCommand = new RelayCommand<string>(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
             OpenFullImageCommand = new RelayCommand(OpenFullImage);
             ClearSelectionCommand = new RelayCommand(ClearSelection);
@@ -139,15 +183,26 @@ namespace AssetManager.ViewModels
             AddAssetTagCommand = new RelayCommand(AddAssetTag);
             RemoveTagCommand = new RelayCommand<Tag>(RemoveTag);
             RemoveAssetTagCommand = new RelayCommand<AssetTag>(RemoveAssetTag);
+            ConvertCommand = new RelayCommand(ConvertFile);
 
             _assetRepository = new AssetRepository();
+
+            foreach (var format in Enum.GetValues(typeof(AssetHelpers.AssetHelpers.AvailableFormats)))
+            {
+                AvailableFormats.Add(format.ToString());
+            }
         }
 
         public OverviewPageVM() { }
 
-        private void ExecuteSearch()
+        void ConvertFile()
         {
-            if (string.IsNullOrEmpty(SearchText))
+            //add conversion
+            //TODO
+        }
+        private void ExecuteSearch(string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
             {
                 FilteredAssets = new List<Asset>(Assets);
             }
@@ -155,7 +210,7 @@ namespace AssetManager.ViewModels
             {
                 try
                 {
-                    var regex = new Regex("^" + Regex.Escape(SearchText), RegexOptions.IgnoreCase);
+                    var regex = new Regex("^" + Regex.Escape(searchText), RegexOptions.IgnoreCase);
                     var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
                         a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
 
@@ -255,7 +310,7 @@ namespace AssetManager.ViewModels
         {
             await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, assetTagName);
 
-            OnPropertyChanged(nameof(SelectedAsset.AssetTags)); 
+            OnPropertyChanged(nameof(SelectedAsset.AssetTags));
             LoadAllTags();
 
         }
@@ -276,7 +331,7 @@ namespace AssetManager.ViewModels
 
             var newTag = await _tagRepository.AddTag(NewTagName);
 
-           
+
             if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
             {
 
@@ -293,6 +348,6 @@ namespace AssetManager.ViewModels
             }
         }
 
-      
+
     }
 }

@@ -53,5 +53,13 @@ namespace AssetManager.AssetHelpers
             
             }
         }
+
+        public enum AvailableFormats
+        {
+            FBX,
+            OBJ,
+            PNG,
+            JPG
+        }
     }
 }

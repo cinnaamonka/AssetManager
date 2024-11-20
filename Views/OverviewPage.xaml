@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:AssetManager.Views"
       xmlns:vm="clr-namespace:AssetManager.ViewModels"
       xmlns:conv="clr-namespace:AssetManager.Converters"
+      xmlns:helpers="clr-namespace:AssetManager.AssetHelpers"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="1400"
       Title="OverviewPage">
@@ -19,7 +20,7 @@
     </Page.Resources>
 
 
-    <Grid>
+    <Grid ShowGridLines="True">
 
         <Grid.InputBindings>
             <MouseBinding Gesture="LeftClick" Command="{Binding ClearSelectionCommand}" />
@@ -70,16 +71,17 @@
             </Border>
         </StackPanel>
 
+        <!--TAGS-->
         <StackPanel Grid.Row="1" Grid.Column="0" Background="White" >
 
             <TextBlock Text="Tags: " Foreground="Black" FontWeight="Bold" Margin="5,10,0,10"/>
-            
+
             <ListBox ItemsSource="{Binding Tags}" 
                      SelectedItem="{Binding SelectedTag, Mode=TwoWay}"
                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
                      MaxHeight="200"
-                     Name="TagsListBox" MouseMove="TagsListBox_MouseMove"> 
-                
+                     Name="TagsListBox" MouseMove="TagsListBox_MouseMove">
+
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="5" HorizontalAlignment="Stretch">
@@ -130,10 +132,6 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-
-
-
-
 
             <StackPanel Orientation="Vertical" Margin="5,0,0,0">
                 <!-- First Row: TextBox and Add Tag Button -->
@@ -228,9 +226,102 @@
             </StackPanel>
 
 
+            <!--CONVERTERS-->
+            <Separator Margin="0,20,0,20" Background="Gray" Height="2" />
+
+            <StackPanel Orientation="Vertical" Margin="10,20,0,0">
+               
+                <TextBlock Text="Asset Conversion" FontWeight="Bold" FontSize="14" Foreground="Black" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Choose a file:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
+                    <ComboBox 
+                          ItemsSource="{Binding FilteredAssets}" 
+                          DisplayMemberPath="FileName"
+                          SelectedItem="{Binding SelectedAsset, Mode=TwoWay}" 
+                          Width="150" 
+                          Margin="0,0,10,0"
+                          VerticalAlignment="Center" />
+
+                    <TextBox 
+                          Text="{Binding SelectedAssetToConvert, UpdateSourceTrigger=PropertyChanged}" 
+                          Width="100" 
+                          Margin="0,0,10,0" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Left"/>
+                </StackPanel>
+
+
+                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                    <TextBlock Text="Convert from format:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox 
+                      ItemsSource="{Binding AvailableFormats}" 
+                      SelectedItem="{Binding SelectedFromFormat, Mode=TwoWay}" 
+                      Width="100" 
+                      VerticalAlignment="Center"
+                        HorizontalAlignment="Left"/>
+                </StackPanel>
+
+             
+                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                    <TextBlock Text="Convert to format:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox 
+                      ItemsSource="{Binding AvailableFormats}" 
+                      SelectedItem="{Binding SelectedToFormat, Mode=TwoWay}" 
+                      Width="100" 
+                      VerticalAlignment="Center" 
+                      HorizontalAlignment="Left"/>
+                </StackPanel>
+
+            
+                <Button Content="Convert" 
+            Command="{Binding ConvertCommand}" 
+            Padding="10,5"
+            HorizontalAlignment="Left" 
+            Width="90" 
+            Height="30">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="DarkGreen" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="BorderBrush" Value="Transparent" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="ButtonBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <!-- Trigger for Pressed State -->
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="ButtonBorder" Property="Background" Value="White" />
+                                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="DarkGreen" />
+                                                <Setter Property="Foreground" Value="DarkGreen" />
+                                            </Trigger>
+                                            <!-- Trigger for MouseOver State -->
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ButtonBorder" Property="Background" Value="LightGreen" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+
+
 
         </StackPanel>
 
+
+        <!--ASSETS-->
         <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
          SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
          Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
