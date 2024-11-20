@@ -275,13 +275,21 @@ namespace AssetManager.ViewModels
             if (NewTagName == null) return;
 
             var newTag = await _tagRepository.AddTag(NewTagName);
-            if (!string.IsNullOrWhiteSpace(NewTagName))
+
+           
+            if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
             {
 
                 Tags = Tags.Append(newTag).ToList();
                 NewTagName = string.Empty;
                 OnPropertyChanged(nameof(Tags));
                 OnPropertyChanged(nameof(NewTagName));
+            }
+            else
+            {
+                NewTagName = string.Empty;
+                OnPropertyChanged(nameof(NewTagName));
+
             }
         }
 

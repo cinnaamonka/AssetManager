@@ -44,8 +44,10 @@ namespace AssetManager.Repositories
         {
             if (tagName == null) return null;
 
-            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName)
-                      ?? new Tag { Name = tagName };
+            var tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
+
+            if (tag != null) return null;
+            tag ??= new Tag { Name = tagName };
 
             Random random = new Random();
             byte r = (byte)random.Next(128, 256);
@@ -70,6 +72,10 @@ namespace AssetManager.Repositories
         {
             var tag = await AddTag(tagName);
 
+            if(tag == null)
+            {
+                tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
+            }
             var assetTag = new AssetTag { AssetId = assetId, TagId = tag.Id };
             if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.Id))
             {

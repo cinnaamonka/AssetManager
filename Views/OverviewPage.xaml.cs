@@ -7,9 +7,6 @@ using System.Windows.Input;
 
 namespace AssetManager.Views
 {
-    /// <summary>
-    /// Interaction logic for MainPage.xaml
-    /// </summary>
     public partial class OverviewPage : Page
     {
         public OverviewPage()
