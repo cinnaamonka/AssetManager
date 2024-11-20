@@ -302,14 +302,18 @@
             </TextBlock>
 
 
+
             <Border AllowDrop="True" 
                     Drop="AssetArea_Drop"
                     DragEnter="AssetArea_DragEnter" 
-                    DragLeave="AssetArea_DragLeave">
-                
+                    DragLeave="AssetArea_DragLeave"
+                    BorderThickness="0.5">
+
                 <StackPanel Margin="0,10,0,0">
                 <TextBlock Text="Tags" FontWeight="Bold" Foreground="Gray" Margin="5,0,0,5" />
-                <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
+
+
+                    <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
              Margin="-5,0,0,0" 
              Padding="0" 
              BorderThickness="0"
@@ -362,11 +366,12 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+             
             </StackPanel>
-            </Border>
 
+            </Border>
             <StackPanel Orientation="Horizontal">
-                <TextBox Width="150" Height="30" Margin="5,0,10,0"
+                <TextBox Width="150" Height="30" Margin="5,0,10,5"
                   Text="{Binding NewAssetTagName, UpdateSourceTrigger=PropertyChanged}" />
 
                 <Button Content="Add Tag" Command="{Binding AddAssetTagCommand}" HorizontalAlignment="Left">

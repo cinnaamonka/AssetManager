@@ -53,6 +53,7 @@ namespace AssetManager.Views
                 if (viewModel.SelectedAsset != null)
                 {
                     viewModel.AddAssetTag(droppedTag.Name);
+                    (sender as Border).BorderBrush = System.Windows.Media.Brushes.Transparent;
                 }
             }
         }
@@ -62,13 +63,13 @@ namespace AssetManager.Views
             if (e.Data.GetDataPresent(typeof(Tag)))
             {
                 // Change the appearance of the drop target
-                (sender as Border).Background = System.Windows.Media.Brushes.LightGreen;
+                (sender as Border).BorderBrush = System.Windows.Media.Brushes.LightGreen;
             }
         }
 
         private void AssetArea_DragLeave(object sender, System.Windows.DragEventArgs e)
         {
-            (sender as Border).Background = System.Windows.Media.Brushes.Transparent;
+            (sender as Border).BorderBrush = System.Windows.Media.Brushes.Transparent;
         }
 
     }
