@@ -61,5 +61,19 @@ namespace AssetManager.AssetHelpers
             PNG,
             JPG
         }
+
+      
+
+        public static System.Windows.Media.Color GenerateRandomColorRGB()
+        {
+            Random random = new Random();
+            byte r = (byte)random.Next(128, 256);
+            byte g = (byte)random.Next(128, 256);
+            byte b = (byte)random.Next(128, 256);
+
+            System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
+
+            return brightColor;
+        }
     }
 }

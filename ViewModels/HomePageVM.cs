@@ -136,6 +136,7 @@ namespace AssetManager.ViewModels
 
             try
             {
+                OverViewPageVM.LoadTags();
                 await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
 
             }
@@ -143,7 +144,7 @@ namespace AssetManager.ViewModels
             {
                 Loader.IsLoading = false;
                 MainPageVM.OpenOverViewPage();
-                OverViewPageVM.LoadTags();
+                
             }
 
 

@@ -126,7 +126,7 @@ namespace AssetManager.Repositories
 
                                 if (existingTag == null)
                                 {
-                                    existingTag = new Tag { Name = asset.FileType.ToString() };
+                                    existingTag = new Tag { Name = asset.FileType.ToString(),Color = GenerateRandomColorRGB().ToString() };
                                     context.Tags.Add(existingTag);
                                     await context.SaveChangesAsync();
 
@@ -208,7 +208,7 @@ namespace AssetManager.Repositories
             }
             return null;
         }
-        private string ConvertFbxToObj(string fbxFilePath)
+        public string ConvertFbxToObj(string fbxFilePath)
         {
             string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles");
 
@@ -219,7 +219,7 @@ namespace AssetManager.Repositories
 
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\FBXToObjConverter", "FBXToObjConverter.exe");
 
-            ProcessStartInfo startInfo = new ProcessStartInfo
+             ProcessStartInfo startInfo = new ProcessStartInfo
             {
 
                 FileName = exePath,

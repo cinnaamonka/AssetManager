@@ -5,9 +5,7 @@ using System.Text.RegularExpressions;
 using AssetManager.Repositories;
 using AssetManager.Views;
 using System.Windows.Input;
-using System.Windows;
-using System.Windows.Controls;
-using static AssetManager.AssetHelpers.AssetHelpers;
+using System.IO;
 
 namespace AssetManager.ViewModels
 {
@@ -197,8 +195,29 @@ namespace AssetManager.ViewModels
 
         void ConvertFile()
         {
-            //add conversion
-            //TODO
+            if (SelectedFromFormat == "FBX" && SelectedToFormat == "OBJ")
+            {
+                string objFilePath = _assetRepository.ConvertFbxToObj(SelectedAsset.FilePath);
+
+                 if (objFilePath != null)
+                {
+                    var asset = new Asset
+                    {
+                        FileName = Path.GetFileName(objFilePath),
+                        FilePath = objFilePath,
+                        ProjectId = SelectedAsset.ProjectId,
+                        AssetTags = SelectedAsset.AssetTags
+                    };
+
+                    if (!Assets.Any(a => a.FileName == asset.FileName && a.FilePath == asset.FilePath && a.ProjectId == asset.ProjectId))
+                    {
+                        _assetRepository.Assets.Add(asset);
+                        Assets = _assetRepository.Assets;
+                        OnPropertyChanged(nameof(Assets));
+                    }
+                  
+                }
+            }
         }
         private void ExecuteSearch(string searchText)
         {
