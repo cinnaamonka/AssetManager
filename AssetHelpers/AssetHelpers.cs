@@ -5,10 +5,13 @@ namespace AssetManager.AssetHelpers
 {
     public class AssetHelpers
     {
+        private static string _resourceFolder => "C:\\Users\\parni\\Desktop\\2024-2025\\semester5\\GraduationWork\\AssetManager\\Resources";
+
         public enum AssetType
         {
             Image,
             Model,
+            Obj,
             Other
         }
 
@@ -74,6 +77,30 @@ namespace AssetManager.AssetHelpers
             System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
 
             return brightColor;
+        }
+
+        public static string GetPlaceholderPath(string extension)
+        {
+            string fileExtension = extension.ToLowerInvariant();
+
+            switch (fileExtension)
+            {
+
+                case "obj":
+                    return Path.Combine(_resourceFolder, "OBJPlaceholder.png");
+
+                //case ".mp3":
+                //case ".wav":
+                //    return @"Placeholders\AudioPlaceholder.png";
+
+                //case ".txt":
+                //case ".docx":
+                //case ".pdf":
+                //    return @"Placeholders\DocumentPlaceholder.png"; 
+
+                default:
+                    return _resourceFolder;
+            }
         }
     }
 }

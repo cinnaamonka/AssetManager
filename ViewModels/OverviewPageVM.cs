@@ -136,10 +136,10 @@ namespace AssetManager.ViewModels
             set
             {
                 _selectedFileToConvert = value;
-              
+
                 OnPropertyChanged(nameof(SelectedAssetToConvert));
                 ExecuteSearch(SelectedAssetToConvert);
-             
+
             }
         }
 
@@ -147,7 +147,7 @@ namespace AssetManager.ViewModels
         public string SelectedFromFormat
         {
             get { return _selectedFromFormat; }
-            set 
+            set
             {
                 _selectedFromFormat = value;
             }
@@ -158,7 +158,7 @@ namespace AssetManager.ViewModels
         {
             get { return _selectedToFormat; }
             set
-            { 
+            {
                 _selectedToFormat = value;
             }
         }
@@ -199,26 +199,57 @@ namespace AssetManager.ViewModels
             {
                 string objFilePath = _assetRepository.ConvertFbxToObj(SelectedAsset.FilePath);
 
-                 if (objFilePath != null)
+                if (objFilePath != null)
                 {
-                    var asset = new Asset
+                    var asset = new Asset(
+
+                      name: Path.GetFileName(objFilePath),
+                      filePath: objFilePath,
+                      projectId: SelectedAsset.ProjectId,
+                      fileType: AssetHelpers.AssetHelpers.AssetType.Obj,
+                      relativePath: Path.GetFileName(objFilePath),
+                      previewImagePath: 
+                      AssetHelpers.AssetHelpers.GetPlaceholderPath(SelectedToFormat));
+
+                    asset.Metadata = new AssetMetadata
                     {
-                        FileName = Path.GetFileName(objFilePath),
-                        FilePath = objFilePath,
-                        ProjectId = SelectedAsset.ProjectId,
-                        AssetTags = SelectedAsset.AssetTags
+                        Name = asset.FileName,
+                        FilePath = asset.FilePath,
+                        FileType = asset.FileType,
+                        Format = "Not defined"
                     };
+
+                    if (!string.IsNullOrEmpty(asset.Metadata.FilePath))
+                    {
+                        FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
+                        asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0), 0);
+                        asset.Metadata.Format = fileInfo.Extension;
+                        asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
+                        asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+
+                    }
+                    else
+                    {
+                        asset.Metadata.FileSize = 0;
+                    }
 
                     if (!Assets.Any(a => a.FileName == asset.FileName && a.FilePath == asset.FilePath && a.ProjectId == asset.ProjectId))
                     {
                         _assetRepository.Assets.Add(asset);
                         Assets = _assetRepository.Assets;
+                        ExecuteSearch(SearchText);
+                        MainPageVM.AppDbContext.Assets.Add(asset);
+                        MainPageVM.AppDbContext.SaveChanges();
                         OnPropertyChanged(nameof(Assets));
+                        OnPropertyChanged(nameof(FilteredAssets));
                     }
-                  
+
                 }
+
+
             }
         }
+
         private void ExecuteSearch(string searchText)
         {
             if (string.IsNullOrEmpty(searchText))
