@@ -19,6 +19,7 @@
   <ItemGroup>
     <None Remove="Resources\MetafileImage.png" />
     <None Remove="Resources\minus.png" />
+    <None Remove="Resources\OBJPlaceholder.png" />
     <None Remove="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx" />
   </ItemGroup>
 
@@ -38,6 +39,9 @@
     <Resource Include="Resources\minus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <EmbeddedResource Include="Resources\OBJPlaceholder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -78,6 +82,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Tools\FBXToObjConverter\libfbxsdk.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\PngToJpgConverter\PngToJpgConverter.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\PngToJpgConverter\PngToJpgConverter.pdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Tools\ThumbnailsGenerator\dbghelp.dll">

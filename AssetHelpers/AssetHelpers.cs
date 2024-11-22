@@ -12,6 +12,7 @@ namespace AssetManager.AssetHelpers
             Image,
             Model,
             Obj,
+           
             Other
         }
 

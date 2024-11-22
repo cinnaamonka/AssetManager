@@ -165,7 +165,7 @@ namespace AssetManager.Repositories
             await context.SaveChangesAsync();
         }
 
-        private string GenerateThumbnail(Asset asset, string extension)
+        public string GenerateThumbnail(Asset asset, string extension)
         {
             if (extension == ".png" || extension == ".jpg")
             {
@@ -241,6 +241,36 @@ namespace AssetManager.Repositories
                     {
                         return Path.Combine(outputFolderPath, Path.ChangeExtension(
                         Path.GetFileName(fbxFilePath), ".obj"));
+                    }
+                }
+            }
+            return null;
+        }
+        public string ConvertPngToJpg(string pngFilePath)
+        {
+            
+            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\PngToJpgConverter", "PngToJpgConverter.exe");
+            string outputFilePath = Path.ChangeExtension(pngFilePath, ".jpg");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = $"\"{pngFilePath}\" \"{outputFilePath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                if (process != null)
+                {
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        return outputFilePath;
                     }
                 }
             }

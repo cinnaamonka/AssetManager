@@ -193,7 +193,7 @@ namespace AssetManager.ViewModels
 
         public OverviewPageVM() { }
 
-        void ConvertFile()
+        async void ConvertFile()
         {
             if (SelectedFromFormat == "FBX" && SelectedToFormat == "OBJ")
             {
@@ -201,6 +201,7 @@ namespace AssetManager.ViewModels
 
                 if (objFilePath != null)
                 {
+                    //TODO
                     var asset = new Asset(
 
                       name: Path.GetFileName(objFilePath),
@@ -208,7 +209,7 @@ namespace AssetManager.ViewModels
                       projectId: SelectedAsset.ProjectId,
                       fileType: AssetHelpers.AssetHelpers.AssetType.Obj,
                       relativePath: Path.GetFileName(objFilePath),
-                      previewImagePath: 
+                      previewImagePath:
                       AssetHelpers.AssetHelpers.GetPlaceholderPath(SelectedToFormat));
 
                     asset.Metadata = new AssetMetadata
@@ -247,6 +248,87 @@ namespace AssetManager.ViewModels
                 }
 
 
+            }
+            else if (SelectedFromFormat == "PNG" && SelectedToFormat == "JPG")
+            {
+                string jpgFilePath = _assetRepository.ConvertPngToJpg(SelectedAsset.FilePath);
+
+                if (jpgFilePath != null)
+                {
+                    //TODO
+                    var asset = new Asset(
+
+                                             name: Path.GetFileName(jpgFilePath),
+                                             filePath: jpgFilePath,
+                                             projectId: SelectedAsset.ProjectId,
+                                             fileType: AssetHelpers.AssetHelpers.AssetType.Image,
+                                             relativePath: Path.GetFileName(jpgFilePath),
+                                                                                                                                                      previewImagePath:
+                                                                                                                                                                           AssetHelpers.AssetHelpers.GetPlaceholderPath(SelectedToFormat));
+
+                    asset.Metadata = new AssetMetadata
+                    {
+                        Name = asset.FileName,
+                        FilePath = asset.FilePath,
+                        FileType = asset.FileType,
+                        Format = "Not defined"
+                    };
+
+                    if (!string.IsNullOrEmpty(asset.Metadata.FilePath))
+                    {
+                        FileInfo fileInfo = new FileInfo(asset.Metadata.FilePath);
+                        asset.Metadata.FileSize = Math.Round((fileInfo.Length / 1024.0), 0);
+                        asset.Metadata.Format = fileInfo.Extension;
+                        asset.Metadata.DateCreated = fileInfo.CreationTimeUtc;
+                        asset.Metadata.DateLastChanged = fileInfo.LastAccessTimeUtc;
+
+                    }
+                    else
+                    {
+                        asset.Metadata.FileSize = 0;
+                    }
+
+                    string extension = Path.GetExtension(Path.GetFileName(jpgFilePath)).ToLower();
+
+
+                    asset.PreviewImagePath = SelectedAsset.PreviewImagePath;
+
+                    var existingTag = MainPageVM.AppDbContext.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
+
+
+                    if (existingTag == null)
+                    {
+                        existingTag = new Tag { Name = asset.FileType.ToString(), Color = AssetHelpers.AssetHelpers.GenerateRandomColorRGB().ToString() };
+                        MainPageVM.AppDbContext.Tags.Add(existingTag);
+
+                    }
+
+                    bool assetTagExists = asset.AssetTags.Any(at => at.TagId == existingTag.Id);
+
+                    if (!assetTagExists)
+                    {
+                        var assetTag = new AssetTag
+                        {
+                            Asset = asset,
+                            Tag = existingTag
+                        };
+
+                        asset.AssetTags.Add(assetTag);
+                        MainPageVM.AppDbContext.AssetTags.Add(assetTag);
+
+                        if (!Assets.Any(a => a.FileName == asset.FileName && a.FilePath == asset.FilePath && a.ProjectId == asset.ProjectId))
+                        {
+                            _assetRepository.Assets.Add(asset);
+                            Assets = _assetRepository.Assets;
+                            ExecuteSearch(SearchText);
+                            MainPageVM.AppDbContext.Assets.Add(asset);
+                            MainPageVM.AppDbContext.SaveChanges();
+                            OnPropertyChanged(nameof(Assets));
+                            OnPropertyChanged(nameof(FilteredAssets));
+                        }
+
+                    }
+                }
             }
         }
 
