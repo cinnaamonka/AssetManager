@@ -84,6 +84,21 @@
     <None Update="Tools\FBXToObjConverter\libfbxsdk.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Tools\JpgToPngConverter\JpgToPngConverter.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\JpgToPngConverter\JpgToPngConverter.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\ObjToFbxConverter\libfbxsdk.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\ObjToFbxConverter\ObjToFbxConverter.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\ObjToFbxConverter\ObjToFbxConverter.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Tools\PngToJpgConverter\PngToJpgConverter.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

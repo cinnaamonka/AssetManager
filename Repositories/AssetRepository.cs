@@ -246,6 +246,38 @@ namespace AssetManager.Repositories
             }
             return null;
         }
+        public string ConvertObjToFbx(string objFilePath)
+        {
+            string outputFolderPath = Path.ChangeExtension(objFilePath,".fbx");
+
+          
+            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ObjToFbxConverter", "ObjToFbxConverter.exe");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+
+                FileName = exePath,
+                Arguments = $"\"{objFilePath}\" \"{outputFolderPath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                if (process != null)
+                {
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        return outputFolderPath;
+                    }
+                }
+            }
+            return null;
+        }
         public string ConvertPngToJpg(string pngFilePath)
         {
             
@@ -256,6 +288,35 @@ namespace AssetManager.Repositories
             {
                 FileName = exePath,
                 Arguments = $"\"{pngFilePath}\" \"{outputFilePath}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                if (process != null)
+                {
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        return outputFilePath;
+                    }
+                }
+            }
+            return null;
+        }
+        public string ConvertJpgToPng(string jpgFilePath)
+        {
+            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\JpgToPngConverter", "JpgToPngConverter.exe");
+            string outputFilePath = Path.ChangeExtension(jpgFilePath, ".png");
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = $"\"{jpgFilePath}\" \"{outputFilePath}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
