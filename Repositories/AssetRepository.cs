@@ -75,6 +75,12 @@ namespace AssetManager.Repositories
 
         }
 
+        public void RemoveAsset(Asset selectedAsset, AppDbContext context)
+        {
+            context.Remove(selectedAsset);
+            context.SaveChanges();
+            Assets = context.Assets.ToList();
+        }
         private Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
         {
             string fileName = Path.GetFileName(filePath);

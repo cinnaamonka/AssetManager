@@ -342,6 +342,7 @@
                                 <Image Source="{Binding PreviewImagePath}" Stretch="Uniform" Width="90" Height="90" 
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
 
+                                    
                                     <Image.InputBindings>
                                         <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                   CommandParameter="{Binding PreviewImagePath}"/>
@@ -350,6 +351,15 @@
                                 </Image>
 
                             </Border>
+
+                            <Button Width="25" Height="25" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="92,3,0,0" 
+                                   Background="Transparent" BorderBrush="Transparent" 
+                                   Command="{Binding DataContext.RemoveAssetCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                   CommandParameter="{Binding}">
+                                   <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=Page}}" Stretch="Uniform" />
+                            </Button>
+
+
 
                             <TextBlock Text="{Binding FileName}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,20"
                                Foreground="Black" TextAlignment="Left" FontWeight="SemiBold" />

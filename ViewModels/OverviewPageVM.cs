@@ -88,6 +88,7 @@ namespace AssetManager.ViewModels
         public ICommand RemoveTagCommand { get; set; }
         public ICommand RemoveAssetTagCommand { get; set; }
         public RelayCommand ConvertCommand { get; set; }
+        public RelayCommand<Asset> RemoveAssetCommand { get; set; } 
 
         public MainPageVM MainPageVM { get; }
 
@@ -183,6 +184,7 @@ namespace AssetManager.ViewModels
             RemoveTagCommand = new RelayCommand<Tag>(RemoveTag);
             RemoveAssetTagCommand = new RelayCommand<AssetTag>(RemoveAssetTag);
             ConvertCommand = new RelayCommand(ConvertFile);
+            RemoveAssetCommand = new RelayCommand<Asset>(RemoveAsset);
 
             _assetRepository = new AssetRepository();
 
@@ -194,6 +196,14 @@ namespace AssetManager.ViewModels
 
         public OverviewPageVM() { }
 
+        void RemoveAsset(Asset asset)
+        {
+            _assetRepository.RemoveAsset(asset, MainPageVM.AppDbContext);
+            Assets = _assetRepository.Assets;
+            OnPropertyChanged(nameof(Assets));
+            OnPropertyChanged(nameof(FilteredAssets));
+            ExecuteSearch(SearchText);
+        }
         void ConvertFile()
         {
             if (string.IsNullOrEmpty(SelectedFromFormat) 
