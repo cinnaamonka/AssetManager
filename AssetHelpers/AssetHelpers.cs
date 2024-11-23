@@ -32,6 +32,7 @@ namespace AssetManager.AssetHelpers
                 ".png" => AssetType.Image,
                 ".jpg" => AssetType.Image,
                 ".fbx" => AssetType.Model,
+                ".obj" => AssetType.Obj,
                 _ => AssetType.Other
             };
         }
@@ -79,7 +80,16 @@ namespace AssetManager.AssetHelpers
 
             return brightColor;
         }
-
+        public static AssetType DetermineFileType(string format)
+        {
+            return format switch
+            {
+                "OBJ" =>AssetType.Obj,
+                "FBX" => AssetType.Model,
+                "PNG" or "JPG" => AssetType.Image,
+                _ => AssetType.Other
+            };
+        }
         public static string GetPlaceholderPath(string extension)
         {
             string fileExtension = extension.ToLowerInvariant();
@@ -88,6 +98,7 @@ namespace AssetManager.AssetHelpers
             {
 
                 case "obj":
+                case ".obj":
                     return Path.Combine(_resourceFolder, "OBJPlaceholder.png");
 
                 //case ".mp3":

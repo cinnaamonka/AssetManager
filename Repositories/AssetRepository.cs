@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using AssetManager.Models;
+using AssetManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static AssetManager.AssetHelpers.AssetHelpers;
@@ -41,8 +42,93 @@ namespace AssetManager.Repositories
                 .Include(a => a.AssetTags)
                 .ToListAsync();
         }
+        public void ProcessAssetConversion(string selectedFromFormat, string selectedToFormat, Asset selectedAsset, AppDbContext context)
+        {
+            var conversionMap = new Dictionary<(string, string), Func<string, string>>
+             {
+                { ("FBX", "OBJ"), filePath => ConvertFbxToObj(filePath) },
+                { ("PNG", "JPG"),ConvertPngToJpg },
+                { ("JPG", "PNG"),ConvertJpgToPng },
+                { ("OBJ", "FBX"),ConvertObjToFbx }
+             };
+
+            if (conversionMap.TryGetValue((selectedFromFormat, selectedToFormat), out var conversionFunc))
+            {
+                string convertedFilePath = conversionFunc(selectedAsset.FilePath);
+
+                if (!string.IsNullOrEmpty(convertedFilePath))
+                {
+                    var asset = CreateAsset(convertedFilePath, selectedAsset.ProjectId, selectedToFormat,context);
+                    SaveAsset(asset, selectedToFormat, context);
+                }
+            }
+        }
+        private void SaveAsset(Asset asset, string targetFormat, AppDbContext context)
+        {
+            if (!Assets.Any(a => a.FileName == asset.FileName && a.FilePath == asset.FilePath && a.ProjectId == asset.ProjectId))
+            {
+                context.Assets.Add(asset);
+                context.SaveChanges();
+                Assets = context.Assets.ToList();
+            }
 
 
+        }
+
+        private Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
+        {
+            string fileName = Path.GetFileName(filePath);
+            var fileInfo = new FileInfo(filePath);
+
+            var asset = new Asset(
+                name: fileName,
+                filePath: filePath,
+                projectId: projectId,
+                fileType: AssetHelpers.AssetHelpers.DetermineFileType(targetFormat),
+                relativePath: fileName
+            );
+
+            asset.PreviewImagePath = GenerateThumbnail(asset, Path.GetExtension(filePath));
+
+            var metadata = new AssetMetadata
+            {
+                Name = fileName,
+                FilePath = filePath,
+                FileType = DetermineFileType(targetFormat),
+                Format = fileInfo.Extension,
+                FileSize = Math.Round((fileInfo.Length / 1024.0), 0),
+                DateCreated = fileInfo.CreationTimeUtc,
+                DateLastChanged = fileInfo.LastAccessTimeUtc
+            };
+
+            asset.Metadata = metadata;
+
+            var existingTag = context.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
+
+
+            if (existingTag == null)
+            {
+                existingTag = new Tag { Name = asset.FileType.ToString(), Color = GenerateRandomColorRGB().ToString() };
+                context.Tags.Add(existingTag);
+
+            }
+
+            bool assetTagExists = asset.AssetTags.Any(at => at.TagId == existingTag.Id);
+
+            if (!assetTagExists)
+            {
+                var assetTag = new AssetTag
+                {
+                    Asset = asset,
+                    Tag = existingTag
+                };
+
+                asset.AssetTags.Add(assetTag);
+            }
+
+            return asset;
+
+        }
         public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId)
         {
             Assets.Clear();
@@ -72,7 +158,7 @@ namespace AssetManager.Repositories
                             string relativePath = result.Substring(assetsFolderPath.Length + 1);
                             string extension = Path.GetExtension(result).ToLower();
 
-                            if ((extension == ".png" || extension == ".jpg" || extension == ".fbx") &&
+                            if ((extension == ".png" || extension == ".jpg" || extension == ".fbx" || extension == ".obj") &&
                                 !existingAssets.Any(a => a.FilePath == result))
                             {
                                 var assetType = GetAssetType(extension);
@@ -109,7 +195,7 @@ namespace AssetManager.Repositories
                                     asset.Metadata.FileSize = 0;
                                 }
 
-                               
+
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
                                     asset.PreviewImagePath = GenerateThumbnail(asset, extension);
@@ -126,7 +212,7 @@ namespace AssetManager.Repositories
 
                                 if (existingTag == null)
                                 {
-                                    existingTag = new Tag { Name = asset.FileType.ToString(),Color = GenerateRandomColorRGB().ToString() };
+                                    existingTag = new Tag { Name = asset.FileType.ToString(), Color = GenerateRandomColorRGB().ToString() };
                                     context.Tags.Add(existingTag);
                                     await context.SaveChangesAsync();
 
@@ -144,9 +230,9 @@ namespace AssetManager.Repositories
 
                                     asset.AssetTags.Add(assetTag);
                                     context.AssetTags.Add(assetTag);
-                    
+
                                     await context.SaveChangesAsync();
-                                   
+
                                 }
                             }
                         }
@@ -189,7 +275,7 @@ namespace AssetManager.Repositories
             }
             else if (extension == ".fbx")
             {
-                string objFilePath = ConvertFbxToObj(asset.FilePath);
+                string objFilePath = ConvertFbxToObj(asset.FilePath, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles"));
 
                 AddVertexFileInfo(objFilePath, asset);
 
@@ -202,24 +288,24 @@ namespace AssetManager.Repositories
 
                 }
             }
-            else if (extension == ".prefab")
+            else if (extension == ".prefab" || extension == ".obj")
             {
-                return GetPlaceholderThumbnail();
+                return AssetHelpers.AssetHelpers.GetPlaceholderPath(extension);
             }
+
             return null;
         }
-        public string ConvertFbxToObj(string fbxFilePath)
+        public string ConvertFbxToObj(string fbxFilePath,string outputFolderPath = "")
         {
-            string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles");
-
-            if (!Directory.Exists(outputFolderPath))
+            if(outputFolderPath == String.Empty)
             {
-                Directory.CreateDirectory(outputFolderPath);
+                outputFolderPath = Path.GetDirectoryName(fbxFilePath);
             }
+           // string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles");
 
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\FBXToObjConverter", "FBXToObjConverter.exe");
 
-             ProcessStartInfo startInfo = new ProcessStartInfo
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
 
                 FileName = exePath,
@@ -248,9 +334,9 @@ namespace AssetManager.Repositories
         }
         public string ConvertObjToFbx(string objFilePath)
         {
-            string outputFolderPath = Path.ChangeExtension(objFilePath,".fbx");
+            string outputFolderPath = Path.ChangeExtension(objFilePath, ".fbx");
 
-          
+
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ObjToFbxConverter", "ObjToFbxConverter.exe");
 
             ProcessStartInfo startInfo = new ProcessStartInfo
@@ -280,7 +366,7 @@ namespace AssetManager.Repositories
         }
         public string ConvertPngToJpg(string pngFilePath)
         {
-            
+
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\PngToJpgConverter", "PngToJpgConverter.exe");
             string outputFilePath = Path.ChangeExtension(pngFilePath, ".jpg");
 
