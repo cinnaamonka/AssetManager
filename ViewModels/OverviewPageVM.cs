@@ -198,8 +198,8 @@ namespace AssetManager.ViewModels
 
         void RemoveAsset(Asset asset)
         {
-            _assetRepository.RemoveAsset(asset, MainPageVM.AppDbContext);
-            Assets = _assetRepository.Assets;
+            _assetRepository.DeleteAssetFromProject(asset, MainPageVM.AppDbContext);
+            Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
             OnPropertyChanged(nameof(Assets));
             OnPropertyChanged(nameof(FilteredAssets));
             ExecuteSearch(SearchText);
@@ -215,7 +215,7 @@ namespace AssetManager.ViewModels
             {
                 _assetRepository.ProcessAssetConversion(SelectedFromFormat, SelectedToFormat, SelectedAsset, MainPageVM.AppDbContext);
 
-                Assets = _assetRepository.Assets;
+                Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
                 OnPropertyChanged(nameof(Assets));
                 OnPropertyChanged(nameof(FilteredAssets));
                 ExecuteSearch(SearchText);
