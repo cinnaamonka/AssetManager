@@ -1,7 +1,5 @@
 ﻿using AssetManager.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing.Imaging;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 public class AppDbContext : DbContext
 {

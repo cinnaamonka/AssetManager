@@ -7,7 +7,7 @@ using AssetManager.Views;
 using System.Windows.Input;
 using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace AssetManager.ViewModels
 {
@@ -195,62 +195,73 @@ namespace AssetManager.ViewModels
             {
                 AvailableFormats.Add(format.ToString());
             }
-
-            Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
-            OnPropertyChanged(nameof(Assets));
-            OnPropertyChanged(nameof(FilteredAssets));
         }
 
         public OverviewPageVM() { }
 
-        void AddAsset()
+        public void AddAsset(string filePath)
         {
-
-            using (var openFileDialog = new OpenFileDialog())
+            if (!AssetHelpers.AssetHelpers.IsSupportedFileType(filePath))
             {
-                openFileDialog.Filter = "Supported Files|*.png;*.jpg;*.jpeg;*.fbx;*.obj|Images|*.png;*.jpg;*.jpeg|Models|*.fbx;*.obj|All Files|*.*";
-                openFileDialog.Multiselect = false;
+                return;
+            }
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string selectedFilePath = openFileDialog.FileName;
-
-                    string destinationFilePath = Path.Combine(MainPageVM.SelectedProject.Path, "Assets", Path.GetFileName(selectedFilePath));
-
-                    File.SetAttributes(selectedFilePath, FileAttributes.Normal);
-                 
-
-                    File.Copy(selectedFilePath, destinationFilePath, overwrite: true);
+            try
+            {
+                string destinationFilePath = Path.Combine(MainPageVM.SelectedProject.Path, "Assets", Path.GetFileName(filePath));
+                File.SetAttributes(filePath, FileAttributes.Normal);
 
 
-                    var newAsset = _assetRepository.CreateAsset(
-                        destinationFilePath,
-                        MainPageVM.SelectedProject.Id,
-                        Path.GetExtension(destinationFilePath),
-                        MainPageVM.AppDbContext
-                    );
+                File.Copy(filePath, destinationFilePath, overwrite: true);
 
-                    _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
+                   var newAsset = _assetRepository.CreateAsset(
+                    destinationFilePath,
+                    MainPageVM.SelectedProject.Id,
+                    Path.GetExtension(destinationFilePath),
+                    MainPageVM.AppDbContext
+                );
 
-                    Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
-                    OnPropertyChanged(nameof(Assets));
-                    OnPropertyChanged(nameof(FilteredAssets));
+                _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
 
+             
+                RefreshAssets();
 
-                    ExecuteSearch(SearchText);
-                }
+               
+            }
+            catch (Exception ex)
+            {
+                Console.Write($"An error occurred while adding the asset: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
+        private void AddAsset()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Supported Files|*.png;*.jpg;*.jpeg;*.fbx;*.obj|Images|*.png;*.jpg;*.jpeg|Models|*.fbx;*.obj|All Files|*.*",
+                Multiselect = false
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                AddAsset(openFileDialog.FileName);
             }
         }
 
         void RemoveAsset(Asset asset)
         {
             _assetRepository.DeleteAssetFromProject(asset, MainPageVM.AppDbContext);
+            RefreshAssets();
+        }
+
+        private void RefreshAssets()
+        {
             Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
             OnPropertyChanged(nameof(Assets));
             OnPropertyChanged(nameof(FilteredAssets));
             ExecuteSearch(SearchText);
         }
+
         void ConvertFile()
         {
             if (string.IsNullOrEmpty(SelectedFromFormat)
@@ -262,10 +273,7 @@ namespace AssetManager.ViewModels
             {
                 _assetRepository.ProcessAssetConversion(SelectedFromFormat, SelectedToFormat, SelectedAsset, MainPageVM.AppDbContext);
 
-                Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
-                OnPropertyChanged(nameof(Assets));
-                OnPropertyChanged(nameof(FilteredAssets));
-                ExecuteSearch(SearchText);
+                RefreshAssets();
 
             }
             catch (Exception ex)

@@ -37,6 +37,12 @@ namespace AssetManager.AssetHelpers
             };
         }
 
+        static public bool IsSupportedFileType(string fileType)
+        {
+            string[] supportedExtensions = { ".png", ".jpg", ".jpeg", ".fbx", ".obj" };
+            string extension = Path.GetExtension(fileType).ToLower();
+            return supportedExtensions.Contains(extension);
+        }
         public static void AddVertexFileInfo(string fileName, Asset asset)
         {
             if(!File.Exists(fileName))
