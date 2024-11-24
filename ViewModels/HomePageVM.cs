@@ -53,8 +53,6 @@ namespace AssetManager.ViewModels
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     UnityProjectPath = folderDialog.SelectedPath;
-
-
                 }
             }
         }

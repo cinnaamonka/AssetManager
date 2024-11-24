@@ -160,8 +160,6 @@ namespace AssetManager.Repositories
         }
         public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId)
         {
-            RemoveAllAsssets(context);
-
             string assetsFolderPath = Path.Combine(projectPath, "Assets");
 
 
