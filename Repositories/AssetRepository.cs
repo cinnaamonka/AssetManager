@@ -18,7 +18,7 @@ namespace AssetManager.Repositories
         public AssetRepository() { }
 
         // MAIN FUNCTIONS
-        private void SaveAsset(Asset asset, AppDbContext context)
+        public void SaveAsset(Asset asset, AppDbContext context)
         {
             var assets = GetAssets(context);
 
@@ -104,7 +104,7 @@ namespace AssetManager.Repositories
             }
         }
 
-        private Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
+        public Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
         {
             string fileName = Path.GetFileName(filePath);
             var fileInfo = new FileInfo(filePath);
@@ -209,7 +209,7 @@ namespace AssetManager.Repositories
 
         public string GenerateThumbnail(Asset asset, string extension)
         {
-            if (extension == ".png" || extension == ".jpg")
+            if (extension.ToLower() == ".png" || extension.ToLower() == ".jpg" )
             {
                 string outputFolderPath = Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,

@@ -7,6 +7,7 @@ using AssetManager.Views;
 using System.Windows.Input;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace AssetManager.ViewModels
 {
@@ -88,7 +89,8 @@ namespace AssetManager.ViewModels
         public ICommand RemoveTagCommand { get; set; }
         public ICommand RemoveAssetTagCommand { get; set; }
         public RelayCommand ConvertCommand { get; set; }
-        public RelayCommand<Asset> RemoveAssetCommand { get; set; } 
+        public RelayCommand AddAssetCommand { get; set; }
+        public RelayCommand<Asset> RemoveAssetCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
 
@@ -185,6 +187,7 @@ namespace AssetManager.ViewModels
             RemoveAssetTagCommand = new RelayCommand<AssetTag>(RemoveAssetTag);
             ConvertCommand = new RelayCommand(ConvertFile);
             RemoveAssetCommand = new RelayCommand<Asset>(RemoveAsset);
+            AddAssetCommand = new RelayCommand(AddAsset);
 
             _assetRepository = new AssetRepository();
 
@@ -192,9 +195,53 @@ namespace AssetManager.ViewModels
             {
                 AvailableFormats.Add(format.ToString());
             }
+
+            Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
+            OnPropertyChanged(nameof(Assets));
+            OnPropertyChanged(nameof(FilteredAssets));
         }
 
         public OverviewPageVM() { }
+
+        void AddAsset()
+        {
+
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Supported Files|*.png;*.jpg;*.jpeg;*.fbx;*.obj|Images|*.png;*.jpg;*.jpeg|Models|*.fbx;*.obj|All Files|*.*";
+                openFileDialog.Multiselect = false;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFilePath = openFileDialog.FileName;
+
+                    string destinationFilePath = Path.Combine(MainPageVM.SelectedProject.Path, "Assets", Path.GetFileName(selectedFilePath));
+
+                    File.SetAttributes(selectedFilePath, FileAttributes.Normal);
+                 
+
+                    File.Copy(selectedFilePath, destinationFilePath, overwrite: true);
+
+
+                    var newAsset = _assetRepository.CreateAsset(
+                        destinationFilePath,
+                        MainPageVM.SelectedProject.Id,
+                        Path.GetExtension(destinationFilePath),
+                        MainPageVM.AppDbContext
+                    );
+
+                    _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
+
+                    Assets = _assetRepository.GetAssets(MainPageVM.AppDbContext);
+                    OnPropertyChanged(nameof(Assets));
+                    OnPropertyChanged(nameof(FilteredAssets));
+
+
+                    ExecuteSearch(SearchText);
+                }
+
+            }
+        }
 
         void RemoveAsset(Asset asset)
         {
@@ -206,8 +253,8 @@ namespace AssetManager.ViewModels
         }
         void ConvertFile()
         {
-            if (string.IsNullOrEmpty(SelectedFromFormat) 
-                || string.IsNullOrEmpty(SelectedToFormat) 
+            if (string.IsNullOrEmpty(SelectedFromFormat)
+                || string.IsNullOrEmpty(SelectedToFormat)
                 || SelectedAsset == null)
                 return;
 
@@ -219,7 +266,7 @@ namespace AssetManager.ViewModels
                 OnPropertyChanged(nameof(Assets));
                 OnPropertyChanged(nameof(FilteredAssets));
                 ExecuteSearch(SearchText);
-           
+
             }
             catch (Exception ex)
             {
@@ -229,154 +276,154 @@ namespace AssetManager.ViewModels
 
         }
 
-    private void ExecuteSearch(string searchText)
-    {
-        if (string.IsNullOrEmpty(searchText))
+        private void ExecuteSearch(string searchText)
         {
-            FilteredAssets = new List<Asset>(Assets);
-        }
-        else
-        {
-            try
+            if (string.IsNullOrEmpty(searchText))
             {
-                var regex = new Regex("^" + Regex.Escape(searchText), RegexOptions.IgnoreCase);
-                var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
-                    a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
-
-                FilteredAssets = new List<Asset>(filtered);
+                FilteredAssets = new List<Asset>(Assets);
             }
-            catch (RegexParseException)
+            else
             {
+                try
+                {
+                    var regex = new Regex("^" + Regex.Escape(searchText), RegexOptions.IgnoreCase);
+                    var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
+                        a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
 
-                FilteredAssets = new List<Asset>();
+                    FilteredAssets = new List<Asset>(filtered);
+                }
+                catch (RegexParseException)
+                {
+
+                    FilteredAssets = new List<Asset>();
+                }
+            }
+
+            OnPropertyChanged(nameof(FilteredAssets));
+
+        }
+
+        private void FilterAssetsByTag()
+        {
+            FilteredAssets = Assets
+                .Where(a => a.AssetTags != null && a.AssetTags.Any(tag =>
+                tag.Tag.Name.Equals(SelectedTag.Name, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            OnPropertyChanged(nameof(FilteredAssets));
+
+        }
+        private void ClearSelection()
+        {
+            SelectedAsset = null;
+        }
+        private void OpenMetadataFile()
+        {
+            MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
+        }
+
+        private void OpenHomePage()
+        {
+            MainPageVM?.OpenHomePage();
+        }
+
+        private void OpenFullImage()
+        {
+            var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+            {
+                Owner = App.Current.MainWindow
+            };
+            imageViewer.ShowDialog();
+        }
+
+        public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
+        {
+
+            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
+                MainPageVM.AppDbContext, currentProjectId);
+            FilteredAssets = Assets;
+
+        }
+
+        public void LoadTags()
+        {
+            _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
+
+            LoadAllTags();
+        }
+        public async void LoadAllTags()
+        {
+            Tags = await _tagRepository.GetAllTagsAsync();
+        }
+
+        public async void RemoveAllTags()
+        {
+            await _tagRepository.RemoveAllTagsAsync();
+            Tags = new List<Tag>();
+            OnPropertyChanged(nameof(Tags));
+        }
+        public async Task<List<AssetTag>> LoadAssetTags(int assetId)
+        {
+            return await _tagRepository.GetAssetTagsAsync(assetId);
+        }
+
+        public async void AddAssetTag()
+        {
+            if (NewAssetTagName == null) return;
+
+            if (!string.IsNullOrWhiteSpace(NewAssetTagName))
+            {
+                await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName);
+                NewAssetTagName = string.Empty;
+                OnPropertyChanged(nameof(NewAssetTagName));
+                OnPropertyChanged(nameof(SelectedAsset.AssetTags));
+                LoadAllTags();
+                OnPropertyChanged(nameof(Tags));
             }
         }
 
-        OnPropertyChanged(nameof(FilteredAssets));
-
-    }
-
-    private void FilterAssetsByTag()
-    {
-        FilteredAssets = Assets
-            .Where(a => a.AssetTags != null && a.AssetTags.Any(tag =>
-            tag.Tag.Name.Equals(SelectedTag.Name, StringComparison.OrdinalIgnoreCase)))
-            .ToList();
-
-        OnPropertyChanged(nameof(FilteredAssets));
-
-    }
-    private void ClearSelection()
-    {
-        SelectedAsset = null;
-    }
-    private void OpenMetadataFile()
-    {
-        MainPageVM?.HandleOpenPopUpWindow(SelectedAsset);
-    }
-
-    private void OpenHomePage()
-    {
-        MainPageVM?.OpenHomePage();
-    }
-
-    private void OpenFullImage()
-    {
-        var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+        public async void AddAssetTag(string assetTagName)
         {
-            Owner = App.Current.MainWindow
-        };
-        imageViewer.ShowDialog();
-    }
+            await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, assetTagName);
 
-    public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
-    {
-
-        Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
-            MainPageVM.AppDbContext, currentProjectId);
-        FilteredAssets = Assets;
-
-    }
-
-    public void LoadTags()
-    {
-        _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
-
-        LoadAllTags();
-    }
-    public async void LoadAllTags()
-    {
-        Tags = await _tagRepository.GetAllTagsAsync();
-    }
-
-    public async void RemoveAllTags()
-    {
-        await _tagRepository.RemoveAllTagsAsync();
-        Tags = new List<Tag>();
-        OnPropertyChanged(nameof(Tags));
-    }
-    public async Task<List<AssetTag>> LoadAssetTags(int assetId)
-    {
-        return await _tagRepository.GetAssetTagsAsync(assetId);
-    }
-
-    public async void AddAssetTag()
-    {
-        if (NewAssetTagName == null) return;
-
-        if (!string.IsNullOrWhiteSpace(NewAssetTagName))
-        {
-            await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName);
-            NewAssetTagName = string.Empty;
-            OnPropertyChanged(nameof(NewAssetTagName));
             OnPropertyChanged(nameof(SelectedAsset.AssetTags));
+            LoadAllTags();
+
+        }
+
+        public async void RemoveAssetTag(AssetTag assetTag)
+        {
+            await _tagRepository.RemoveTagFromAssetAsync(assetTag.AssetId, assetTag.Tag.Name);
+        }
+        public async void RemoveTag(Tag tag)
+        {
+            _tagRepository.RemoveTag(tag.Name);
             LoadAllTags();
             OnPropertyChanged(nameof(Tags));
         }
-    }
-
-    public async void AddAssetTag(string assetTagName)
-    {
-        await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, assetTagName);
-
-        OnPropertyChanged(nameof(SelectedAsset.AssetTags));
-        LoadAllTags();
-
-    }
-
-    public async void RemoveAssetTag(AssetTag assetTag)
-    {
-        await _tagRepository.RemoveTagFromAssetAsync(assetTag.AssetId, assetTag.Tag.Name);
-    }
-    public async void RemoveTag(Tag tag)
-    {
-        _tagRepository.RemoveTag(tag.Name);
-        LoadAllTags();
-        OnPropertyChanged(nameof(Tags));
-    }
-    public async void AddTag()
-    {
-        if (NewTagName == null) return;
-
-        var newTag = await _tagRepository.AddTag(NewTagName);
-
-
-        if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
+        public async void AddTag()
         {
+            if (NewTagName == null) return;
 
-            Tags = Tags.Append(newTag).ToList();
-            NewTagName = string.Empty;
-            OnPropertyChanged(nameof(Tags));
-            OnPropertyChanged(nameof(NewTagName));
-        }
-        else
-        {
-            NewTagName = string.Empty;
-            OnPropertyChanged(nameof(NewTagName));
+            var newTag = await _tagRepository.AddTag(NewTagName);
 
+
+            if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
+            {
+
+                Tags = Tags.Append(newTag).ToList();
+                NewTagName = string.Empty;
+                OnPropertyChanged(nameof(Tags));
+                OnPropertyChanged(nameof(NewTagName));
+            }
+            else
+            {
+                NewTagName = string.Empty;
+                OnPropertyChanged(nameof(NewTagName));
+
+            }
         }
+
+
     }
-
-
-}
 }
