@@ -80,13 +80,13 @@
                     Width="100" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" 
                     Margin="10,0,0,0"
                     Style="{StaticResource CustomButtonStyle}" >
-              
+
             </Button>
 
             <Button Content="Add File" Command="{Binding AddAssetCommand}" 
          Width="100" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0,0,0"
                     Style="{StaticResource CustomButtonStyle}" >
-                
+
             </Button>
         </StackPanel>
 
@@ -127,7 +127,7 @@
                      MaxHeight="200"
                      Name="TagsListBox" MouseMove="TagsListBox_MouseMove">
 
-            
+
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -201,11 +201,11 @@
             <Separator Margin="0,20,0,20" Background="Gray" Height="2" />
 
             <StackPanel Orientation="Vertical" Margin="10,20,0,0">
-               
+
                 <TextBlock Text="Asset Conversion" FontWeight="Bold" FontSize="14" Foreground="Black" Margin="0,0,0,10"/>
 
                 <TextBlock Text="Choose a file:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                
+
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                     <ComboBox 
                           ItemsSource="{Binding FilteredAssets}" 
@@ -228,7 +228,7 @@
                         HorizontalAlignment="Left"/>
                 </StackPanel>
 
-             
+
                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
                     <TextBlock Text="Convert to format:" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <ComboBox 
@@ -239,14 +239,14 @@
                       HorizontalAlignment="Left"/>
                 </StackPanel>
 
-            
+
                 <Button Content="Convert" 
             Command="{Binding ConvertCommand}" 
             Padding="10,5"
             HorizontalAlignment="Left" 
             Width="90" 
             Height="30" Style="{StaticResource CustomButtonStyle}" >
-                   
+
                 </Button>
             </StackPanel>
 
@@ -257,8 +257,12 @@
 
         <!--ASSETS-->
         <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
-         SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
-         Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
+                Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                AllowDrop="True"
+                Drop="AssetArea_Drop"
+                DragEnter="AssetArea_DragEnter"
+                DragLeave="AssetArea_DragLeave">
 
 
             <ListBox.ItemsPanel>
@@ -277,7 +281,7 @@
                                 <Image Source="{Binding PreviewImagePath}" Stretch="Uniform" Width="90" Height="90" 
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                                    
+
                                     <Image.InputBindings>
                                         <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                   CommandParameter="{Binding PreviewImagePath}"/>
@@ -291,7 +295,7 @@
                                    Background="Transparent" BorderBrush="Transparent" 
                                    Command="{Binding DataContext.RemoveAssetCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
                                    CommandParameter="{Binding}">
-                                   <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=Page}}" Stretch="Uniform" />
+                                <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=Page}}" Stretch="Uniform" />
                             </Button>
 
 
@@ -340,13 +344,13 @@
 
 
             <Border AllowDrop="True" 
-                    Drop="AssetArea_Drop"
-                    DragEnter="AssetArea_DragEnter" 
-                    DragLeave="AssetArea_DragLeave"
+                    Drop="TagArea_Drop"
+                    DragEnter="TagArea_DragEnter" 
+                    DragLeave="TagArea_DragLeave"
                     BorderThickness="0.5">
 
                 <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Tags" FontWeight="Bold" Foreground="Gray" Margin="5,0,0,5" />
+                    <TextBlock Text="Tags" FontWeight="Bold" Foreground="Gray" Margin="5,0,0,5" />
 
 
                     <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
@@ -356,56 +360,56 @@
              ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
              ScrollViewer.VerticalScrollBarVisibility="Auto" 
              MaxHeight="200">
-                     
-                        
+
+
                         <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <Border Background="{Binding Tag.Color}" 
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <Border Background="{Binding Tag.Color}" 
                             Padding="5" 
                             CornerRadius="5">
-                                    <TextBlock Text="{Binding Tag.Name}" 
+                                        <TextBlock Text="{Binding Tag.Name}" 
                                    HorizontalAlignment="Center" 
                                    VerticalAlignment="Center" 
                                    Foreground="White" />
-                                </Border>
-                                <Button 
+                                    </Border>
+                                    <Button 
                                      Command="{Binding DataContext.RemoveAssetTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
                                      CommandParameter="{Binding}" 
                                      VerticalAlignment="Center" 
                                      HorizontalAlignment="Center" 
                                      Width="18" 
                                      Height="18">
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="Button">
-                                                        <Grid>
-                                                            <Ellipse Fill="{TemplateBinding Background}" />
-                                                            <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="{TemplateBinding Background}" />
+                                                                <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                        Width="12" 
                                                        Height="12" 
                                                        VerticalAlignment="Center" 
                                                        HorizontalAlignment="Center" />
-                                                        </Grid>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-             
-            </StackPanel>
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                </StackPanel>
 
             </Border>
             <StackPanel Orientation="Horizontal">

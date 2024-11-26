@@ -39,7 +39,7 @@ namespace AssetManager.Views
             }
         }
 
-        private void AssetArea_Drop(object sender, System.Windows.DragEventArgs e)
+        private void TagArea_Drop(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Tag)))
             {
@@ -55,7 +55,7 @@ namespace AssetManager.Views
             }
         }
 
-        private void AssetArea_DragEnter(object sender, System.Windows.DragEventArgs e)
+        private void TagArea_DragEnter(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Tag)))
             {
@@ -64,9 +64,47 @@ namespace AssetManager.Views
             }
         }
 
-        private void AssetArea_DragLeave(object sender, System.Windows.DragEventArgs e)
+        private void TagArea_DragLeave(object sender, System.Windows.DragEventArgs e)
         {
             (sender as Border).BorderBrush = System.Windows.Media.Brushes.Transparent;
+        }
+
+        private void AssetArea_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                string[] filePaths = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+
+                var viewModel = (OverviewPageVM)DataContext;
+
+                foreach (var filePath in filePaths)
+                {
+                    viewModel.AddAsset(filePath);
+                }
+
+                (sender as System.Windows.Controls.ListBox).BorderBrush = System.Windows.Media.Brushes.Transparent;
+            }
+        }
+
+
+
+        private void AssetArea_DragEnter(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop) || e.Data.GetDataPresent(typeof(Tag)))
+            {
+                (sender as System.Windows.Controls.ListBox).BorderBrush = System.Windows.Media.Brushes.LightGreen;
+                e.Effects = System.Windows.DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = System.Windows.DragDropEffects.None;
+            }
+        }
+
+
+        private void AssetArea_DragLeave(object sender, System.Windows.DragEventArgs e)
+        {
+            (sender as System.Windows.Controls.ListBox).BorderBrush = System.Windows.Media.Brushes.Transparent;
         }
 
     }

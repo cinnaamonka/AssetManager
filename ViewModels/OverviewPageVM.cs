@@ -223,7 +223,11 @@ namespace AssetManager.ViewModels
 
                 _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
 
-             
+                var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);
+                selectedProject.FileCount++;
+
+                MainPageVM.AppDbContext.Projects.Update(selectedProject);
+                MainPageVM.AppDbContext.SaveChanges();
                 RefreshAssets();
 
                
@@ -251,6 +255,11 @@ namespace AssetManager.ViewModels
         void RemoveAsset(Asset asset)
         {
             _assetRepository.DeleteAssetFromProject(asset, MainPageVM.AppDbContext);
+            var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);
+            selectedProject.FileCount--;
+
+            MainPageVM.AppDbContext.Projects.Update(selectedProject);
+            MainPageVM.AppDbContext.SaveChanges();
             RefreshAssets();
         }
 
