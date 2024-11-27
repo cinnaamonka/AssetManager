@@ -97,7 +97,7 @@ namespace AssetManager.ViewModels
         private AssetRepository _assetRepository;
         private TagRepository _tagRepository;
 
-
+        private FileSystemWatcher _fileWatcher;
 
         private string _newTagName;
 
@@ -195,9 +195,16 @@ namespace AssetManager.ViewModels
             {
                 AvailableFormats.Add(format.ToString());
             }
+
+        
         }
 
         public OverviewPageVM() { }
+
+        ~OverviewPageVM()
+        {
+            StopFileWatcher();
+        }
 
         public void AddAsset(string filePath)
         {
@@ -209,17 +216,22 @@ namespace AssetManager.ViewModels
             try
             {
                 string destinationFilePath = Path.Combine(MainPageVM.SelectedProject.Path, "Assets", Path.GetFileName(filePath));
-                File.SetAttributes(filePath, FileAttributes.Normal);
+
+                if(!File.Exists(destinationFilePath))
+                {
+                    File.SetAttributes(filePath, FileAttributes.Normal);
 
 
-                File.Copy(filePath, destinationFilePath, overwrite: true);
+                    File.Copy(filePath, destinationFilePath, overwrite: true);
+                }
 
-                   var newAsset = _assetRepository.CreateAsset(
-                    destinationFilePath,
-                    MainPageVM.SelectedProject.Id,
-                    Path.GetExtension(destinationFilePath),
-                    MainPageVM.AppDbContext
-                );
+
+                var newAsset = _assetRepository.CreateAsset(
+                 destinationFilePath,
+                 MainPageVM.SelectedProject.Id,
+                 Path.GetExtension(destinationFilePath),
+                 MainPageVM.AppDbContext
+             );
 
                 _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
 
@@ -230,7 +242,7 @@ namespace AssetManager.ViewModels
                 MainPageVM.AppDbContext.SaveChanges();
                 RefreshAssets();
 
-               
+
             }
             catch (Exception ex)
             {
@@ -252,7 +264,15 @@ namespace AssetManager.ViewModels
             }
         }
 
-        void RemoveAsset(Asset asset)
+
+        public void UpdateAsset(Asset asset)
+        {
+            MainPageVM.AppDbContext.Assets.Update(asset);
+            MainPageVM.AppDbContext.SaveChanges();
+
+            RefreshAssets();
+        }
+        public void RemoveAsset(Asset asset)
         {
             _assetRepository.DeleteAssetFromProject(asset, MainPageVM.AppDbContext);
             var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);
@@ -360,6 +380,11 @@ namespace AssetManager.ViewModels
                 MainPageVM.AppDbContext, currentProjectId);
             FilteredAssets = Assets;
 
+            if (MainPageVM.SelectedProject != null)
+            {
+                InitializeFileWatcher(MainPageVM.SelectedProject.Path);
+            }
+
         }
 
         public void LoadTags()
@@ -441,6 +466,88 @@ namespace AssetManager.ViewModels
             }
         }
 
+        private void InitializeFileWatcher(string projectPath)
+        {
+            if (_fileWatcher != null)
+            {
+                _fileWatcher.EnableRaisingEvents = false;
+                _fileWatcher.Dispose();
+            }
 
+            _fileWatcher = new FileSystemWatcher
+            {
+                Path = projectPath,
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.DirectoryName
+            };
+
+            // Subscribe to events
+            _fileWatcher.Changed += OnFileChanged;
+            _fileWatcher.Created += OnFileCreated;
+            _fileWatcher.Deleted += OnFileDeleted;
+            _fileWatcher.Renamed += OnFileRenamed;
+
+            // Start monitoring
+            _fileWatcher.EnableRaisingEvents = true;
+        }
+
+        private void StopFileWatcher()
+        {
+            if (_fileWatcher != null)
+            {
+                _fileWatcher.EnableRaisingEvents = false;
+                _fileWatcher.Dispose();
+            }
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var asset = Assets.FirstOrDefault(a => a.FilePath == e.FullPath);
+                if (asset != null)
+                {
+                    asset.Metadata.DateLastChanged = File.GetLastWriteTime(e.FullPath);
+                    UpdateAsset(asset); // Update in the database
+                }
+            });
+        }
+
+        private void OnFileCreated(object sender, FileSystemEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (!File.Exists(e.FullPath) || !AssetHelpers.AssetHelpers.IsSupportedFileType(e.FullPath))
+                    return;
+
+                AddAsset(e.FullPath); // Add to database and UI
+            });
+        }
+
+        private void OnFileDeleted(object sender, FileSystemEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var asset = Assets.FirstOrDefault(a => a.FilePath == e.FullPath);
+                if (asset != null)
+                {
+                    RemoveAsset(asset); // Remove from database and UI
+                }
+            });
+        }
+
+        private void OnFileRenamed(object sender, RenamedEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var asset = Assets.FirstOrDefault(a => a.FilePath == e.OldFullPath);
+                if (asset != null)
+                {
+                    asset.FilePath = e.FullPath;
+                    asset.FileName = Path.GetFileName(e.FullPath);
+                    UpdateAsset(asset); // Update in the database
+                }
+            });
+        }
     }
 }

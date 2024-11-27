@@ -52,11 +52,14 @@ namespace AssetManager.Repositories
             context.Remove(selectedAsset);
             context.SaveChanges();
 
-            File.SetAttributes(selectedAsset.FilePath, FileAttributes.Normal);
+            if(Path.Exists(selectedAsset.FilePath))
+            {
+                File.SetAttributes(selectedAsset.FilePath, FileAttributes.Normal);
 
-            File.Delete(selectedAsset.FilePath);
+                File.Delete(selectedAsset.FilePath);
+            }
+
         }
-
 
 
         public async Task<List<Asset>> GetAssetsByProjectPathAsync(string projectPath, AppDbContext context)

@@ -16,7 +16,8 @@ namespace AssetManager.ViewModels
 
         public Page CurrentPage { get; set; }
 
-        private AppDbContext _appDbContext;
+     
+
         public AppDbContext AppDbContext { get; set; }
 
         private MetadataWindowVM metadataWindowVM { get; }
@@ -30,6 +31,7 @@ namespace AssetManager.ViewModels
                 _selectedProject = value;
                 OnPropertyChanged(nameof(SelectedProject));
                
+
             }
         }
 
@@ -47,7 +49,7 @@ namespace AssetManager.ViewModels
 
             CurrentPage = HomePage;
 
-          
+            
         }
 
         public void HandleOpenPopUpWindow(Asset selectedAsset) 
@@ -70,6 +72,8 @@ namespace AssetManager.ViewModels
         {
             CurrentPage = MainPage;
             OnPropertyChanged(nameof(CurrentPage));
+
+
         }
 
         public void OpenHomePage()
@@ -79,5 +83,6 @@ namespace AssetManager.ViewModels
         }
 
       
+
     }
 }
