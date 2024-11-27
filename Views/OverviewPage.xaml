@@ -257,13 +257,12 @@
 
         <!--ASSETS-->
         <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FilteredAssets}"
-                SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
-                Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                AllowDrop="True"
-                Drop="AssetArea_Drop"
-                DragEnter="AssetArea_DragEnter"
-                DragLeave="AssetArea_DragLeave">
-
+         SelectedItem="{Binding SelectedAsset, Mode=TwoWay}"
+         Background="White" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         AllowDrop="True"
+         Drop="AssetArea_Drop"
+         DragEnter="AssetArea_DragEnter"
+         DragLeave="AssetArea_DragLeave">
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -276,15 +275,14 @@
                     <Border Width="120" Height="140" Margin="10" BorderBrush="LightGray" BorderThickness="1" CornerRadius="5">
                         <Grid>
                             <Border Width="120" Height="100" BorderBrush="LightGray" BorderThickness="0,0,0,1" CornerRadius="5" 
-                                    HorizontalAlignment="Center" VerticalAlignment="Top">
+                            HorizontalAlignment="Center" VerticalAlignment="Top">
 
                                 <Image Source="{Binding PreviewImagePath}" Stretch="Uniform" Width="90" Height="90" 
-                                    HorizontalAlignment="Center" VerticalAlignment="Center">
-
+                               HorizontalAlignment="Center" VerticalAlignment="Center">
 
                                     <Image.InputBindings>
                                         <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                  CommandParameter="{Binding PreviewImagePath}"/>
+                                              CommandParameter="{Binding PreviewImagePath}"/>
                                     </Image.InputBindings>
 
                                 </Image>
@@ -292,23 +290,26 @@
                             </Border>
 
                             <Button Width="25" Height="25" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="92,3,0,0" 
-                                   Background="Transparent" BorderBrush="Transparent" 
-                                   Command="{Binding DataContext.RemoveAssetCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
-                                   CommandParameter="{Binding}">
+                            Background="Transparent" BorderBrush="Transparent" 
+                            Command="{Binding DataContext.RemoveAssetCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                            CommandParameter="{Binding}">
                                 <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=Page}}" Stretch="Uniform" />
                             </Button>
 
-
-
-                            <TextBlock Text="{Binding FileName}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,20"
-                               Foreground="Black" TextAlignment="Left" FontWeight="SemiBold" />
+                            <!-- Editable TextBox for FileName -->
+                            <TextBox Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,20"
+                             Foreground="Black" FontWeight="SemiBold"
+                             BorderBrush="Transparent" Background="Transparent"
+                             TextAlignment="Left" 
+                             KeyDown="FileNameTextBox_KeyDown"/>
 
                             <TextBlock Text="{Binding FileType}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="3,0,0,5"
-                                Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
+                               Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
 
                             <Button Width="15" Height="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3" Background="Transparent" BorderBrush="Transparent" 
-                                     Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                      CommandParameter="{Binding}"  Click="MetadataButton_Click">
+                            Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                            CommandParameter="{Binding}">
                                 <Image Source="/Resources/MetafileImage.png" Stretch="Fill"/>
                             </Button>
 

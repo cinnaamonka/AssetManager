@@ -61,6 +61,27 @@ namespace AssetManager.Repositories
 
         }
 
+        public void RenameAsset(Asset asset,AppDbContext context)
+        {
+            File.SetAttributes(asset.FilePath, FileAttributes.Normal);
+
+            string directory = Path.GetDirectoryName(asset.FilePath);
+
+            string newFilePath = Path.Combine(directory, asset.FileName);
+
+            File.Move(asset.FilePath, newFilePath);
+
+            asset.FilePath = newFilePath;
+
+            UpdateAsset(asset, context);
+        }
+        public void UpdateAsset(Asset asset, AppDbContext context)
+        {
+
+            context.Assets.Update(asset);
+            context.SaveChanges();
+
+        }
 
         public async Task<List<Asset>> GetAssetsByProjectPathAsync(string projectPath, AppDbContext context)
         {

@@ -105,7 +105,23 @@ namespace AssetManager.Views
         private void AssetArea_DragLeave(object sender, System.Windows.DragEventArgs e)
         {
             (sender as System.Windows.Controls.ListBox).BorderBrush = System.Windows.Media.Brushes.Transparent;
+
+
+
         }
 
+        private void FileNameTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var viewModel = (OverviewPageVM)DataContext;
+
+                viewModel.RenameAsset(viewModel.SelectedAsset);
+
+                var parent = (sender as System.Windows.Controls.TextBox)?.Parent as UIElement;
+                parent?.Focus();
+                e.Handled = true;
+            }
+        }
     }
 }

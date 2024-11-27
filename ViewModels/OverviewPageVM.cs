@@ -50,6 +50,7 @@ namespace AssetManager.ViewModels
             {
                 _selectedAsset = value;
                 OnPropertyChanged(nameof(SelectedAsset));
+              
             }
         }
 
@@ -264,10 +265,18 @@ namespace AssetManager.ViewModels
             }
         }
 
-
+        public void RenameAsset(Asset asset)
+        {
+            if (asset != null)
+            {
+                _assetRepository.RenameAsset(asset, MainPageVM.AppDbContext);
+                RefreshAssets();
+            }
+        }
         public void UpdateAsset(Asset asset)
         {
             MainPageVM.AppDbContext.Assets.Update(asset);
+          
             MainPageVM.AppDbContext.SaveChanges();
 
             RefreshAssets();
