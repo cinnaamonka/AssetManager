@@ -12,7 +12,7 @@ namespace AssetManager.AssetHelpers
             Image,
             Model,
             Obj,
-           
+
             Other
         }
 
@@ -24,8 +24,51 @@ namespace AssetManager.AssetHelpers
             Video,
             Audio
         }
+        static public string FindClosestColorName(Color inputColor)
+        {
+            // Define a list of known colors
+            var knownColors = new Dictionary<string, Color>
+        {
+            { "Red", Color.Red },
+            { "Green", Color.Green },
+            { "Blue", Color.Blue },
+            { "Yellow", Color.Yellow },
+            { "Cyan", Color.Cyan },
+            { "Magenta", Color.Magenta },
+            { "White", Color.White },
+            { "Black", Color.Black },
+            { "Gray", Color.Gray },
+            { "Orange", Color.Orange },
+            { "Purple", Color.Purple },
+            { "Pink", Color.Pink },
+        };
 
-        public static AssetType GetAssetType(string extension)
+            string closestColorName = null;
+            double smallestDistance = double.MaxValue;
+
+            foreach (var kvp in knownColors)
+            {
+                string name = kvp.Key;
+                Color knownColor = kvp.Value;
+
+                // Calculate Euclidean distance
+                double distance = Math.Sqrt(
+                    Math.Pow(inputColor.R - knownColor.R, 2) +
+                    Math.Pow(inputColor.G - knownColor.G, 2) +
+                    Math.Pow(inputColor.B - knownColor.B, 2)
+                );
+
+                if (distance < smallestDistance)
+                {
+                    smallestDistance = distance;
+                    closestColorName = name;
+                }
+            }
+
+            return closestColorName;
+        }
+
+    public static AssetType GetAssetType(string extension)
         {
             return extension.ToLower() switch
             {

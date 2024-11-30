@@ -17,6 +17,7 @@
 
     <Page.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:BackgroundToForegroundColorConverter x:Key="BackgroundToForegroundColorConverter" />
         <Style x:Key="CustomButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="DarkBlue" />
             <Setter Property="Foreground" Value="White" />
@@ -52,6 +53,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
     </Page.Resources>
 
 
@@ -355,12 +357,12 @@
 
 
                     <ListBox ItemsSource="{Binding SelectedAsset.AssetTags}"  
-             Margin="-5,0,0,0" 
-             Padding="0" 
-             BorderThickness="0"
-             ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-             ScrollViewer.VerticalScrollBarVisibility="Auto" 
-             MaxHeight="200">
+                           Margin="-5,0,0,0" 
+                           Padding="0" 
+                           BorderThickness="0"
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                           ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                           MaxHeight="200">
 
 
                         <ListBox.ItemsPanel>
@@ -372,13 +374,15 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="5">
                                     <Border Background="{Binding Tag.Color}" 
-                            Padding="5" 
-                            CornerRadius="5">
+                                            Padding="5" 
+                                            CornerRadius="5">
                                         <TextBlock Text="{Binding Tag.Name}" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center" 
-                                   Foreground="White" />
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center" 
+                                                   Foreground="{Binding Tag.Color, 
+                                            Converter={StaticResource BackgroundToForegroundColorConverter}}" />
                                     </Border>
+
                                     <Button 
                                      Command="{Binding DataContext.RemoveAssetTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
                                      CommandParameter="{Binding}" 

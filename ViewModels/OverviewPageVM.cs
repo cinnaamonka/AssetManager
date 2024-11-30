@@ -384,9 +384,16 @@ namespace AssetManager.ViewModels
 
         public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
         {
+            if(_tagRepository == null)
+            {
+                _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
+
+
+            }
+
 
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
-                MainPageVM.AppDbContext, currentProjectId);
+                MainPageVM.AppDbContext, currentProjectId,_tagRepository);
             FilteredAssets = Assets;
 
             if (MainPageVM.SelectedProject != null)

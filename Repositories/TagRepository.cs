@@ -1,8 +1,9 @@
 ﻿using AssetManager.Models;
 using Microsoft.EntityFrameworkCore;
 using static AssetManager.AssetHelpers.AssetHelpers;
-using System.Windows.Media;
+using System.IO ;
 using AssetManager.ViewModels;
+using System.Diagnostics;
 
 
 namespace AssetManager.Repositories
@@ -12,9 +13,9 @@ namespace AssetManager.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        MainPageVM MainPageVM;  
+        MainPageVM MainPageVM;
 
-        public TagRepository(AppDbContext dbContext,MainPageVM mainPageVM)
+        public TagRepository(AppDbContext dbContext, MainPageVM mainPageVM)
         {
             _dbContext = dbContext;
 
@@ -37,7 +38,7 @@ namespace AssetManager.Repositories
                     }
                 }
             }
-          
+
         }
 
         public async Task<Tag> AddTag(string tagName)
@@ -68,15 +69,18 @@ namespace AssetManager.Repositories
             return tag;
         }
 
-        public async Task AddAssetTagAsync(int assetId, string tagName)
+        public async Task AddAssetTagAsync(int assetId, string tagName, string color = null)
         {
             var tag = await AddTag(tagName);
 
-            if(tag == null)
+            if (tag == null)
             {
                 tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
             }
+            tag.Color = color;
             var assetTag = new AssetTag { AssetId = assetId, TagId = tag.Id };
+          
+
             if (!await _dbContext.AssetTags.AnyAsync(at => at.AssetId == assetId && at.TagId == tag.Id))
             {
                 _dbContext.AssetTags.Add(assetTag);

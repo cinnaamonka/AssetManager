@@ -61,6 +61,7 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenTK" Version="4.8.2" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
     <PackageReference Include="System.Reactive.Windows.Forms" Version="6.0.1" />
     <PackageReference Include="UnityEditor" Version="2019.3.2.1" />
   </ItemGroup>
@@ -73,6 +74,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\projects.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\ColorDetector\ColorDetector.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Tools\ColorDetector\ColorDetector.pdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Tools\FBXToObjConverter\FBXToObjConverter.exe">

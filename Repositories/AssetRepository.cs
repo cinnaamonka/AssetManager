@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
@@ -177,12 +178,16 @@ namespace AssetManager.Repositories
                 };
 
                 asset.AssetTags.Add(assetTag);
+
             }
+
+
 
             return asset;
 
         }
-        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId)
+        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId,
+            TagRepository tagRepository)
         {
             string assetsFolderPath = Path.Combine(projectPath, "Assets");
 
@@ -213,7 +218,33 @@ namespace AssetManager.Repositories
                                 !existingAssets.Any(a => a.FilePath == result))
                             {
                                 var asset = CreateAsset(result, currentProjectId, extension, context);
+                              
                                 SaveAsset(asset, context);
+
+                                //TODo
+                                if (extension == ".png" || extension == ".jpg")
+                                { 
+                                string tagColor = AssetHelpers.ColorDetector.GetColor(asset.FilePath);
+
+                                if (tagColor != null)
+                                {
+                                    var numbers = Regex.Matches(tagColor, @"\d+");
+
+                                    int[] rgb = numbers.Cast<Match>()
+                                   .Select(m => int.Parse(m.Value))
+                                   .ToArray();
+
+                                
+                                    if (rgb.Length == 3)
+                                    {
+                                       System.Drawing.Color inputColor = System.Drawing.Color.FromArgb(rgb[0], rgb[1], rgb[2]);
+
+                                        string closestColorName = FindClosestColorName(inputColor);
+
+                                        await tagRepository.AddAssetTagAsync(asset.Id, closestColorName,closestColorName);
+                                    }
+                                }
+                                }
                             }
                         }
                     }
