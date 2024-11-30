@@ -142,7 +142,7 @@ namespace AssetManager.Repositories
                 relativePath: fileName
             );
 
-            asset.PreviewImagePath = GenerateThumbnail(asset, Path.GetExtension(filePath));
+            
 
             var metadata = new AssetMetadata
             {
@@ -156,6 +156,8 @@ namespace AssetManager.Repositories
             };
 
             asset.Metadata = metadata;
+
+            asset.PreviewImagePath = GenerateThumbnail(ref asset, Path.GetExtension(filePath));
 
             var existingTag = context.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
 
@@ -262,7 +264,7 @@ namespace AssetManager.Repositories
             await context.SaveChangesAsync();
         }
 
-        public string GenerateThumbnail(Asset asset, string extension)
+        public string GenerateThumbnail(ref Asset asset, string extension)
         {
             if (extension.ToLower() == ".png" || extension.ToLower() == ".jpg" )
             {
@@ -289,6 +291,7 @@ namespace AssetManager.Repositories
                 string objFilePath = FileConverter.ConvertFbxToObj(asset.FilePath, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles"));
 
                 AddVertexFileInfo(objFilePath, asset);
+
 
                 if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
                 {

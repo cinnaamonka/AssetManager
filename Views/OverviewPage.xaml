@@ -310,7 +310,7 @@
                                Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
 
                             <Button Width="15" Height="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3" Background="Transparent" BorderBrush="Transparent" 
-                            Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                            Command="{Binding DataContext.OpenMetadataFileCommand,RelativeSource={RelativeSource AncestorType=Page}}"
                             CommandParameter="{Binding}">
                                 <Image Source="/Resources/MetafileImage.png" Stretch="Fill"/>
                             </Button>

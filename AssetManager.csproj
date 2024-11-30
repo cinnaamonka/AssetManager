@@ -76,12 +76,6 @@
     <None Update="Resources\projects.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Tools\ColorDetector\ColorDetector.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Tools\ColorDetector\ColorDetector.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Tools\FBXToObjConverter\FBXToObjConverter.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,11 +1,6 @@
-﻿using AssetManager.Models;
-using AssetManager.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using AssetManager.ViewModels;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace AssetManager.AssetHelpers
 {
