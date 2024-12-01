@@ -341,7 +341,7 @@ namespace AssetManager.ViewModels
             {
                 try
                 {
-                    var regex = new Regex("^" + Regex.Escape(searchText), RegexOptions.IgnoreCase);
+                    var regex = new Regex(Regex.Escape(searchText), RegexOptions.IgnoreCase);
                     var filtered = Assets.Where(a => regex.IsMatch(a.FileName) ||
                         a.AssetTags != null && a.AssetTags.Any(tag => regex.IsMatch(tag.Tag.Name)));
 

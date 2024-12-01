@@ -127,7 +127,7 @@
             <ListBox ItemsSource="{Binding Tags}" 
                      SelectedItem="{Binding SelectedTag, Mode=TwoWay}"
                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                     MaxHeight="200"
+                     MaxHeight="200" 
                      Name="TagsListBox" MouseMove="TagsListBox_MouseMove"
                      MouseDoubleClick="TagsListBox_MouseDoubleClick">
 
@@ -141,12 +141,15 @@
                             </Grid.ColumnDefinitions>
 
                             <Border Background="{Binding Color}" 
-                        Padding="5" 
-                        CornerRadius="5" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left" 
-                        Grid.Column="0">
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                              Padding="5" 
+                              CornerRadius="5" 
+                              VerticalAlignment="Center" 
+                              HorizontalAlignment="Left" 
+                              Grid.Column="0">
+                                                      <TextBlock Text="{Binding Name}" 
+               VerticalAlignment="Center" 
+               Foreground="{Binding Color, 
+                            Converter={StaticResource BackgroundToForegroundColorConverter}}" />
                             </Border>
 
                             <Button 
