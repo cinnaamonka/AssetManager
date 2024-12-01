@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
@@ -53,7 +54,7 @@ namespace AssetManager.Repositories
             context.Remove(selectedAsset);
             context.SaveChanges();
 
-            if(Path.Exists(selectedAsset.FilePath))
+            if (Path.Exists(selectedAsset.FilePath))
             {
                 File.SetAttributes(selectedAsset.FilePath, FileAttributes.Normal);
 
@@ -62,7 +63,7 @@ namespace AssetManager.Repositories
 
         }
 
-        public void RenameAsset(Asset asset,AppDbContext context)
+        public void RenameAsset(Asset asset, AppDbContext context)
         {
             File.SetAttributes(asset.FilePath, FileAttributes.Normal);
 
@@ -131,6 +132,7 @@ namespace AssetManager.Repositories
 
         public Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
         {
+
             string fileName = Path.GetFileName(filePath);
             var fileInfo = new FileInfo(filePath);
 
@@ -142,7 +144,6 @@ namespace AssetManager.Repositories
                 relativePath: fileName
             );
 
-            
 
             var metadata = new AssetMetadata
             {
@@ -183,9 +184,8 @@ namespace AssetManager.Repositories
 
             }
 
-
-
             return asset;
+
 
         }
         public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId,
@@ -212,40 +212,41 @@ namespace AssetManager.Repositories
                     {
                         if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
                         {
-                            string result = file.Replace(" ", "");
-                            string relativePath = result.Substring(assetsFolderPath.Length + 1);
-                            string extension = Path.GetExtension(result).ToLower();
+                           
+                            string relativePath = file.Substring(assetsFolderPath.Length + 1);
+                            string extension = Path.GetExtension(file).ToLower();
 
                             if ((extension == ".png" || extension == ".jpg" || extension == ".fbx" || extension == ".obj") &&
-                                !existingAssets.Any(a => a.FilePath == result))
+                                !existingAssets.Any(a => a.FilePath == file))
                             {
-                                var asset = CreateAsset(result, currentProjectId, extension, context);
-                              
+                                var asset = CreateAsset(file, currentProjectId, extension, context);
+
+                                if (asset == null) continue;
                                 SaveAsset(asset, context);
 
                                 //TODo
                                 if (extension == ".png" || extension == ".jpg")
-                                { 
-                                string tagColor = AssetHelpers.ColorDetector.GetColor(asset.FilePath);
-
-                                if (tagColor != null)
                                 {
-                                    var numbers = Regex.Matches(tagColor, @"\d+");
+                                    string tagColor = AssetHelpers.ColorDetector.GetColor(asset.FilePath);
 
-                                    int[] rgb = numbers.Cast<Match>()
-                                   .Select(m => int.Parse(m.Value))
-                                   .ToArray();
-
-                                
-                                    if (rgb.Length == 3)
+                                    if (tagColor != null)
                                     {
-                                       System.Drawing.Color inputColor = System.Drawing.Color.FromArgb(rgb[0], rgb[1], rgb[2]);
+                                        var numbers = Regex.Matches(tagColor, @"\d+");
 
-                                        string closestColorName = FindClosestColorName(inputColor);
+                                        int[] rgb = numbers.Cast<Match>()
+                                       .Select(m => int.Parse(m.Value))
+                                       .ToArray();
 
-                                        await tagRepository.AddAssetTagAsync(asset.Id, closestColorName,closestColorName);
+
+                                        if (rgb.Length == 3)
+                                        {
+                                            System.Drawing.Color inputColor = System.Drawing.Color.FromArgb(rgb[0], rgb[1], rgb[2]);
+
+                                            string closestColorName = FindClosestColorName(inputColor);
+
+                                            await tagRepository.AddAssetTagAsync(asset.Id, closestColorName, closestColorName);
+                                        }
                                     }
-                                }
                                 }
                             }
                         }
@@ -266,7 +267,7 @@ namespace AssetManager.Repositories
 
         public string GenerateThumbnail(ref Asset asset, string extension)
         {
-            if (extension.ToLower() == ".png" || extension.ToLower() == ".jpg" )
+            if (extension.ToLower() == ".png" || extension.ToLower() == ".jpg")
             {
                 string outputFolderPath = Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
