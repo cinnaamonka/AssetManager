@@ -123,7 +123,7 @@ namespace AssetManager.ViewModels
             set
             {
                 _selectedTag = value;
-                FilterAssetsByTag();
+             
 
             }
         }
@@ -358,7 +358,7 @@ namespace AssetManager.ViewModels
 
         }
 
-        private void FilterAssetsByTag()
+        public void FilterAssetsByTag()
         {
             FilteredAssets = Assets
                 .Where(a => a.AssetTags != null && a.AssetTags.Any(tag =>
@@ -400,7 +400,7 @@ namespace AssetManager.ViewModels
             if (string.IsNullOrEmpty(filePath))
                 return;
 
-            IsLoading = true; // Show loader
+            IsLoading = true;
             try
             {
                 string extension = Path.GetExtension(filePath).ToLower();
@@ -419,7 +419,7 @@ namespace AssetManager.ViewModels
                 {
                  
 
-                    string content = await LoadFileAsync(filePath); // Async file loading
+                    string content = await LoadFileAsync(filePath);
 
                    
 

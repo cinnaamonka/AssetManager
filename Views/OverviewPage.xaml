@@ -128,9 +128,8 @@
                      SelectedItem="{Binding SelectedTag, Mode=TwoWay}"
                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
                      MaxHeight="200"
-                     Name="TagsListBox" MouseMove="TagsListBox_MouseMove">
-
-
+                     Name="TagsListBox" MouseMove="TagsListBox_MouseMove"
+                     MouseDoubleClick="TagsListBox_MouseDoubleClick">
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -166,10 +165,10 @@
                                                     <Grid>
                                                         <Ellipse Fill="{TemplateBinding Background}" />
                                                         <Image Source="{Binding DataContext.RemoveIconPath, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                   Width="20" 
-                                   Height="20" 
-                                   VerticalAlignment="Center" 
-                                   HorizontalAlignment="Center" />
+                                                                Width="20" 
+                                                                Height="20" 
+                                                                VerticalAlignment="Center" 
+                                                                HorizontalAlignment="Center" />
                                                     </Grid>
                                                 </ControlTemplate>
                                             </Setter.Value>

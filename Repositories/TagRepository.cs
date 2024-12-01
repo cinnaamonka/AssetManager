@@ -77,7 +77,11 @@ namespace AssetManager.Repositories
             {
                 tag = await _dbContext.Tags.SingleOrDefaultAsync(t => t.Name == tagName);
             }
-            tag.Color = color;
+            if( color != null)
+            {
+                tag.Color = color;
+            }
+          
             var assetTag = new AssetTag { AssetId = assetId, TagId = tag.Id };
           
 

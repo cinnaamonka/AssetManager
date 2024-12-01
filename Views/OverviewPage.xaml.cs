@@ -123,5 +123,18 @@ namespace AssetManager.Views
                 e.Handled = true;
             }
         }
+
+        private void TagsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is System.Windows.Controls.ListBox listBox && listBox.SelectedItem != null)
+            {
+                var viewModel = DataContext as OverviewPageVM; 
+                if (viewModel != null)
+                {
+                  //  viewModel.SelectedTag = listBox.SelectedItem as Tag;
+                    viewModel.FilterAssetsByTag();
+                }
+            }
+        }
     }
 }
