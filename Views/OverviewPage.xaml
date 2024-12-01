@@ -18,6 +18,7 @@
     <Page.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <conv:BackgroundToForegroundColorConverter x:Key="BackgroundToForegroundColorConverter" />
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style x:Key="CustomButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="DarkBlue" />
             <Setter Property="Foreground" Value="White" />
@@ -53,7 +54,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
     </Page.Resources>
 
 
@@ -283,8 +284,9 @@
                                HorizontalAlignment="Center" VerticalAlignment="Center">
 
                                     <Image.InputBindings>
-                                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                              CommandParameter="{Binding PreviewImagePath}"/>
+                                        <MouseBinding Gesture="LeftDoubleClick" 
+                              Command="{Binding DataContext.OpenFullImageCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                              CommandParameter="{Binding FilePath}" />
                                     </Image.InputBindings>
 
                                 </Image>
@@ -310,7 +312,7 @@
                                Foreground="Black" TextAlignment="Left" FontWeight="Normal" FontSize="10" />
 
                             <Button Width="15" Height="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3" Background="Transparent" BorderBrush="Transparent" 
-                            Command="{Binding DataContext.OpenMetadataFileCommand,RelativeSource={RelativeSource AncestorType=Page}}"
+                            Command="{Binding DataContext.OpenMetadataFileCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                             CommandParameter="{Binding}">
                                 <Image Source="/Resources/MetafileImage.png" Stretch="Fill"/>
                             </Button>
@@ -321,6 +323,11 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
+        <Grid  Grid.Row="1" Grid.Column="1"  Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" 
+          Background="Black" Opacity="0.5" ZIndex="10">
+            <TextBlock Text="Loading..." Foreground="White" FontSize="16" FontWeight="Bold" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
 
 
         <StackPanel Grid.Row="1" Grid.Column="2" Background="White"  

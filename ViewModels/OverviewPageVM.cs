@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.IO;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AssetManager.ViewModels
 {
@@ -80,7 +81,7 @@ namespace AssetManager.ViewModels
         public RelayCommand OpenMetadataCommand { get; set; }
         public RelayCommand OpenHomePageCommand { get; set; }
 
-        public RelayCommand OpenFullImageCommand { get; set; }
+        public AsyncRelayCommand<string> OpenFullImageCommand { get; set; }
         public RelayCommand ClearSelectionCommand { get; }
 
         public RelayCommand OpenMetadataFileCommand { get; }
@@ -167,6 +168,14 @@ namespace AssetManager.ViewModels
                 _selectedToFormat = value;
             }
         }
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
+        }
+
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -178,7 +187,7 @@ namespace AssetManager.ViewModels
 
             SearchCommand = new RelayCommand<string>(ExecuteSearch);
             OpenHomePageCommand = new RelayCommand(OpenHomePage);
-            OpenFullImageCommand = new RelayCommand(OpenFullImage);
+            OpenFullImageCommand = new AsyncRelayCommand<string>(OpenFullImage);
             ClearSelectionCommand = new RelayCommand(ClearSelection);
             OpenMetadataFileCommand = new RelayCommand(OpenMetadataFile);
             RemoveAllTagsCommand = new RelayCommand(RemoveAllTags);
@@ -373,14 +382,70 @@ namespace AssetManager.ViewModels
             MainPageVM?.OpenHomePage();
         }
 
-        private void OpenFullImage()
+        private Task<string> LoadFileAsync(string filePath)
         {
-            var imageViewer = new ImageViewerWindow(SelectedAsset.FilePath)
+         
+            return Task.Run(() =>
             {
-                Owner = App.Current.MainWindow
-            };
-            imageViewer.ShowDialog();
+               
+                using (var reader = new StreamReader(filePath))
+                {
+                    return reader.ReadToEnd();
+                }
+            });
         }
+
+        public async Task OpenFullImage(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return;
+
+            IsLoading = true; // Show loader
+            try
+            {
+                string extension = Path.GetExtension(filePath).ToLower();
+
+                if (extension == ".png" || extension == ".jpg")
+                {
+                    IsLoading = false;
+                    var imageWindow = new ImageViewerWindow(filePath)
+                    {
+                        Owner = App.Current.MainWindow
+                    };
+                   
+                    imageWindow.ShowDialog();
+                }
+                else if (extension == ".obj")
+                {
+                 
+
+                    string content = await LoadFileAsync(filePath); // Async file loading
+
+                   
+
+                    var textWindow = new TextViewerWindow(content)
+                    {
+                        Owner = App.Current.MainWindow
+                    };
+                    IsLoading = false;
+                    textWindow.ShowDialog();
+                  
+                }
+                else
+                {
+                    IsLoading = false;
+                    System.Windows.MessageBox.Show("Unsupported file type.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                IsLoading = false;
+                System.Windows.MessageBox.Show($"Error reading the file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+         
+        }
+
+
 
         public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
         {
