@@ -439,52 +439,36 @@
                 </StackPanel>
 
             </Border>
+
             <StackPanel Orientation="Horizontal">
                 <TextBox Width="150" Height="30" Margin="5,0,10,5"
-                  Text="{Binding NewAssetTagName, UpdateSourceTrigger=PropertyChanged}" />
+    Text="{Binding NewAssetTagName, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Button Content="Add Tag" Command="{Binding AddAssetTagCommand}" HorizontalAlignment="Left">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="DarkBlue" />
-                            <Setter Property="Foreground" Value="White" />
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="BorderBrush" Value="Transparent" />
-                            <Setter Property="Padding" Value="10,5" />
-                            <Setter Property="Width" Value="70" />
-                            <Setter Property="Height" Value="30" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="ButtonBorder"
-                                       Background="{TemplateBinding Background}"
-                                       CornerRadius="10"
-                                       BorderBrush="{TemplateBinding BorderBrush}"
-                                       BorderThickness="1">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <!-- Trigger for Pressed State -->
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="ButtonBorder" Property="Background" Value="White" />
-                                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="DarkBlue" />
-                                                <Setter Property="Foreground" Value="DarkBlue" />
-                                            </Trigger>
-
-                                            <!-- Trigger for MouseOver State -->
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="ButtonBorder" Property="Background" Value="LightBlue" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <ComboBox Width="50" Height="30" Margin="0,0,10,0"
+                  SelectedItem="{Binding NewAssetTagColor}"
+                  ItemsSource="{Binding Source={StaticResource AvailableColors}}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="16" Height="16" Fill="{Binding}" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <StackPanel Orientation="Horizontal">
 
 
+                    <Button Content="Add Tag" Command="{Binding AddAssetTagCommand}" HorizontalAlignment="Left"
+          Style="{StaticResource CustomButtonStyle}" >
+                    </Button>
+
+
+                </StackPanel>
             </StackPanel>
+            
+          
 
         </StackPanel>
 

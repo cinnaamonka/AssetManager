@@ -124,6 +124,13 @@ namespace AssetManager.ViewModels
             set { _newAssetTagName = value; }
         }
 
+        private string _newAssetTagColor;
+        public string NewAssetTagColor
+        {
+            get { return _newAssetTagColor; }
+            set { _newAssetTagColor = value; }
+        }
+
         private Tag _selectedTag;
         public Tag SelectedTag
         {
@@ -504,7 +511,7 @@ namespace AssetManager.ViewModels
 
             if (!string.IsNullOrWhiteSpace(NewAssetTagName))
             {
-                await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName);
+                await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName,NewAssetTagColor);
                 NewAssetTagName = string.Empty;
                 OnPropertyChanged(nameof(NewAssetTagName));
                 OnPropertyChanged(nameof(SelectedAsset.AssetTags));
