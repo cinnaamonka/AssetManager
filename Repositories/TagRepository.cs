@@ -41,7 +41,7 @@ namespace AssetManager.Repositories
 
         }
 
-        public async Task<Tag> AddTag(string tagName)
+        public async Task<Tag> AddTag(string tagName,string color = null)
         {
             if (tagName == null) return null;
 
@@ -50,14 +50,21 @@ namespace AssetManager.Repositories
             if (tag != null) return null;
             tag ??= new Tag { Name = tagName };
 
-            Random random = new Random();
-            byte r = (byte)random.Next(128, 256);
-            byte g = (byte)random.Next(128, 256);
-            byte b = (byte)random.Next(128, 256);
+            if (color != null)
+            {
+                tag.Color = color;
+            }
+            else
+            {
+                Random random = new Random();
+                byte r = (byte)random.Next(128, 256);
+                byte g = (byte)random.Next(128, 256);
+                byte b = (byte)random.Next(128, 256);
 
-            System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
+                System.Windows.Media.Color brightColor = System.Windows.Media.Color.FromRgb(r, g, b);
 
-            tag.Color = brightColor.ToString();
+                tag.Color = brightColor.ToString();
+            }
 
             if (!await _dbContext.Tags.AnyAsync(t => t.Id == tag.Id))
             {

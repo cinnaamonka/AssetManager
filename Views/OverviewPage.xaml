@@ -54,7 +54,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+        <ObjectDataProvider x:Key="AvailableColors" ObjectType="{x:Type helpers:AssetHelpers}"  MethodName="get_AvailableColors"/>
     </Page.Resources>
 
 
@@ -188,18 +188,31 @@
             <StackPanel Orientation="Vertical" Margin="5,0,0,0">
                 <!-- First Row: TextBox and Add Tag Button -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <TextBox Width="150" Height="30" Margin="0,0,10,0"
+                    <TextBox Width="130" Height="30" Margin="0,0,10,0"
                  VerticalAlignment="Center"
                  HorizontalAlignment="Left"
                  Text="{Binding NewTagName, UpdateSourceTrigger=PropertyChanged}" />
+                    
+                    <ComboBox Width="50" Height="30" Margin="0,0,10,0"
+                  SelectedItem="{Binding NewTagColor}"
+                   ItemsSource="{Binding Source={StaticResource AvailableColors}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16" Fill="{Binding}" Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <Button Content="Add Tag" Command="{Binding AddTagCommand}" Padding="10,5" Style="{StaticResource CustomButtonStyle}" />
                 </StackPanel>
 
                 <!-- Second Row: Remove All Tags Button -->
                 <Button Content="Remove All Tags" Command="{Binding RemoveAllTagsCommand}" Padding="10,5" Margin="0,10,0,0" HorizontalAlignment="Left"
-                        Style="{StaticResource CustomButtonStyle}" />
-
+            Style="{StaticResource CustomButtonStyle}" />
             </StackPanel>
+
 
 
             <!--CONVERTERS-->

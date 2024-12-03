@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using AssetManager.Models;
 
 namespace AssetManager.AssetHelpers
@@ -129,7 +130,16 @@ namespace AssetManager.AssetHelpers
 
             return brightColor;
         }
-     
+
+        public static List<string> AvailableColors { get; } = new List<string>
+    {
+        "Red", 
+        "Green", 
+        "Blue", 
+        "Yellow",   
+        "Orange",
+        "Purple"
+    };
         public static string GetPlaceholderPath(string extension)
         {
             string fileExtension = extension.ToLowerInvariant();

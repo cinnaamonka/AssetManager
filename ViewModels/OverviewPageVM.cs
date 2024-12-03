@@ -109,6 +109,14 @@ namespace AssetManager.ViewModels
             set { _newTagName = value; }
         }
 
+        private string _newTagColor;
+
+        public string NewTagColor
+        {
+            get { return _newTagColor; }
+            set { _newTagColor = value; }
+        }
+
         private string _newAssetTagName;
         public string NewAssetTagName
         {
@@ -528,7 +536,7 @@ namespace AssetManager.ViewModels
         {
             if (NewTagName == null) return;
 
-            var newTag = await _tagRepository.AddTag(NewTagName);
+            var newTag = await _tagRepository.AddTag(NewTagName,NewTagColor);
 
 
             if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
