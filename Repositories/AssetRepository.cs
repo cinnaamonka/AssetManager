@@ -222,14 +222,10 @@ namespace AssetManager.Repositories
                             {
                                 var asset = CreateAsset(file, currentProjectId, extension, context);
 
-                                if(asset.PreviewImagePath == null)
-                                {
-                                    int a = 10;
-                                }
+                         
                                 if (asset == null) continue;
                                 SaveAsset(asset, context);
 
-                                //TODo
                                 if (extension == ".png" || extension == ".jpg")
                                 {
                                     string tagColor = AssetHelpers.ColorDetector.GetColor(asset.FilePath);

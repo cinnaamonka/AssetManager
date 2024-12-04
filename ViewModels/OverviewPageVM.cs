@@ -430,7 +430,7 @@ namespace AssetManager.ViewModels
                    
                     imageWindow.ShowDialog();
                 }
-                else if (extension == ".obj")
+                else if (extension == ".obj" || extension == ".txt")
                 {
                  
 
