@@ -10,7 +10,7 @@ namespace AssetManager.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string FilePath { get; set; }
-        public AssetType FileType { get; set; }
+        public string FileType { get; set; }
         public double FileSize { get; set; }
         public string Format { get; set; }
 

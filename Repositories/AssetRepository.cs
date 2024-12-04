@@ -149,7 +149,7 @@ namespace AssetManager.Repositories
             {
                 Name = fileName,
                 FilePath = filePath,
-                FileType = GetAssetType(targetFormat),
+                FileType = GetAssetType(targetFormat).ToString(),
                 Format = fileInfo.Extension,
                 FileSize = Math.Round((fileInfo.Length / 1024.0), 0),
                 DateCreated = fileInfo.CreationTimeUtc,
@@ -216,11 +216,16 @@ namespace AssetManager.Repositories
                             string relativePath = file.Substring(assetsFolderPath.Length + 1);
                             string extension = Path.GetExtension(file).ToLower();
 
-                            if ((extension == ".png" || extension == ".jpg" || extension == ".fbx" || extension == ".obj") &&
-                                !existingAssets.Any(a => a.FilePath == file))
+                            if (AssetHelpers.AssetHelpers.AvailableFileFormats.Any(format =>
+                                format.Equals(extension, StringComparison.OrdinalIgnoreCase) &&
+                                !existingAssets.Any(a => a.FilePath == file)))
                             {
                                 var asset = CreateAsset(file, currentProjectId, extension, context);
 
+                                if(asset.PreviewImagePath == null)
+                                {
+                                    int a = 10;
+                                }
                                 if (asset == null) continue;
                                 SaveAsset(asset, context);
 
@@ -267,51 +272,65 @@ namespace AssetManager.Repositories
 
         public string GenerateThumbnail(ref Asset asset, string extension)
         {
-            if (extension.ToLower() == ".png" || extension.ToLower() == ".jpg")
+            switch (extension.ToLower())
             {
-                string outputFolderPath = Path.Combine(
+                case ".png":
+                case ".jpg":
+                case ".jpeg":
+                    {
+                        string outputFolderPath = Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
                             "TempThumbnails",
                             Path.GetFileNameWithoutExtension(asset.FilePath) + "_thumbnail.png"
- );
+                        );
 
-                if (File.Exists(outputFolderPath))
-                {
-                    return outputFolderPath;
-                }
+                        if (File.Exists(outputFolderPath))
+                        {
+                            return outputFolderPath;
+                        }
 
-                if (File.Exists(asset.FilePath))
-                {
-                    return LoadAndSaveImageThumbnail(asset.FilePath, thumbnailSize, outputFolderPath);
-                }
-                return null;
+                        if (File.Exists(asset.FilePath))
+                        {
+                            return LoadAndSaveImageThumbnail(asset.FilePath, thumbnailSize, outputFolderPath);
+                        }
 
+                        return null;
+                    }
+
+                case ".fbx":
+                    {
+                        string objFilePath = FileConverter.ConvertFbxToObj(
+                            asset.FilePath,
+                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles")
+                        );
+
+                        AddVertexFileInfo(objFilePath, asset);
+
+                        if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
+                        {
+                            string filename = GeneratePngThumbnail(objFilePath);
+
+                            return LoadAndSaveImageThumbnail(
+                                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename),
+                                thumbnailSize
+                            );
+                        }
+
+                        return null;
+                    }
+
+                case ".obj" or ".mp3" or ".mp4" or ".txt" or ".pdf" or ".wav" or ".docx":
+                    {
+                        return AssetHelpers.AssetHelpers.GetPlaceholderPath(extension);
+                    }
+
+                default:
+                    return null;
             }
-            else if (extension == ".fbx")
-            {
-                string objFilePath = FileConverter.ConvertFbxToObj(asset.FilePath, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles"));
-
-                AddVertexFileInfo(objFilePath, asset);
-
-
-                if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
-                {
-                    string filename = GeneratePngThumbnail(objFilePath);
-
-
-                    return LoadAndSaveImageThumbnail(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename), thumbnailSize);
-
-                }
-            }
-            else if (extension == ".prefab" || extension == ".obj")
-            {
-                return AssetHelpers.AssetHelpers.GetPlaceholderPath(extension);
-            }
-
-            return null;
         }
+     
 
-        private string GeneratePngThumbnail(string objFilePath)
+            private string GeneratePngThumbnail(string objFilePath)
         {
 
             string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");

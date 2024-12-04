@@ -51,6 +51,7 @@ namespace AssetManager.Migrations
                     ProjectId = table.Column<int>(type: "INTEGER", nullable: false),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FilePath = table.Column<string>(type: "TEXT", nullable: false),
+                    FileType = table.Column<string>(type: "TEXT", nullable: false),
                     RelativePath = table.Column<string>(type: "TEXT", nullable: false),
                     PreviewImagePath = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -97,7 +98,7 @@ namespace AssetManager.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     FilePath = table.Column<string>(type: "TEXT", nullable: false),
-                    FileType = table.Column<int>(type: "INTEGER", nullable: false),
+                    FileType = table.Column<string>(type: "TEXT", nullable: false),
                     FileSize = table.Column<double>(type: "REAL", nullable: false),
                     Format = table.Column<string>(type: "TEXT", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),

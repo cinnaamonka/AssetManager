@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241118204336_InitialCreate")]
+    [Migration("20241204004509_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,6 +30,10 @@ namespace AssetManager.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -76,8 +80,9 @@ namespace AssetManager.Migrations
                     b.Property<double>("FileSize")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("FileType")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Format")
                         .IsRequired()

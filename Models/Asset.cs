@@ -16,7 +16,7 @@ namespace AssetManager.Models
 
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public AssetType FileType { get; }
+        public string FileType { get; set; }
 
 
         public string RelativePath { get; set; }
@@ -34,7 +34,7 @@ namespace AssetManager.Models
             
             FileName = name;
             FilePath = filePath;
-            FileType = fileType;
+            FileType = fileType.ToString();
             RelativePath = relativePath;
             PreviewImagePath = previewImagePath;
             ProjectId = projectId;

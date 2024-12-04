@@ -13,8 +13,50 @@ namespace AssetManager.AssetHelpers
             Image,
             Model,
             Obj,
-
+            Document,
+            Audio,
+            Video,
             Other
+        }
+
+        public static List<string> AvailableFileFormats { get; } = new List<string>
+    {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".fbx",
+        ".obj",
+        ".mp3",
+        ".wav",
+        ".txt",
+        ".docx",
+        ".pdf",
+        ".mp4"
+    };
+
+        // Generate a filter string dynamically
+        public static string GetOpenFileDialogFilter()
+        {
+            var images = new[] { ".png", ".jpg", ".jpeg" };
+            var models = new[] { ".fbx", ".obj" };
+            var audio = new[] { ".mp3", ".wav" };
+            var documents = new[] { ".txt", ".docx", ".pdf" };
+            var videos = new[] { ".mp4" };
+
+            string supportedFiles = string.Join(";", AvailableFileFormats.Select(ext => $"*{ext}"));
+            string imageFilter = string.Join(";", images.Select(ext => $"*{ext}"));
+            string modelFilter = string.Join(";", models.Select(ext => $"*{ext}"));
+            string audioFilter = string.Join(";", audio.Select(ext => $"*{ext}"));
+            string documentFilter = string.Join(";", documents.Select(ext => $"*{ext}"));
+            string videoFilter = string.Join(";", videos.Select(ext => $"*{ext}"));
+
+            return $"Supported Files|{supportedFiles}|" +
+                   $"Images|{imageFilter}|" +
+                   $"Models|{modelFilter}|" +
+                   $"Audio|{audioFilter}|" +
+                   $"Documents|{documentFilter}|" +
+                   $"Videos|{videoFilter}|" +
+                   "All Files|*.*";
         }
 
         public enum Tags
@@ -69,43 +111,50 @@ namespace AssetManager.AssetHelpers
             return closestColorName;
         }
 
-    public static AssetType GetAssetType(string extension)
+        public static AssetType GetAssetType(string extension)
         {
             return extension.ToLower() switch
             {
                 ".png" or "png" => AssetType.Image,
-                ".jpg" or "jpg" => AssetType.Image,
+                ".jpg" or "jpg" or ".jpeg" or "jpeg" => AssetType.Image,
                 ".fbx" or "fbx" => AssetType.Model,
                 ".obj" or "obj" => AssetType.Obj,
+                ".mp3" or "mp3" => AssetType.Audio,
+                ".wav" or "wav" => AssetType.Audio,
+                ".txt" or "txt" => AssetType.Document,
+                ".docx" or "docx" => AssetType.Document,
+                ".pdf" or "pdf" => AssetType.Document,
+                ".mp4" or "mp4" => AssetType.Video,
+
                 _ => AssetType.Other
             };
         }
 
         static public bool IsSupportedFileType(string fileType)
         {
-            string[] supportedExtensions = { ".png", ".jpg", ".jpeg", ".fbx", ".obj" };
+
             string extension = Path.GetExtension(fileType).ToLower();
-            return supportedExtensions.Contains(extension);
+            return AvailableFileFormats.Contains(extension);
         }
         public static void AddVertexFileInfo(string fileName, Asset asset)
         {
-            if(!File.Exists(fileName))
+            if (!File.Exists(fileName))
             {
                 Console.WriteLine("File does not exist");
                 return;
             }
 
-            foreach(var line in File.ReadAllLines(fileName))
+            foreach (var line in File.ReadAllLines(fileName))
             {
-                if(line.StartsWith("v"))
+                if (line.StartsWith("v"))
                 {
                     asset.Metadata.VertexCount++;
                 }
-                else if(line.StartsWith("f"))
+                else if (line.StartsWith("f"))
                 {
                     asset.Metadata.FaceCount++;
                 }
-            
+
             }
         }
 
@@ -117,7 +166,7 @@ namespace AssetManager.AssetHelpers
             JPG
         }
 
-      
+
 
         public static System.Windows.Media.Color GenerateRandomColorRGB()
         {
@@ -133,10 +182,10 @@ namespace AssetManager.AssetHelpers
 
         public static List<string> AvailableColors { get; } = new List<string>
     {
-        "Red", 
-        "Green", 
-        "Blue", 
-        "Yellow",   
+        "Red",
+        "Green",
+        "Blue",
+        "Yellow",
         "Orange",
         "Purple"
     };
@@ -151,14 +200,17 @@ namespace AssetManager.AssetHelpers
                 case ".obj":
                     return Path.Combine(_resourceFolder, "OBJPlaceholder.png");
 
-                //case ".mp3":
-                //case ".wav":
-                //    return @"Placeholders\AudioPlaceholder.png";
+                case ".mp4":
+                case ".wav":
+                    return Path.Combine(_resourceFolder, "VideoPlaceholder.png");
 
-                //case ".txt":
-                //case ".docx":
-                //case ".pdf":
-                //    return @"Placeholders\DocumentPlaceholder.png"; 
+                case ".txt":
+                case ".docx":
+                case ".pdf":
+                    return Path.Combine(_resourceFolder, "TextPlaceholder.png");
+
+                case ".mp3":
+                    return Path.Combine(_resourceFolder, "WavePlaceholder.png");
 
                 default:
                     return _resourceFolder;

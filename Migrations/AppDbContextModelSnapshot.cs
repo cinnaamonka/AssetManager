@@ -30,6 +30,10 @@ namespace AssetManager.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PreviewImagePath")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -73,8 +77,9 @@ namespace AssetManager.Migrations
                     b.Property<double>("FileSize")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("FileType")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Format")
                         .IsRequired()

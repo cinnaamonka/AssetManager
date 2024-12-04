@@ -279,7 +279,7 @@ namespace AssetManager.ViewModels
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Supported Files|*.png;*.jpg;*.jpeg;*.fbx;*.obj|Images|*.png;*.jpg;*.jpeg|Models|*.fbx;*.obj|All Files|*.*",
+                Filter = AssetHelpers.AssetHelpers.GetOpenFileDialogFilter(),
                 Multiselect = false
             };
 
