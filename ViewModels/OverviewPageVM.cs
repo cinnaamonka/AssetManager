@@ -253,13 +253,13 @@ namespace AssetManager.ViewModels
 
                 var newAsset = _assetRepository.CreateAsset(
                  destinationFilePath,
-                 MainPageVM.SelectedProject.Id,
+                 MainPageVM.SelectedProject,
                  Path.GetExtension(destinationFilePath),
                  MainPageVM.AppDbContext
              );
 
                 _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
-
+                 
                 var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);
                 selectedProject.FileCount++;
 
@@ -467,18 +467,16 @@ namespace AssetManager.ViewModels
 
 
 
-        public async Task LoadAssetsFromUnityProject(string projectPath, int currentProjectId)
+        public async Task LoadAssetsFromUnityProject(Project selectedProject)
         {
             if(_tagRepository == null)
             {
                 _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
-
-
             }
 
 
-            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(projectPath,
-                MainPageVM.AppDbContext, currentProjectId,_tagRepository);
+            Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(selectedProject,
+                MainPageVM.AppDbContext,  _tagRepository);
             FilteredAssets = Assets;
 
             if (MainPageVM.SelectedProject != null)

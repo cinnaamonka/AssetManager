@@ -9,7 +9,8 @@ namespace AssetManager.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is AssetType assetType && assetType == AssetType.Model)
+
+            if (value.ToString() == AssetType.Model.ToString())
             {
                 return Visibility.Visible;
             }

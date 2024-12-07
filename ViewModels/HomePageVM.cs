@@ -49,15 +49,7 @@ namespace AssetManager.ViewModels
                     MainPageVM.SelectedProject = _selectedProject;
 
                 }
-                else
-                {
-                    //MainPageVM.AppDbContext.RemoveRange(_selectedProject);
-                    //MainPageVM.AppDbContext.SaveChanges();
-
-                    //OnPropertyChanged(nameof(SelectedProject));
-                    //Projects = new ObservableCollection<Project>(MainPageVM.AppDbContext.Projects.ToList());
-                    //OnPropertyChanged(nameof(Projects));
-                }
+             
             }
         }
 
@@ -87,6 +79,8 @@ namespace AssetManager.ViewModels
             Projects = new ObservableCollection<Project>();
             LoadProjects();
 
+
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Projects");
         }
 
 
@@ -94,12 +88,12 @@ namespace AssetManager.ViewModels
         {
             if (SelectedProject != null)
             {
-                OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
+                OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject);
 
             }
             else
             {
-                // call clear function OverViewPageVM if there is no project
+         
                 OverViewPageVM.Assets = [];
                 OverViewPageVM.FilteredAssets = [];
             }
@@ -132,7 +126,7 @@ namespace AssetManager.ViewModels
 
             await Task.Delay(10);
 
-            await OverViewPageVM.LoadAssetsFromUnityProject(project.Path, project.Id);
+            await OverViewPageVM.LoadAssetsFromUnityProject(project);
 
             Loader.IsLoading = false;
 
@@ -143,6 +137,11 @@ namespace AssetManager.ViewModels
             Projects.Add(project);
 
             OnPropertyChanged(nameof(Projects));
+
+
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(),"Projects",project.Name));
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Projects", project.Name,"Thumbnails"));
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Projects", project.Name, "ObjFiles"));
         }
 
         public void RemoveProject(Project project)
@@ -204,7 +203,7 @@ namespace AssetManager.ViewModels
                 OverViewPageVM.LoadTags();
                 if (SelectedProject == null) return;
 
-                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
+                await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject);
 
             }
             finally

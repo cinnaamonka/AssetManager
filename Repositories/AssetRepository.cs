@@ -124,13 +124,13 @@ namespace AssetManager.Repositories
 
                 if (!string.IsNullOrEmpty(convertedFilePath))
                 {
-                    var asset = CreateAsset(convertedFilePath, selectedAsset.ProjectId, selectedToFormat, context);
+                    var asset = CreateAsset(convertedFilePath, context.Projects.FirstOrDefault(project => project.Id == selectedAsset.ProjectId),selectedToFormat, context);
                     SaveAsset(asset, context);
                 }
             }
         }
 
-        public Asset CreateAsset(string filePath, int projectId, string targetFormat, AppDbContext context)
+        public Asset CreateAsset(string filePath, Project selectedProject, string targetFormat, AppDbContext context)
         {
 
             string fileName = Path.GetFileName(filePath);
@@ -139,7 +139,7 @@ namespace AssetManager.Repositories
             var asset = new Asset(
                 name: fileName,
                 filePath: filePath,
-                projectId: projectId,
+                projectId: selectedProject.Id,
                 fileType: AssetHelpers.AssetHelpers.GetAssetType(targetFormat),
                 relativePath: fileName
             );
@@ -158,7 +158,7 @@ namespace AssetManager.Repositories
 
             asset.Metadata = metadata;
 
-            asset.PreviewImagePath = GenerateThumbnail(ref asset, Path.GetExtension(filePath));
+            asset.PreviewImagePath = GenerateThumbnail(ref asset, Path.GetExtension(filePath), selectedProject.Name);
 
             var existingTag = context.Tags.FirstOrDefault(t => t.Name == asset.FileType.ToString());
 
@@ -188,13 +188,15 @@ namespace AssetManager.Repositories
 
 
         }
-        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(string projectPath, AppDbContext context, int currentProjectId,
+        public async Task<List<Asset>> LoadAssetsFromUnityProjectAsync(Project selectedProject, AppDbContext context,
             TagRepository tagRepository)
         {
-            string assetsFolderPath = Path.Combine(projectPath, "Assets");
+            string assetsFolderPath = Path.Combine(selectedProject.Path, "Assets");
 
 
-            var existingAssets = await GetAssetsByProjectPathAsync(projectPath, context);
+            var existingAssets = await GetAssetsByProjectPathAsync(selectedProject.Path, context);
+
+
             AddAssets(existingAssets, context);
 
             if (existingAssets != null && existingAssets.Count > 0)
@@ -220,7 +222,7 @@ namespace AssetManager.Repositories
                                 format.Equals(extension, StringComparison.OrdinalIgnoreCase) &&
                                 !existingAssets.Any(a => a.FilePath == file)))
                             {
-                                var asset = CreateAsset(file, currentProjectId, extension, context);
+                                var asset = CreateAsset(file, selectedProject, extension, context);
 
 
                                 if (asset == null) continue;
@@ -266,7 +268,7 @@ namespace AssetManager.Repositories
             await context.SaveChangesAsync();
         }
 
-        public string GenerateThumbnail(ref Asset asset, string extension)
+        public string GenerateThumbnail(ref Asset asset, string extension,string currentProjectName)
         {
             switch (extension.ToLower())
             {
@@ -276,7 +278,9 @@ namespace AssetManager.Repositories
                     {
                         string outputFolderPath = Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
-                            "TempThumbnails",
+                            "Projects",
+                            currentProjectName,
+                            "Thumbnails",
                             Path.GetFileNameWithoutExtension(asset.FilePath) + "_thumbnail.png"
                         );
 
@@ -297,18 +301,21 @@ namespace AssetManager.Repositories
                     {
                         string objFilePath = FileConverter.ConvertFbxToObj(
                             asset.FilePath,
-                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempObjFiles")
+                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+                            "Projects",
+                            currentProjectName,
+                            "ObjFiles")
                         );
 
                         AddVertexFileInfo(objFilePath, asset);
 
                         if (!string.IsNullOrEmpty(objFilePath) && File.Exists(objFilePath))
                         {
-                            string filename = GeneratePngThumbnail(objFilePath);
+                            string filename = GeneratePngThumbnail(objFilePath, currentProjectName);
 
                             return LoadAndSaveImageThumbnail(
                                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename),
-                                thumbnailSize
+                                thumbnailSize, currentProjectName
                             );
                         }
 
@@ -326,14 +333,16 @@ namespace AssetManager.Repositories
         }
 
 
-        private string GeneratePngThumbnail(string objFilePath)
+        private string GeneratePngThumbnail(string objFilePath,string selectedProjectName)
         {
 
             string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tools\\ThumbnailsGenerator", "DirectX.exe");
 
 
-            string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TempThumbnails");
+            string outputFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Projects",
+                            selectedProjectName,
+                            "Thumbnails");
 
             if (!Directory.Exists(outputFolderPath))
             {
@@ -380,7 +389,7 @@ namespace AssetManager.Repositories
         }
 
 
-        private string LoadAndSaveImageThumbnail(string filePath, int thumbnailSize, string outputFilePath = "")
+        private string LoadAndSaveImageThumbnail(string filePath, int thumbnailSize, string selectedProjectName, string outputFilePath = "")
         {
             // Validate input
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
@@ -391,7 +400,7 @@ namespace AssetManager.Repositories
             // Determine output path
             if (string.IsNullOrEmpty(outputFilePath))
             {
-                string directory = Path.Combine(Path.GetDirectoryName(filePath), "Thumbnails");
+                string directory = Path.Combine(Path.GetDirectoryName(filePath), selectedProjectName, "Thumbnails");
                 Directory.CreateDirectory(directory); // Ensure the thumbnails folder exists
                 outputFilePath = Path.Combine(directory, Path.GetFileName(filePath));
             }

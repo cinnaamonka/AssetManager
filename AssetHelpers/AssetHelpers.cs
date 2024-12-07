@@ -34,7 +34,7 @@ namespace AssetManager.AssetHelpers
         ".mp4"
     };
 
-        // Generate a filter string dynamically
+      
         public static string GetOpenFileDialogFilter()
         {
             var images = new[] { ".png", ".jpg", ".jpeg" };
