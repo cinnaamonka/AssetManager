@@ -6,7 +6,7 @@ namespace AssetManager.AssetHelpers
 {
     public class AssetHelpers
     {
-        private static string _resourceFolder => "C:\\Users\\parni\\Desktop\\2024-2025\\semester5\\GraduationWork\\AssetManager\\Resources";
+    
 
         public enum AssetType
         {
@@ -192,28 +192,29 @@ namespace AssetManager.AssetHelpers
         public static string GetPlaceholderPath(string extension)
         {
             string fileExtension = extension.ToLowerInvariant();
+            string resourcesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources"); 
 
             switch (fileExtension)
             {
 
                 case "obj":
                 case ".obj":
-                    return Path.Combine(_resourceFolder, "OBJPlaceholder.png");
+                    return Path.Combine(resourcesFolderPath, "OBJPlaceholder.png");
 
                 case ".mp4":
                 case ".wav":
-                    return Path.Combine(_resourceFolder, "VideoPlaceholder.png");
+                    return Path.Combine(resourcesFolderPath, "VideoPlaceholder.png");
 
                 case ".txt":
                 case ".docx":
                 case ".pdf":
-                    return Path.Combine(_resourceFolder, "TextPlaceholder.png");
+                    return Path.Combine(resourcesFolderPath, "TextPlaceholder.png");
 
                 case ".mp3":
-                    return Path.Combine(_resourceFolder, "WavePlaceholder.png");
+                    return Path.Combine(resourcesFolderPath, "WavePlaceholder.png");
 
                 default:
-                    return _resourceFolder;
+                    return resourcesFolderPath;
             }
         }
     }

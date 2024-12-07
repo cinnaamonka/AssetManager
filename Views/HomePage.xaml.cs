@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AssetManager.Models;
+using AssetManager.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +25,23 @@ namespace AssetManager.Views
         public HomePage()
         {
             InitializeComponent();
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button && button.DataContext is Project project)
+            {
+               
+                var viewModel = DataContext as HomePageVM;
+                viewModel.SelectedProject = project;
+
+                if (viewModel?.RemoveProjectCommand.CanExecute(project) == true)
+                {
+                    viewModel.RemoveProjectCommand.Execute(project);
+                }
+            }
+
+            e.Handled = true;
         }
     }
 }

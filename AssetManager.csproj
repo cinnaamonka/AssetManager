@@ -20,6 +20,7 @@
     <None Remove="Resources\MetafileImage.png" />
     <None Remove="Resources\minus.png" />
     <None Remove="Resources\OBJPlaceholder.png" />
+    <None Remove="Resources\TextPlaceholder.png" />
     <None Remove="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx" />
   </ItemGroup>
 
@@ -39,9 +40,12 @@
     <Resource Include="Resources\minus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <EmbeddedResource Include="Resources\OBJPlaceholder.png">
+    <Resource Include="Resources\OBJPlaceholder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Resource>
+    <Resource Include="Resources\TextPlaceholder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <EmbeddedResource Include="Tools\ThumbnailsGenerator\Resources\PosCol3D.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -75,9 +79,6 @@
     </None>
     <None Update="Resources\projects.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\TextPlaceholder.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\VideoPlaceholder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -34,6 +34,7 @@ namespace AssetManager.AssetHelpers
                     }
                 }
             }
+
             return null;
         }
 

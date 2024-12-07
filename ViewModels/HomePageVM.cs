@@ -8,11 +8,15 @@ namespace AssetManager.ViewModels
 {
     internal class HomePageVM : ObservableObject
     {
+        public string RemoveIconPath => "C:\\Users\\parni\\Desktop\\2024-2025\\semester5\\GraduationWork\\AssetManager\\Resources\\minus.png";
+
+
         public MainPageVM MainPageVM { get; }
         public OverviewPageVM OverViewPageVM { get; }
 
         public LoaderVM Loader { get; set; } = new LoaderVM();
         public RelayCommand OpenOverviewPageCommand { get; set; }
+        public RelayCommand<Project> RemoveProjectCommand { get; set; }
         public AsyncRelayCommand BrowseProjectFiles { get; set; }
         public AsyncRelayCommand OpenProjectDetailsCommand { get; }
 
@@ -37,11 +41,22 @@ namespace AssetManager.ViewModels
             set
             {
                 SetProperty(ref _selectedProject, value);
-                if (_selectedProject != null)
+
+                if (_selectedProject == null) return;
+
+                if (Directory.Exists(_selectedProject.Path))
                 {
-                    OpenProjectDetailsCommand.Execute(_selectedProject);
                     MainPageVM.SelectedProject = _selectedProject;
-                  
+
+                }
+                else
+                {
+                    //MainPageVM.AppDbContext.RemoveRange(_selectedProject);
+                    //MainPageVM.AppDbContext.SaveChanges();
+
+                    //OnPropertyChanged(nameof(SelectedProject));
+                    //Projects = new ObservableCollection<Project>(MainPageVM.AppDbContext.Projects.ToList());
+                    //OnPropertyChanged(nameof(Projects));
                 }
             }
         }
@@ -66,21 +81,39 @@ namespace AssetManager.ViewModels
             MainPageVM = mainPageVM;
             OverViewPageVM = OverviewPageViewModel;
             OpenOverviewPageCommand = new RelayCommand(OpenOverviewPage);
-            BrowseProjectFiles = new AsyncRelayCommand(BrowseFiles);
+            BrowseProjectFiles = new AsyncRelayCommand(AddProject);
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
+            RemoveProjectCommand = new RelayCommand<Project>(RemoveProject);
             Projects = new ObservableCollection<Project>();
             LoadProjects();
-           
+
         }
 
 
         private void OpenOverviewPage()
         {
+            if (SelectedProject != null)
+            {
+                OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
+
+            }
+            else
+            {
+                // call clear function OverViewPageVM if there is no project
+                OverViewPageVM.Assets = [];
+                OverViewPageVM.FilteredAssets = [];
+            }
+
             MainPageVM.OpenOverViewPage();
         }
-        async private Task BrowseFiles()
+        async private Task AddProject()
         {
             OpenFolderDialog();
+
+            if (UnityProjectPath == null)
+            {
+                return;
+            }
 
             var project = new Project()
             {
@@ -112,6 +145,38 @@ namespace AssetManager.ViewModels
             OnPropertyChanged(nameof(Projects));
         }
 
+        public void RemoveProject(Project project)
+        {
+            var projectAssets = MainPageVM.AppDbContext.Assets.Where(a => a.ProjectId == project.Id).ToList();
+            var thumbnails = projectAssets.Select(a => a.PreviewImagePath).ToList();
+
+            MainPageVM.AppDbContext.Projects.Remove(project);
+            MainPageVM.AppDbContext.SaveChanges();
+
+            UnityProjectPath = null;
+
+            Projects = new ObservableCollection<Project>(MainPageVM.AppDbContext.Projects.ToList());
+
+
+            OnPropertyChanged(nameof(Projects));
+
+
+            SelectedProject = null;
+            MainPageVM.SelectedProject = null;
+
+            OnPropertyChanged(nameof(MainPageVM.SelectedProject));
+            OnPropertyChanged(nameof(SelectedProject));
+
+            foreach (var thumbnail in thumbnails)
+            {
+                if (File.Exists(thumbnail) && !thumbnail.ToLower().Contains("resources"))
+                {
+                    File.Delete(thumbnail);
+                }
+            }
+
+            OverViewPageVM.StopFileWatcher();
+        }
 
         private async void LoadProjects()
         {
@@ -127,6 +192,8 @@ namespace AssetManager.ViewModels
 
         private async Task OpenProjectLibraryAsync()
         {
+
+
             Loader.IsLoading = true;
             Loader.LoadingMessage = "Loading project...";
 
@@ -135,14 +202,20 @@ namespace AssetManager.ViewModels
             try
             {
                 OverViewPageVM.LoadTags();
+                if (SelectedProject == null) return;
+
                 await OverViewPageVM.LoadAssetsFromUnityProject(SelectedProject.Path, SelectedProject.Id);
 
             }
             finally
             {
                 Loader.IsLoading = false;
-                MainPageVM.OpenOverViewPage();
-                
+                if (SelectedProject != null)
+                {
+                    MainPageVM.OpenOverViewPage();
+                }
+
+
             }
 
 

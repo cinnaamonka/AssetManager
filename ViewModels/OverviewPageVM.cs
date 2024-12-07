@@ -300,10 +300,15 @@ namespace AssetManager.ViewModels
         public void UpdateAsset(Asset asset)
         {
             MainPageVM.AppDbContext.Assets.Update(asset);
-          
-            MainPageVM.AppDbContext.SaveChanges();
 
-            RefreshAssets();
+            if(asset != null)
+            {
+
+                MainPageVM.AppDbContext.SaveChanges();
+
+                RefreshAssets();
+            }
+         
         }
         public void RemoveAsset(Asset asset)
         {
@@ -430,7 +435,7 @@ namespace AssetManager.ViewModels
                    
                     imageWindow.ShowDialog();
                 }
-                else if (extension == ".obj" || extension == ".txt")
+                else if (extension == ".obj" || extension == ".txt" )
                 {
                  
 
@@ -568,6 +573,7 @@ namespace AssetManager.ViewModels
             {
                 _fileWatcher.EnableRaisingEvents = false;
                 _fileWatcher.Dispose();
+                return;
             }
 
             _fileWatcher = new FileSystemWatcher
@@ -587,7 +593,7 @@ namespace AssetManager.ViewModels
             _fileWatcher.EnableRaisingEvents = true;
         }
 
-        private void StopFileWatcher()
+        public void StopFileWatcher()
         {
             if (_fileWatcher != null)
             {

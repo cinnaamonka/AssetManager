@@ -212,7 +212,7 @@ namespace AssetManager.Repositories
                     {
                         if (!file.EndsWith(".meta") && !file.EndsWith(".asset") && !file.EndsWith(".uss") && !file.EndsWith(".cs"))
                         {
-                           
+
                             string relativePath = file.Substring(assetsFolderPath.Length + 1);
                             string extension = Path.GetExtension(file).ToLower();
 
@@ -222,7 +222,7 @@ namespace AssetManager.Repositories
                             {
                                 var asset = CreateAsset(file, currentProjectId, extension, context);
 
-                         
+
                                 if (asset == null) continue;
                                 SaveAsset(asset, context);
 
@@ -324,9 +324,9 @@ namespace AssetManager.Repositories
                     return null;
             }
         }
-     
 
-            private string GeneratePngThumbnail(string objFilePath)
+
+        private string GeneratePngThumbnail(string objFilePath)
         {
 
             string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");
@@ -356,6 +356,7 @@ namespace AssetManager.Repositories
                 if (process != null)
                 {
                     process.WaitForExit();
+
                     if (process.ExitCode == 0)
                     {
 
@@ -381,39 +382,54 @@ namespace AssetManager.Repositories
 
         private string LoadAndSaveImageThumbnail(string filePath, int thumbnailSize, string outputFilePath = "")
         {
-            if (outputFilePath == string.Empty)
+            // Validate input
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
             {
-                outputFilePath = filePath;
+                throw new ArgumentException("The provided file path is null, empty, or does not exist.");
             }
 
+            // Determine output path
+            if (string.IsNullOrEmpty(outputFilePath))
+            {
+                string directory = Path.Combine(Path.GetDirectoryName(filePath), "Thumbnails");
+                Directory.CreateDirectory(directory); // Ensure the thumbnails folder exists
+                outputFilePath = Path.Combine(directory, Path.GetFileName(filePath));
+            }
+
+            // Skip processing if thumbnail already exists
             if (File.Exists(outputFilePath))
             {
                 return outputFilePath;
             }
 
-            if (filePath != null)
+            try
             {
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
                 bitmap.UriSource = new Uri(filePath);
                 bitmap.DecodePixelWidth = thumbnailSize;
-                bitmap.EndInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad; 
 
+                bitmap.EndInit();
+                bitmap.Freeze();
 
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(bitmap));
-
 
                 using (var fileStream = new FileStream(outputFilePath, FileMode.Create))
                 {
                     encoder.Save(fileStream);
                 }
 
-
                 return outputFilePath;
-            }
 
-            return null;
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error creating thumbnail for {filePath}: {ex.Message}");
+                throw;
+            }
         }
     }
 }

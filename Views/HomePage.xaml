@@ -68,21 +68,58 @@
                        HorizontalAlignment="Center"/>
         </StackPanel>
 
-        <!-- Table for Content -->
-        <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" 
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                  ItemsSource="{Binding Projects}"
-                  SelectedItem="{Binding SelectedProject, Mode=TwoWay}"
-                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
-                  Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
-                  RowBackground="White" AlternatingRowBackground="#F8F8F8">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
-                <DataGridTextColumn Header="Date Added" Binding="{Binding DateAdded}" Width="200"/>
-                <DataGridTextColumn Header="Files Amount" Binding="{Binding FileCount}" Width="200"/>
-            </DataGrid.Columns>
-        </DataGrid>
+    
+            <DataGrid Name="ProjectsDataGrid" AutoGenerateColumns="False" Grid.Row="1" Grid.Column="1" 
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+          ItemsSource="{Binding Projects}"
+          SelectedItem="{Binding SelectedProject}"
+          HeadersVisibility="Column" GridLinesVisibility="Horizontal" 
+          Background="White" Foreground="#333333" BorderBrush="Gray" BorderThickness="1"
+          RowBackground="White" AlternatingRowBackground="#F8F8F8">
+
+                <DataGrid.Columns>
+                    <!-- S.No Column -->
+                    <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
+
+                    <!-- Name Column -->
+                    <DataGridTemplateColumn Header="Name" Width="300">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" Foreground="Blue" Cursor="Hand">
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding Command="{Binding DataContext.OpenProjectDetailsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                          CommandParameter="{Binding}" MouseAction="LeftClick" />
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Date Added Column -->
+                    <DataGridTextColumn Header="Date Added" Binding="{Binding DateAdded}" Width="150"/>
+
+                    <!-- Files Amount Column -->
+                    <DataGridTextColumn Header="Files Amount" Binding="{Binding FileCount}" Width="100"/>
+
+                    <DataGridTemplateColumn Header="Actions" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <!--<Button Content="Delete" Width="Auto" Height="Auto" Background="Transparent" BorderBrush="Transparent"
+                    Command="{Binding DataContext.RemoveProjectCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                    CommandParameter="{Binding}">
+                            </Button>-->
+                                <Button Content="Delete" Background="Transparent" BorderBrush="Transparent"
+                    Click="DeleteButton_Click">
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+ 
+
+
 
         <Grid Background="#80000000" 
          Visibility="{Binding Loader.IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="2" Grid.ColumnSpan="3">
