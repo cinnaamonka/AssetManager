@@ -65,6 +65,7 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenTK" Version="4.8.2" />
+    <PackageReference Include="p4api.net" Version="2024.1.265.5426" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
     <PackageReference Include="System.Reactive.Windows.Forms" Version="6.0.1" />
     <PackageReference Include="UnityEditor" Version="2019.3.2.1" />

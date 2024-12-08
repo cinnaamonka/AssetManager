@@ -95,12 +95,12 @@
         </StackPanel>
 
         <StackPanel Grid.Row = "0" Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Center" 
-                    Background="DarkBlue" Height="50">
+                    Background="DarkBlue" Height="50" Width="280">
             <!--Home page button-->
             <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand" Command="{Binding OpenHomePageCommand}">
                 <Border BorderBrush="Transparent" BorderThickness="2" Margin="5" Background="Transparent">
-                    <TextBlock Text="Home" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                    <TextBlock Text="Home" FontSize="16" Foreground="White"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Center" Padding="10"/>
                 </Border>
             </Button>
 
@@ -112,11 +112,11 @@
                         <GradientStop Color="Transparent" Offset="1.0" />
                     </LinearGradientBrush>
                 </Border.BorderBrush>
-                <TextBlock Text="Library" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+                <TextBlock Text="Library" FontSize="16" Foreground="White"  HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
             </Border>
 
-            <Border BorderBrush="Transparent" BorderThickness="2" Margin="5">
-                <TextBlock Text="?" FontSize="16" Foreground="White" FontFamily="Comic Sans MS" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
+            <Border BorderBrush="Transparent" BorderThickness="2" Margin="1">
+                <TextBlock Text="Version Control" FontSize="15" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
             </Border>
         </StackPanel>
 
@@ -206,7 +206,7 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Button Content="Add Tag" Command="{Binding AddTagCommand}" Padding="10,5" Style="{StaticResource CustomButtonStyle}" />
+                    <Button Content="Add Tag" Command="{Binding AddTagCommand}" Padding="10,5" Style="{StaticResource CustomButtonStyle}" Click="Button_Click" />
                 </StackPanel>
 
                 <!-- Second Row: Remove All Tags Button -->

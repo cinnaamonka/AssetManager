@@ -3,6 +3,9 @@ using AssetManager.Models;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.IO;
+using AssetManager.Views;
+using AssetManager.Repositories;
+using System.Windows;
 
 namespace AssetManager.ViewModels
 {
@@ -19,6 +22,9 @@ namespace AssetManager.ViewModels
         public RelayCommand<Project> RemoveProjectCommand { get; set; }
         public AsyncRelayCommand BrowseProjectFiles { get; set; }
         public AsyncRelayCommand OpenProjectDetailsCommand { get; }
+        public RelayCommand OpenVersionControlConfigurationCommand { get; set; }
+
+
 
         private ObservableCollection<Project> _projects;
         public ObservableCollection<Project> Projects
@@ -76,6 +82,8 @@ namespace AssetManager.ViewModels
             BrowseProjectFiles = new AsyncRelayCommand(AddProject);
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             RemoveProjectCommand = new RelayCommand<Project>(RemoveProject);
+            OpenVersionControlConfigurationCommand = new RelayCommand(OpenVersionControl);
+
             Projects = new ObservableCollection<Project>();
             LoadProjects();
 
@@ -219,6 +227,12 @@ namespace AssetManager.ViewModels
 
 
         }
+        private void OpenVersionControl()
+        {
+            MainPageVM.OpenPerforceConfiguration();
+        }
+
+      
     }
 }
 

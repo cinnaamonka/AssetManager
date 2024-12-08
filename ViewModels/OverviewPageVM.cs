@@ -93,6 +93,7 @@ namespace AssetManager.ViewModels
         public RelayCommand ConvertCommand { get; set; }
         public RelayCommand AddAssetCommand { get; set; }
         public RelayCommand<Asset> RemoveAssetCommand { get; set; }
+       
 
         public MainPageVM MainPageVM { get; }
 
@@ -191,6 +192,8 @@ namespace AssetManager.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
+     
+
         public OverviewPageVM(MainPageVM mainPageVM)
         {
             MainPageVM = mainPageVM;
@@ -213,6 +216,7 @@ namespace AssetManager.ViewModels
             ConvertCommand = new RelayCommand(ConvertFile);
             RemoveAssetCommand = new RelayCommand<Asset>(RemoveAsset);
             AddAssetCommand = new RelayCommand(AddAsset);
+          
 
             _assetRepository = new AssetRepository();
 
@@ -222,6 +226,7 @@ namespace AssetManager.ViewModels
             }
 
         
+
         }
 
         public OverviewPageVM() { }
@@ -649,5 +654,7 @@ namespace AssetManager.ViewModels
                 }
             });
         }
+
+      
     }
 }
