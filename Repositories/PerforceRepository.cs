@@ -1,5 +1,6 @@
 ﻿using Perforce.P4;
 using System.Net;
+using System.Windows;
 
 namespace AssetManager.Repositories
 {
@@ -7,16 +8,19 @@ namespace AssetManager.Repositories
     {
         private Repository _repository;
 
+        private Connection _connection;
+        private Server _server;
+
         public PerforceRepository(string serverUri, string username, string password)
         {
-            var server = new Server(new ServerAddress(serverUri));
+            _server = new Server(new ServerAddress(serverUri));
 
-            var connection = new Connection(server)
+            _connection = new Connection(_server)
             {
                 UserName = username
             };
 
-            bool isConnected = connection.Connect(null);
+            bool isConnected = _connection.Connect(null);
             if (!isConnected)
             {
                 throw new Exception("Unable to connect to the Perforce server.");
@@ -24,16 +28,17 @@ namespace AssetManager.Repositories
 
             if (!string.IsNullOrEmpty(password))
             {
-                connection.Login(password);
+                _connection.Login(password);
             }
 
 
-            _repository = new Repository(server);
-        }
+            _repository = new Repository(_server);
 
-        public PerforceRepository()
-        {
-
+            if (IsConnected())
+            {
+                int a = 10;
+            }
+           
         }
 
         public bool IsConnected()
@@ -43,13 +48,33 @@ namespace AssetManager.Repositories
 
         public void SyncWorkspace(string workspaceName)
         {
-            _repository.Connection.Client = _repository.GetClient(workspaceName);
+            if(IsConnected())
+            {
+                var client = _repository.GetClient(workspaceName);
+                if (client == null)
+                {
+                    throw new Exception($"Workspace '{workspaceName}' does not exist or is not accessible.");
+                }
 
-            var fileSpec = new FileSpec(new DepotPath("//..."), null);
 
-            _repository.Connection.Client.SyncFiles(new List<FileSpec> { fileSpec }, null);
+                _repository.Connection.Client = client;
 
-            Console.WriteLine("Workspace synced successfully.");
+
+                var fileSpec = new FileSpec(new DepotPath("//..."), null);
+
+                _repository.Connection.Client.SyncFiles(new List<FileSpec> { fileSpec }, null);
+
+                Console.WriteLine("Workspace synced successfully.");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("You are disconnected.");
+            }
+
+         
         }
+
+    
+
     }
 }

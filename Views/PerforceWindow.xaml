@@ -3,9 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AssetManager.ViewModels"
         xmlns:local="clr-namespace:AssetManager.Views"
         mc:Ignorable="d"
         Title="PerforceWindow" Height="200" Width="400">
+
+    <Window.DataContext>
+        <vm:PerforceWindowVM />
+    </Window.DataContext>
 
     <Window.Resources>
         <Style x:Key="CustomButtonStyle" TargetType="Button">
@@ -61,19 +66,19 @@
 
         <!-- Server URI -->
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Server URI:" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ServerUri}" Margin="5" />
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PerforceConfiguration.ServerUri}" Margin="5" />
 
         <!-- Username -->
         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Username:" />
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Username}" Margin="5" />
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PerforceConfiguration.Username}" Margin="5" />
 
         <!-- Password -->
         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Password:" />
-        <PasswordBox Grid.Row="2" Grid.Column="1" Margin="5" x:Name="PasswordBox" />
+        <PasswordBox Grid.Row="2" Grid.Column="1" Margin="5" x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
 
         <!-- Workspace -->
         <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="Workspace Name:" />
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding WorkspaceName}" Margin="5" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding PerforceConfiguration.WorkspaceName}" Margin="5" />
 
         <!-- Action Buttons -->
         <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">

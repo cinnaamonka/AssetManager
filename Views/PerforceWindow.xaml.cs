@@ -24,8 +24,15 @@ namespace AssetManager.Views
         {
             InitializeComponent();
 
-            //var viewModel = DataContext as PerforceWindowVM;
-            //viewModel.CloseWindowAction += this.Close; 
+        
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is PerforceWindowVM viewModel)
+            {
+                viewModel.PerforceConfiguration.Password = PasswordBox.Password; 
+            }
         }
     }
 }

@@ -13,11 +13,12 @@ namespace AssetManager.ViewModels
     {
         public OverviewPage MainPage { get; set; }
         public MetadataWindow MetadataWindow { get; set; }
+        public PerforceWindow PerforceWindow { get; set; }
         public HomePage HomePage { get; }
 
         public Page CurrentPage { get; set; }
 
-     
+
 
         public AppDbContext AppDbContext { get; set; }
 
@@ -32,41 +33,40 @@ namespace AssetManager.ViewModels
             {
                 _selectedProject = value;
                 OnPropertyChanged(nameof(SelectedProject));
-               
+
 
             }
         }
 
-        // Version control
-        PerforceRepository _perforceRepository;
-  
-        public RelayCommand OpenVersionControlConfigurationCommand { get; set; }
+
+
 
         public MainPageVM()
         {
             AppDbContext = new AppDbContext();
 
-            OverviewPageVM overViewPageVM = new(this);
-       
-            HomePageVM homePageVM = new(this,overViewPageVM);
+            _perforceWindowVM = new PerforceWindowVM();
 
-         
+            OverviewPageVM overViewPageVM = new(this);
+
+            HomePageVM homePageVM = new(this, overViewPageVM);
 
             metadataWindowVM = new(this, overViewPageVM);
+
             MainPage = new OverviewPage { DataContext = overViewPageVM };
             HomePage = new HomePage { DataContext = homePageVM };
 
             CurrentPage = HomePage;
 
-            OpenVersionControlConfigurationCommand = new RelayCommand(OpenPerforceConfiguration);
-            _perforceRepository = new PerforceRepository();
+
+
         }
 
-        public void HandleOpenPopUpWindow(Asset selectedAsset) 
+        public void HandleOpenPopUpWindow(Asset selectedAsset)
         {
             if (selectedAsset != null)
             {
-              
+
                 metadataWindowVM.SelectedMetadata = selectedAsset.Metadata;
 
 
@@ -75,7 +75,7 @@ namespace AssetManager.ViewModels
                     DataContext = metadataWindowVM,
                 };
 
-                MetadataWindow.ShowDialog(); 
+                MetadataWindow.ShowDialog();
             }
         }
         public void OpenOverViewPage()
@@ -93,25 +93,15 @@ namespace AssetManager.ViewModels
         }
         public void OpenPerforceConfiguration()
         {
-            var configWindow = new PerforceWindow();
-            if (configWindow.ShowDialog() == true)
+            PerforceWindow = new PerforceWindow
             {
-                PerforceWindowVM perforceWindowVM = new PerforceWindowVM(_perforceRepository); 
+                DataContext = _perforceWindowVM,
 
-                var config = perforceWindowVM.PerforceConfiguration; 
+            };
+            _perforceWindowVM.CloseWindowAction = () => PerforceWindow.Close();
 
-                try
-                {
-                    _perforceRepository = new PerforceRepository(
-                        config.ServerUri, config.Username, config.Password
-                    );
-                    System.Windows.MessageBox.Show("Connected to Perforce successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show($"Failed to connect: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            PerforceWindow.ShowDialog();
+
         }
 
 

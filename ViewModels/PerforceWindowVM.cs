@@ -9,52 +9,26 @@ namespace AssetManager.ViewModels
 {
     public class PerforceWindowVM : ObservableObject
     {
-        private string _serverUri;
-        public string ServerUri
-        {
-            get => _serverUri;
-            set => SetProperty(ref _serverUri, value);
-        }
-
-        private string _username;
-        public string Username
-        {
-            get => _username;
-            set => SetProperty(ref _username, value);
-        }
-
-        private string _workspaceName;
-        public string WorkspaceName
-        {
-            get => _workspaceName;
-            set => SetProperty(ref _workspaceName, value);
-        }
-
-        public RelayCommand ConnectCommand { get; }
-
-        private PerforceRepository _perforceRepository;
+        public RelayCommand ConnectCommand { get; set; }
 
         public Action CloseWindowAction { get; set; }
 
+        private PerforceRepository _perforceRepository; 
 
-
-        public PerforceWindowVM(PerforceRepository perforceRepository)
+        public PerforceWindowVM()
         {
             ConnectCommand = new RelayCommand(ConnectToPerforce);
             _perforceConfiguration = new PerforceConfig();
-
-            _perforceRepository = perforceRepository;
-
         }
 
-        private PerforceConfig _perforceConfiguration { get; set; } 
-        public PerforceConfig PerforceConfiguration 
+        private PerforceConfig _perforceConfiguration { get; set; }
+        public PerforceConfig PerforceConfiguration
         {
             get { return _perforceConfiguration; }
             set
             {
                 _perforceConfiguration = value;
-                
+
             }
         }
 
@@ -62,20 +36,31 @@ namespace AssetManager.ViewModels
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(ServerUri) ||
-                    string.IsNullOrWhiteSpace(Username) ||
-                    string.IsNullOrWhiteSpace(WorkspaceName))
+                if (string.IsNullOrWhiteSpace(PerforceConfiguration.ServerUri) ||
+                    string.IsNullOrWhiteSpace(PerforceConfiguration.Username) ||
+                    string.IsNullOrWhiteSpace(PerforceConfiguration.WorkspaceName)
+                    )
                 {
                     System.Windows.MessageBox.Show("Please provide all required fields: Server URI, Username, and Password.",
                         "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                 
+
                     return;
                 }
 
-              
-                System.Windows.MessageBox.Show($"Saved Configuration:\nServer URI: {ServerUri}\nUsername: {Username}\nWorkspace: {WorkspaceName}",
+                _perforceRepository = new PerforceRepository(PerforceConfiguration.ServerUri, PerforceConfiguration.Username,
+                     PerforceConfiguration.Password);
+
+                System.Windows.MessageBox.Show($"Saved Configuration:\nServer URI: {PerforceConfiguration.ServerUri}\nUsername:" +
+                    $" {PerforceConfiguration.Username}\nWorkspace: {PerforceConfiguration.WorkspaceName}",
                     "Save Successful", MessageBoxButton.OK, MessageBoxImage.Information);
 
-              
+
+                
+                _perforceRepository.SyncWorkspace(PerforceConfiguration.WorkspaceName);
+                
+
                 CloseWindowAction?.Invoke();
             }
             catch (Exception ex)
