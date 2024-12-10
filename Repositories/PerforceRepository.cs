@@ -8,37 +8,36 @@ namespace AssetManager.Repositories
     {
         private Repository _repository;
 
-        private Connection _connection;
+        private const string DEPOT_PATH = "//grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png //mparniuk_Maryia_8712/grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png";
         private Server _server;
 
         public PerforceRepository(string serverUri, string username, string password)
         {
             _server = new Server(new ServerAddress(serverUri));
+            _repository = new Repository(_server);
 
-            _connection = new Connection(_server)
-            {
-                UserName = username
-            };
+        
+            _repository.Connection.UserName = username;
 
-            bool isConnected = _connection.Connect(null);
+            // Connect using the repository's connection
+            bool isConnected = _repository.Connection.Connect(null);
             if (!isConnected)
             {
                 throw new Exception("Unable to connect to the Perforce server.");
             }
 
+            // Login using the repository's connection
             if (!string.IsNullOrEmpty(password))
             {
-                _connection.Login(password);
+                _repository.Connection.Login(password);
             }
 
-
-            _repository = new Repository(_server);
-
+            // Check if connected
             if (IsConnected())
             {
                 int a = 10;
             }
-           
+
         }
 
         public bool IsConnected()
@@ -59,10 +58,8 @@ namespace AssetManager.Repositories
 
                 _repository.Connection.Client = client;
 
-
-                var fileSpec = new FileSpec(new DepotPath("//..."), null);
-
-                _repository.Connection.Client.SyncFiles(new List<FileSpec> { fileSpec }, null);
+                var smallFile = new FileSpec(new DepotPath(DEPOT_PATH), null);
+                _repository.Connection.Client.SyncFiles(new List<FileSpec> { smallFile }, null);
 
                 Console.WriteLine("Workspace synced successfully.");
             }
