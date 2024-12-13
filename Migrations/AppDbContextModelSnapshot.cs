@@ -124,6 +124,10 @@ namespace AssetManager.Migrations
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DepotPath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("FileCount")
                         .HasColumnType("INTEGER");
 
@@ -135,8 +139,24 @@ namespace AssetManager.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PerforcePassword")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PerforceUser")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ServerUri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("WasInitialized")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("WorkspaceName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

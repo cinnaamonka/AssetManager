@@ -31,7 +31,7 @@ namespace AssetManager.Views
         {
             if (sender is System.Windows.Controls.Button button && button.DataContext is Project project)
             {
-               
+
                 var viewModel = DataContext as HomePageVM;
                 viewModel.SelectedProject = project;
 
@@ -39,6 +39,19 @@ namespace AssetManager.Views
                 {
                     viewModel.RemoveProjectCommand.Execute(project);
                 }
+            }
+
+            e.Handled = true;
+        }
+
+        private void OpenPerforceConnection(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button && button.DataContext is Project project)
+            {
+                var viewModel = DataContext as HomePageVM;
+                viewModel.SelectedProject = project;
+                viewModel.OpenVersionControl();
+
             }
 
             e.Handled = true;

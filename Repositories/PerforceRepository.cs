@@ -1,17 +1,18 @@
 ﻿using Perforce.P4;
 using System.Net;
-using System.Windows;
+using System.IO;
 
 namespace AssetManager.Repositories
 {
     public class PerforceRepository
     {
         private Repository _repository;
+        private string _workspaceName;
 
-        private const string DEPOT_PATH = "//grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png //mparniuk_Maryia_8712/grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png";
+        private string _depotPath = "//grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png //mparniuk_Maryia_8712/grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png";
         private Server _server;
 
-        public PerforceRepository(string serverUri, string username, string password)
+        public PerforceRepository(string serverUri, string username, string password,string workspaceName)
         {
             _server = new Server(new ServerAddress(serverUri));
             _repository = new Repository(_server);
@@ -32,11 +33,7 @@ namespace AssetManager.Repositories
                 _repository.Connection.Login(password);
             }
 
-            // Check if connected
-            if (IsConnected())
-            {
-                int a = 10;
-            }
+            _workspaceName = workspaceName;
 
         }
 
@@ -45,9 +42,9 @@ namespace AssetManager.Repositories
             return _repository.Connection != null && _repository.Connection.Status == ConnectionStatus.Connected;
         }
 
-        public void SyncWorkspace(string workspaceName)
+        public void SyncWorkspace(string workspaceName, string selectedProjectPath)
         {
-            if(IsConnected())
+            if (IsConnected())
             {
                 var client = _repository.GetClient(workspaceName);
                 if (client == null)
@@ -55,23 +52,48 @@ namespace AssetManager.Repositories
                     throw new Exception($"Workspace '{workspaceName}' does not exist or is not accessible.");
                 }
 
-
+                // Assign the client to the repository's connection
                 _repository.Connection.Client = client;
 
-                var smallFile = new FileSpec(new DepotPath(DEPOT_PATH), null);
-                _repository.Connection.Client.SyncFiles(new List<FileSpec> { smallFile }, null);
+                // Log the client root for debugging
+                string clientRoot = _repository.Connection.Client.Root;
+                Console.WriteLine($"Client Root: {clientRoot}");
 
-                Console.WriteLine("Workspace synced successfully.");
+                // Ensure selectedProjectPath is absolute
+                if (!Path.IsPathRooted(selectedProjectPath))
+                {
+                    throw new Exception("selectedProjectPath must be an absolute path.");
+                }
+
+                // Construct the depot path (use the absolute path directly)
+                _depotPath = selectedProjectPath;
+
+                // Log the depot path for debugging
+                Console.WriteLine($"Depot Path: {_depotPath}");
+
+                try
+                {
+                    // Create a FileSpec with the absolute path
+                    var depotFileSpec = new FileSpec(new LocalPath(_depotPath), null);
+
+                    // Sync the file
+                    _repository.Connection.Client.SyncFiles(new List<FileSpec> { depotFileSpec }, null);
+
+                    Console.WriteLine($"File {_depotPath} synced successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to sync file: {ex.Message}");
+                    throw;
+                }
             }
             else
             {
                 System.Windows.MessageBox.Show("You are disconnected.");
             }
-
-         
         }
 
-    
+
 
     }
 }

@@ -13,7 +13,9 @@ namespace AssetManager.ViewModels
 
         public Action CloseWindowAction { get; set; }
 
-        private PerforceRepository _perforceRepository; 
+        private PerforceRepository _perforceRepository;
+
+        private Project _selectedProject; 
 
         public PerforceWindowVM()
         {
@@ -29,6 +31,15 @@ namespace AssetManager.ViewModels
             {
                 _perforceConfiguration = value;
 
+            }
+        }
+
+        public Project SelectedProject
+        {
+            get { return _selectedProject; }
+            set
+            {
+                _selectedProject = value;
             }
         }
 
@@ -50,7 +61,7 @@ namespace AssetManager.ViewModels
                 }
 
                 _perforceRepository = new PerforceRepository(PerforceConfiguration.ServerUri, PerforceConfiguration.Username,
-                     PerforceConfiguration.Password);
+                     PerforceConfiguration.Password, PerforceConfiguration.WorkspaceName);
 
                 System.Windows.MessageBox.Show($"Saved Configuration:\nServer URI: {PerforceConfiguration.ServerUri}\nUsername:" +
                     $" {PerforceConfiguration.Username}\nWorkspace: {PerforceConfiguration.WorkspaceName}",
@@ -58,7 +69,7 @@ namespace AssetManager.ViewModels
 
 
                 
-                _perforceRepository.SyncWorkspace(PerforceConfiguration.WorkspaceName);
+                _perforceRepository.SyncWorkspace(PerforceConfiguration.WorkspaceName, _selectedProject.Path);
                 
 
                 CloseWindowAction?.Invoke();

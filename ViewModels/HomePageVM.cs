@@ -123,7 +123,12 @@ namespace AssetManager.ViewModels
                 DateAdded = DateTime.Now,
                 FileCount = OverViewPageVM.FilteredAssets.Count,
                 Id = Projects.Count + 1,
-                Path = UnityProjectPath
+                Path = UnityProjectPath,
+                ServerUri = "",
+                WorkspaceName = "",
+                DepotPath = "",
+                PerforceUser = "",
+                PerforcePassword = ""
             };
 
             MainPageVM.AppDbContext.Projects.Add(project);
@@ -227,7 +232,7 @@ namespace AssetManager.ViewModels
 
 
         }
-        private void OpenVersionControl()
+        public void OpenVersionControl()
         {
             MainPageVM.OpenPerforceConfiguration();
         }

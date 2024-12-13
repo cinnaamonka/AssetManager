@@ -115,9 +115,6 @@
                 <TextBlock Text="Library" FontSize="16" Foreground="White"  HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
             </Border>
 
-            <Border BorderBrush="Transparent" BorderThickness="2" Margin="1">
-                <TextBlock Text="Version Control" FontSize="15" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
-            </Border>
         </StackPanel>
 
         <!--TAGS-->

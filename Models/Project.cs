@@ -17,5 +17,22 @@ namespace AssetManager.Models
         public string Path { get;set; }
 
         public bool WasInitialized { get; set; }
+
+        // Perforce-related properties
+        public string ServerUri { get; set; }
+        public string WorkspaceName { get; set; }
+        public string DepotPath { get; set; }
+        public string PerforceUser { get; set; }
+        public string PerforcePassword { get; set; }
+
+        public bool IsPerforceEnabled
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(ServerUri)
+                       && !string.IsNullOrEmpty(WorkspaceName)
+                       && !string.IsNullOrEmpty(DepotPath);
+            }
+        }
     }
 }

@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
 
         <!-- Top Menu -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" 
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch" 
                     Background="DarkBlue" Height="50" VerticalAlignment="Top">
             <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand">
                 <Border BorderThickness="2" Margin="5" Background="Transparent">
@@ -51,11 +51,7 @@
                     <TextBlock Text="Library" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
                 </Border>
             </Button>
-            <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Cursor="Hand" Command="{Binding OpenVersionControlConfigurationCommand}">
-                <Border BorderBrush="Transparent" BorderThickness="2" Margin="5">
-                <TextBlock Text="Version Control" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10"/>
-                </Border>
-          </Button>
+          
 
         </StackPanel>
 
@@ -85,7 +81,7 @@
                     <DataGridTextColumn Header="S.No" Binding="{Binding Id}" Width="50"/>
 
                     <!-- Name Column -->
-                    <DataGridTemplateColumn Header="Name" Width="300">
+                    <DataGridTemplateColumn Header="Name" Width="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" Foreground="Blue" Cursor="Hand">
@@ -107,10 +103,7 @@
                     <DataGridTemplateColumn Header="Actions" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <!--<Button Content="Delete" Width="Auto" Height="Auto" Background="Transparent" BorderBrush="Transparent"
-                    Command="{Binding DataContext.RemoveProjectCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                    CommandParameter="{Binding}">
-                            </Button>-->
+                        
                                 <Button Content="Delete" Background="Transparent" BorderBrush="Transparent"
                     Click="DeleteButton_Click">
                                 </Button>
@@ -118,7 +111,18 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                </DataGrid.Columns>
+                <DataGridTemplateColumn Header="Source Control" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+
+                            <Button Content="Perforce" Background="Transparent" BorderBrush="Transparent"
+                                    Click="OpenPerforceConnection">
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
             </DataGrid>
  
 

@@ -34,7 +34,10 @@ namespace AssetManager.ViewModels
                 _selectedProject = value;
                 OnPropertyChanged(nameof(SelectedProject));
 
-
+                if(_perforceWindowVM != null)
+                {
+                    _perforceWindowVM.SelectedProject = _selectedProject;
+                }
             }
         }
 
