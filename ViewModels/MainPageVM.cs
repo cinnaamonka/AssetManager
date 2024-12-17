@@ -18,12 +18,20 @@ namespace AssetManager.ViewModels
 
         public Page CurrentPage { get; set; }
 
-
-
         public AppDbContext AppDbContext { get; set; }
 
         private MetadataWindowVM metadataWindowVM { get; }
         private PerforceWindowVM _perforceWindowVM { get; set; }
+
+        private PerforceRepository _perforceRepository;
+        public PerforceRepository PerforceRepository
+        {
+            get { return _perforceRepository; }
+            set
+            {
+                _perforceRepository = value;
+            }
+        }
 
         private Project _selectedProject;
         public Project SelectedProject
@@ -49,18 +57,21 @@ namespace AssetManager.ViewModels
         {
             AppDbContext = new AppDbContext();
 
-            _perforceWindowVM = new PerforceWindowVM();
+          
 
             OverviewPageVM overViewPageVM = new(this);
 
             HomePageVM homePageVM = new(this, overViewPageVM);
 
             metadataWindowVM = new(this, overViewPageVM);
+            _perforceWindowVM = new (this);
 
             MainPage = new OverviewPage { DataContext = overViewPageVM };
             HomePage = new HomePage { DataContext = homePageVM };
 
             CurrentPage = HomePage;
+
+            _perforceRepository = new PerforceRepository();
         }
 
         public void HandleOpenPopUpWindow(Asset selectedAsset)
@@ -100,16 +111,24 @@ namespace AssetManager.ViewModels
             _perforceWindowVM.CloseWindowAction = () => PerforceWindow.Close();
            
              PerforceWindow.ShowDialog();
-            
-            if (SelectedProject.IsPerforceEnabled)
-            {
-                return true;
-            }
 
-            return false;
-
+            return SelectedProject.IsPerforceEnabled;
+      
         }
 
+        public void SyncProject()
+        {
+            try
+            {
+                _perforceRepository.ConnectToPerforce(SelectedProject.ServerUri, SelectedProject.PerforceUser, SelectedProject.PerforcePassword,
+                    SelectedProject.WorkspaceName);
+                _perforceWindowVM.SyncWorkspace();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+            }
+        }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Perforce.P4;
 using System.Net;
 using System.IO;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace AssetManager.Repositories
 {
@@ -12,12 +13,18 @@ namespace AssetManager.Repositories
         private string _depotPath = "//grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png //mparniuk_Maryia_8712/grpprj11/Dev/Around The Arena/Assets/ArtAssets/UI/Textures/PlayerIcon.png";
         private Server _server;
 
-        public PerforceRepository(string serverUri, string username, string password,string workspaceName)
+        public PerforceRepository() 
+        {
+          
+           
+        }
+
+        public void ConnectToPerforce(string serverUri, string username, string password, string workspaceName)
         {
             _server = new Server(new ServerAddress(serverUri));
             _repository = new Repository(_server);
 
-        
+
             _repository.Connection.UserName = username;
 
             bool isConnected = _repository.Connection.Connect(null);
@@ -32,7 +39,6 @@ namespace AssetManager.Repositories
             }
 
             _workspaceName = workspaceName;
-
         }
 
         public bool IsConnected()

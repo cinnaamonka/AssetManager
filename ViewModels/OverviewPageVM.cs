@@ -51,7 +51,7 @@ namespace AssetManager.ViewModels
             {
                 _selectedAsset = value;
                 OnPropertyChanged(nameof(SelectedAsset));
-              
+
             }
         }
 
@@ -93,7 +93,8 @@ namespace AssetManager.ViewModels
         public RelayCommand ConvertCommand { get; set; }
         public RelayCommand AddAssetCommand { get; set; }
         public RelayCommand<Asset> RemoveAssetCommand { get; set; }
-       
+
+        public RelayCommand SyncPerforceProjectCommand { get; set; }
 
         public MainPageVM MainPageVM { get; }
 
@@ -139,7 +140,7 @@ namespace AssetManager.ViewModels
             set
             {
                 _selectedTag = value;
-             
+
 
             }
         }
@@ -192,7 +193,7 @@ namespace AssetManager.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
-     
+
 
         public OverviewPageVM(MainPageVM mainPageVM)
         {
@@ -216,7 +217,8 @@ namespace AssetManager.ViewModels
             ConvertCommand = new RelayCommand(ConvertFile);
             RemoveAssetCommand = new RelayCommand<Asset>(RemoveAsset);
             AddAssetCommand = new RelayCommand(AddAsset);
-          
+            SyncPerforceProjectCommand = new RelayCommand(SyncPerforceProject);
+
 
             _assetRepository = new AssetRepository();
 
@@ -225,7 +227,7 @@ namespace AssetManager.ViewModels
                 AvailableFormats.Add(format.ToString());
             }
 
-        
+
 
         }
 
@@ -247,7 +249,7 @@ namespace AssetManager.ViewModels
             {
                 string destinationFilePath = Path.Combine(MainPageVM.SelectedProject.Path, "Assets", Path.GetFileName(filePath));
 
-                if(!File.Exists(destinationFilePath))
+                if (!File.Exists(destinationFilePath))
                 {
                     File.SetAttributes(filePath, FileAttributes.Normal);
 
@@ -264,7 +266,7 @@ namespace AssetManager.ViewModels
              );
 
                 _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
-                 
+
                 var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);
                 selectedProject.FileCount++;
 
@@ -306,14 +308,14 @@ namespace AssetManager.ViewModels
         {
             MainPageVM.AppDbContext.Assets.Update(asset);
 
-            if(asset != null)
+            if (asset != null)
             {
 
                 MainPageVM.AppDbContext.SaveChanges();
 
                 RefreshAssets();
             }
-         
+
         }
         public void RemoveAsset(Asset asset)
         {
@@ -409,10 +411,10 @@ namespace AssetManager.ViewModels
 
         private Task<string> LoadFileAsync(string filePath)
         {
-         
+
             return Task.Run(() =>
             {
-               
+
                 using (var reader = new StreamReader(filePath))
                 {
                     return reader.ReadToEnd();
@@ -437,16 +439,16 @@ namespace AssetManager.ViewModels
                     {
                         Owner = App.Current.MainWindow
                     };
-                   
+
                     imageWindow.ShowDialog();
                 }
-                else if (extension == ".obj" || extension == ".txt" )
+                else if (extension == ".obj" || extension == ".txt")
                 {
-                 
+
 
                     string content = await LoadFileAsync(filePath);
 
-                   
+
 
                     var textWindow = new TextViewerWindow(content)
                     {
@@ -454,7 +456,7 @@ namespace AssetManager.ViewModels
                     };
                     IsLoading = false;
                     textWindow.ShowDialog();
-                  
+
                 }
                 else
                 {
@@ -467,21 +469,21 @@ namespace AssetManager.ViewModels
                 IsLoading = false;
                 System.Windows.MessageBox.Show($"Error reading the file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-         
+
         }
 
 
 
         public async Task LoadAssetsFromUnityProject(Project selectedProject)
         {
-            if(_tagRepository == null)
+            if (_tagRepository == null)
             {
                 _tagRepository = new TagRepository(MainPageVM.AppDbContext, MainPageVM);
             }
 
 
             Assets = await _assetRepository.LoadAssetsFromUnityProjectAsync(selectedProject,
-                MainPageVM.AppDbContext,  _tagRepository);
+                MainPageVM.AppDbContext, _tagRepository);
             FilteredAssets = Assets;
 
             if (MainPageVM.SelectedProject != null)
@@ -519,7 +521,7 @@ namespace AssetManager.ViewModels
 
             if (!string.IsNullOrWhiteSpace(NewAssetTagName))
             {
-                await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName,NewAssetTagColor);
+                await _tagRepository.AddAssetTagAsync(SelectedAsset.Id, NewAssetTagName, NewAssetTagColor);
                 NewAssetTagName = string.Empty;
                 OnPropertyChanged(nameof(NewAssetTagName));
                 OnPropertyChanged(nameof(SelectedAsset.AssetTags));
@@ -551,7 +553,7 @@ namespace AssetManager.ViewModels
         {
             if (NewTagName == null) return;
 
-            var newTag = await _tagRepository.AddTag(NewTagName,NewTagColor);
+            var newTag = await _tagRepository.AddTag(NewTagName, NewTagColor);
 
 
             if (!string.IsNullOrWhiteSpace(NewTagName) && newTag != null)
@@ -655,6 +657,9 @@ namespace AssetManager.ViewModels
             });
         }
 
-      
+        public void SyncPerforceProject()
+        {
+            MainPageVM.SyncProject();
+        }
     }
 }
