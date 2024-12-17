@@ -37,6 +37,7 @@ namespace AssetManager.ViewModels
                 if(_perforceWindowVM != null)
                 {
                     _perforceWindowVM.SelectedProject = _selectedProject;
+                    _perforceWindowVM.AppDbContext = AppDbContext;
                 }
             }
         }
@@ -60,9 +61,6 @@ namespace AssetManager.ViewModels
             HomePage = new HomePage { DataContext = homePageVM };
 
             CurrentPage = HomePage;
-
-
-
         }
 
         public void HandleOpenPopUpWindow(Asset selectedAsset)
@@ -85,8 +83,6 @@ namespace AssetManager.ViewModels
         {
             CurrentPage = MainPage;
             OnPropertyChanged(nameof(CurrentPage));
-
-
         }
 
         public void OpenHomePage()
@@ -94,7 +90,7 @@ namespace AssetManager.ViewModels
             CurrentPage = HomePage;
             OnPropertyChanged(nameof(CurrentPage));
         }
-        public void OpenPerforceConfiguration()
+        public bool OpenPerforceConfiguration()
         {
             PerforceWindow = new PerforceWindow
             {
@@ -102,8 +98,15 @@ namespace AssetManager.ViewModels
 
             };
             _perforceWindowVM.CloseWindowAction = () => PerforceWindow.Close();
+           
+             PerforceWindow.ShowDialog();
+            
+            if (SelectedProject.IsPerforceEnabled)
+            {
+                return true;
+            }
 
-            PerforceWindow.ShowDialog();
+            return false;
 
         }
 

@@ -18,7 +18,6 @@ namespace AssetManager.Models
 
         public bool WasInitialized { get; set; }
 
-        // Perforce-related properties
         public string ServerUri { get; set; }
         public string WorkspaceName { get; set; }
         public string DepotPath { get; set; }

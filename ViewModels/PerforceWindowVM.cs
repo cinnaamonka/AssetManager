@@ -4,6 +4,7 @@ using AssetManager.Repositories;
 using System.Windows;
 using AssetManager.Models;
 using Assimp;
+using Perforce.P4;
 
 namespace AssetManager.ViewModels
 {
@@ -15,12 +16,15 @@ namespace AssetManager.ViewModels
 
         private PerforceRepository _perforceRepository;
 
-        private Project _selectedProject; 
+        private Project _selectedProject;
+
+        AppDbContext _context;
 
         public PerforceWindowVM()
         {
             ConnectCommand = new RelayCommand(ConnectToPerforce);
             _perforceConfiguration = new PerforceConfig();
+        
         }
 
         private PerforceConfig _perforceConfiguration { get; set; }
@@ -31,6 +35,15 @@ namespace AssetManager.ViewModels
             {
                 _perforceConfiguration = value;
 
+            }
+        }
+
+        public AppDbContext AppDbContext
+        {
+            get { return _context; }
+            set
+            {
+                _context = value;
             }
         }
 
@@ -55,7 +68,7 @@ namespace AssetManager.ViewModels
                     System.Windows.MessageBox.Show("Please provide all required fields: Server URI, Username, and Password.",
                         "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-                 
+
 
                     return;
                 }
@@ -68,9 +81,24 @@ namespace AssetManager.ViewModels
                     "Save Successful", MessageBoxButton.OK, MessageBoxImage.Information);
 
 
-                
+
                 _perforceRepository.SyncWorkspace(PerforceConfiguration.WorkspaceName, _selectedProject.Path);
-                
+
+
+
+                var localProject = _context.Projects.Local.FirstOrDefault(p => p.Id == _selectedProject.Id);
+
+                localProject.ServerUri = PerforceConfiguration.ServerUri;
+                localProject.PerforceUser = PerforceConfiguration.Username;
+                localProject.WorkspaceName = PerforceConfiguration.WorkspaceName;
+                localProject.DepotPath = new LocalPath(_selectedProject.Path).ToString();
+                localProject.PerforcePassword = PerforceConfiguration.Password;
+
+                _context.Projects.Update(localProject);
+                _context.SaveChanges();
+                _selectedProject = localProject;
+
+                OnPropertyChanged(nameof(_selectedProject));
 
                 CloseWindowAction?.Invoke();
             }

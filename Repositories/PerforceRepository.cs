@@ -20,14 +20,12 @@ namespace AssetManager.Repositories
         
             _repository.Connection.UserName = username;
 
-            // Connect using the repository's connection
             bool isConnected = _repository.Connection.Connect(null);
             if (!isConnected)
             {
                 throw new Exception("Unable to connect to the Perforce server.");
             }
 
-            // Login using the repository's connection
             if (!string.IsNullOrEmpty(password))
             {
                 _repository.Connection.Login(password);
@@ -52,31 +50,24 @@ namespace AssetManager.Repositories
                     throw new Exception($"Workspace '{workspaceName}' does not exist or is not accessible.");
                 }
 
-                // Assign the client to the repository's connection
                 _repository.Connection.Client = client;
 
-                // Log the client root for debugging
                 string clientRoot = _repository.Connection.Client.Root;
                 Console.WriteLine($"Client Root: {clientRoot}");
 
-                // Ensure selectedProjectPath is absolute
                 if (!Path.IsPathRooted(selectedProjectPath))
                 {
                     throw new Exception("selectedProjectPath must be an absolute path.");
                 }
 
-                // Construct the depot path (use the absolute path directly)
                 _depotPath = selectedProjectPath;
 
-                // Log the depot path for debugging
                 Console.WriteLine($"Depot Path: {_depotPath}");
 
                 try
                 {
-                    // Create a FileSpec with the absolute path
                     var depotFileSpec = new FileSpec(new LocalPath(_depotPath), null);
 
-                    // Sync the file
                     _repository.Connection.Client.SyncFiles(new List<FileSpec> { depotFileSpec }, null);
 
                     Console.WriteLine($"File {_depotPath} synced successfully.");
