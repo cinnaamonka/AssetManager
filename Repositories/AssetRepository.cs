@@ -124,7 +124,7 @@ namespace AssetManager.Repositories
 
                 if (!string.IsNullOrEmpty(convertedFilePath))
                 {
-                    var asset = CreateAsset(convertedFilePath, context.Projects.FirstOrDefault(project => project.Id == selectedAsset.ProjectId),selectedToFormat, context);
+                    var asset = CreateAsset(convertedFilePath, context.Projects.FirstOrDefault(project => project.Id == selectedAsset.ProjectId), selectedToFormat, context);
                     SaveAsset(asset, context);
                 }
             }
@@ -153,7 +153,8 @@ namespace AssetManager.Repositories
                 Format = fileInfo.Extension,
                 FileSize = Math.Round((fileInfo.Length / 1024.0), 0),
                 DateCreated = fileInfo.CreationTimeUtc,
-                DateLastChanged = fileInfo.LastAccessTimeUtc
+                DateLastChanged = fileInfo.LastAccessTimeUtc,
+                Author = String.Empty
             };
 
             asset.Metadata = metadata;
@@ -268,7 +269,7 @@ namespace AssetManager.Repositories
             await context.SaveChangesAsync();
         }
 
-        public string GenerateThumbnail(ref Asset asset, string extension,string currentProjectName)
+        public string GenerateThumbnail(ref Asset asset, string extension, string currentProjectName)
         {
             switch (extension.ToLower())
             {
@@ -301,7 +302,7 @@ namespace AssetManager.Repositories
                     {
                         string objFilePath = FileConverter.ConvertFbxToObj(
                             asset.FilePath,
-                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                             "Projects",
                             currentProjectName,
                             "ObjFiles")
@@ -333,7 +334,7 @@ namespace AssetManager.Repositories
         }
 
 
-        private string GeneratePngThumbnail(string objFilePath,string selectedProjectName)
+        private string GeneratePngThumbnail(string objFilePath, string selectedProjectName)
         {
 
             string originalThumbnailPath = Path.ChangeExtension(objFilePath, ".png");
@@ -417,7 +418,7 @@ namespace AssetManager.Repositories
                 bitmap.BeginInit();
                 bitmap.UriSource = new Uri(filePath);
                 bitmap.DecodePixelWidth = thumbnailSize;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad; 
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
 
                 bitmap.EndInit();
                 bitmap.Freeze();

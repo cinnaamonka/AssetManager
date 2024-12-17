@@ -108,6 +108,7 @@ namespace AssetManager.Migrations
                     Format = table.Column<string>(type: "TEXT", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DateLastChanged = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Author = table.Column<string>(type: "TEXT", nullable: false),
                     AssetId = table.Column<int>(type: "INTEGER", nullable: false),
                     VertexCount = table.Column<int>(type: "INTEGER", nullable: false),
                     FaceCount = table.Column<int>(type: "INTEGER", nullable: false)

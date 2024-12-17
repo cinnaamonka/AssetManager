@@ -660,6 +660,12 @@ namespace AssetManager.ViewModels
         public void SyncPerforceProject()
         {
             MainPageVM.SyncProject();
+
+            Assets = MainPageVM.AppDbContext.Assets.ToList();
+
+            OnPropertyChanged(nameof(Assets));
+
+           
         }
     }
 }

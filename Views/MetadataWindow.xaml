@@ -81,6 +81,11 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
+                    <TextBlock Text="Last changed by:" FontWeight="SemiBold" Foreground="#555" />
+                    <TextBlock Text="{Binding SelectedMetadata.Author}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="2,0,0,2">
                     <TextBlock Text="Last Changes:" FontWeight="SemiBold" Foreground="#555" />
                     <TextBlock Text="{Binding SelectedMetadata.DateLastChanged}" FontSize="14" Foreground="#333" Margin="5,0,0,0"/>
                 </StackPanel>

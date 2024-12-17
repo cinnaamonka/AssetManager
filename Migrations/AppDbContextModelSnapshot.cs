@@ -61,6 +61,10 @@ namespace AssetManager.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("TEXT");
 

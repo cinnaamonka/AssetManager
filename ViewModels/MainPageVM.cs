@@ -123,6 +123,24 @@ namespace AssetManager.ViewModels
                 _perforceRepository.ConnectToPerforce(SelectedProject.ServerUri, SelectedProject.PerforceUser, SelectedProject.PerforcePassword,
                     SelectedProject.WorkspaceName);
                 _perforceWindowVM.SyncWorkspace();
+
+                var assets = AppDbContext.Assets;
+
+                Parallel.ForEach(assets, asset =>
+                {
+                    var changeDetails = _perforceRepository.GetLastChangeDetails(asset.FilePath);
+
+                    asset.Metadata.Author = changeDetails.LastChangeMadeByUser;
+                    asset.Metadata.DateLastChanged = changeDetails.LastChanged;
+
+                    lock (AppDbContext)
+                    {
+                        AppDbContext.Assets.Update(asset);
+                    }
+                });
+
+            
+
             }
             catch (Exception ex)
             {
