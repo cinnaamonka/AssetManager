@@ -21,7 +21,12 @@ namespace AssetManager.Migrations
                     DateAdded = table.Column<DateTime>(type: "TEXT", nullable: false),
                     FileCount = table.Column<int>(type: "INTEGER", nullable: false),
                     Path = table.Column<string>(type: "TEXT", nullable: false),
-                    WasInitialized = table.Column<bool>(type: "INTEGER", nullable: false)
+                    WasInitialized = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ServerUri = table.Column<string>(type: "TEXT", nullable: false),
+                    WorkspaceName = table.Column<string>(type: "TEXT", nullable: false),
+                    DepotPath = table.Column<string>(type: "TEXT", nullable: false),
+                    PerforceUser = table.Column<string>(type: "TEXT", nullable: false),
+                    PerforcePassword = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,6 +108,7 @@ namespace AssetManager.Migrations
                     Format = table.Column<string>(type: "TEXT", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DateLastChanged = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Author = table.Column<string>(type: "TEXT", nullable: false),
                     AssetId = table.Column<int>(type: "INTEGER", nullable: false),
                     VertexCount = table.Column<int>(type: "INTEGER", nullable: false),
                     FaceCount = table.Column<int>(type: "INTEGER", nullable: false)

@@ -19,6 +19,12 @@ namespace AssetManager.AssetHelpers
             Other
         }
 
+        public struct ProjectPerforceDetails
+        {
+            public System.DateTime LastChanged;
+            public string LastChangeMadeByUser;
+        }
+
         public static List<string> AvailableFileFormats { get; } = new List<string>
     {
         ".png",

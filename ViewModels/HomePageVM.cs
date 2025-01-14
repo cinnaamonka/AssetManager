@@ -3,6 +3,8 @@ using AssetManager.Models;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows.Media;
+using System.Windows.Data;
 
 namespace AssetManager.ViewModels
 {
@@ -19,6 +21,21 @@ namespace AssetManager.ViewModels
         public RelayCommand<Project> RemoveProjectCommand { get; set; }
         public AsyncRelayCommand BrowseProjectFiles { get; set; }
         public AsyncRelayCommand OpenProjectDetailsCommand { get; }
+        public RelayCommand OpenVersionControlConfigurationCommand { get; set; }
+
+        private string _sourceControlStatus = "Perforce";
+        public string SourceControlStatus
+        {
+            get => _sourceControlStatus;
+            set => SetProperty(ref _sourceControlStatus, value);
+        }
+
+        private System.Windows.Media.Brush _sourceControlBackground = System.Windows.Media.Brushes.Transparent;
+        public System.Windows.Media.Brush SourceControlBackground
+        {
+            get => _sourceControlBackground;
+            set => SetProperty(ref _sourceControlBackground, value);
+        }
 
         private ObservableCollection<Project> _projects;
         public ObservableCollection<Project> Projects
@@ -76,6 +93,8 @@ namespace AssetManager.ViewModels
             BrowseProjectFiles = new AsyncRelayCommand(AddProject);
             OpenProjectDetailsCommand = new AsyncRelayCommand(OpenProjectLibraryAsync);
             RemoveProjectCommand = new RelayCommand<Project>(RemoveProject);
+            OpenVersionControlConfigurationCommand = new RelayCommand(OpenVersionControl);
+
             Projects = new ObservableCollection<Project>();
             LoadProjects();
 
@@ -115,7 +134,12 @@ namespace AssetManager.ViewModels
                 DateAdded = DateTime.Now,
                 FileCount = OverViewPageVM.FilteredAssets.Count,
                 Id = Projects.Count + 1,
-                Path = UnityProjectPath
+                Path = UnityProjectPath,
+                ServerUri = String.Empty,
+                WorkspaceName = String.Empty,
+                DepotPath = String.Empty,
+                PerforceUser = String.Empty,
+                PerforcePassword = String.Empty
             };
 
             MainPageVM.AppDbContext.Projects.Add(project);
@@ -219,6 +243,18 @@ namespace AssetManager.ViewModels
 
 
         }
+        public void OpenVersionControl()
+        {
+            if(MainPageVM.OpenPerforceConfiguration())
+            {
+                CollectionViewSource.GetDefaultView(Projects).Refresh();
+                OnPropertyChanged(nameof(Projects));
+            }
+
+        
+        }
+
+      
     }
 }
 

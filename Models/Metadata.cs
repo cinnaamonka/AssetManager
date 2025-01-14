@@ -17,6 +17,8 @@ namespace AssetManager.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateLastChanged { get; set; }
 
+        public string Author { get; set; }
+
         public int AssetId { get; set; }
         public Asset Asset { get; set; }
 
