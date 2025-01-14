@@ -81,7 +81,7 @@ namespace AssetManager.Repositories
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to sync file: {ex.Message}");
+                    System.Windows.MessageBox.Show("You are disconnected from Perforce.");
                     throw;
                 }
             }

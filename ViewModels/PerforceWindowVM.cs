@@ -70,7 +70,7 @@ namespace AssetManager.ViewModels
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error during sync: {ex.Message}",
+                System.Windows.MessageBox.Show($"Error during sync: Project not connected to Perforce",
                                        "Sync Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

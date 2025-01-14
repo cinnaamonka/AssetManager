@@ -122,6 +122,7 @@ namespace AssetManager.Repositories
             {
                 string convertedFilePath = conversionFunc(selectedAsset.FilePath);
 
+
                 if (!string.IsNullOrEmpty(convertedFilePath))
                 {
                     var asset = CreateAsset(convertedFilePath, context.Projects.FirstOrDefault(project => project.Id == selectedAsset.ProjectId), selectedToFormat, context);
@@ -154,7 +155,7 @@ namespace AssetManager.Repositories
                 FileSize = Math.Round((fileInfo.Length / 1024.0), 0),
                 DateCreated = fileInfo.CreationTimeUtc,
                 DateLastChanged = fileInfo.LastAccessTimeUtc,
-                Author = String.Empty
+                Author = selectedProject.PerforceUser
             };
 
             asset.Metadata = metadata;

@@ -265,6 +265,10 @@ namespace AssetManager.ViewModels
                  MainPageVM.AppDbContext
              );
 
+                var existingAsset = MainPageVM.AppDbContext.Assets.FirstOrDefault(asset => asset.FileName == newAsset.FileName);
+                if (existingAsset != null) return;
+              
+
                 _assetRepository.SaveAsset(newAsset, MainPageVM.AppDbContext);
 
                 var selectedProject = MainPageVM.AppDbContext.Projects.FirstOrDefault(p => p.Id == MainPageVM.SelectedProject.Id);

@@ -51,8 +51,6 @@ namespace AssetManager.ViewModels
         }
 
 
-
-
         public MainPageVM()
         {
             AppDbContext = new AppDbContext();
@@ -79,8 +77,7 @@ namespace AssetManager.ViewModels
             if (selectedAsset != null)
             {
 
-                metadataWindowVM.SelectedMetadata = selectedAsset.Metadata;
-
+                metadataWindowVM.SelectedMetadata = AppDbContext.Assets.FirstOrDefault(asset => asset.FileName == selectedAsset.FileName)?.Metadata;
 
                 MetadataWindow = new MetadataWindow
                 {
@@ -136,11 +133,12 @@ namespace AssetManager.ViewModels
                     lock (AppDbContext)
                     {
                         AppDbContext.Assets.Update(asset);
+                      
                     }
                 });
 
             
-
+               
             }
             catch (Exception ex)
             {
